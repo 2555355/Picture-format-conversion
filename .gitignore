@@ -1,0 +1,31 @@
+# Build output
+target/
+*.class
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+.settings/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+logs/
+
+# Maven wrapper
+.mvn/
+mvnw
+mvnw.cmd
+
+# Temporary files
+*.tmp
+*.bak
+*.swp

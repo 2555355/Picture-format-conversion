@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+      <defs>
+        <linearGradient id="g_crop" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#ec4899"/>
+          <stop offset="100%" stop-color="#a855f7"/>
+        </linearGradient>
+      </defs>
+      <rect width="120" height="120" rx="20" fill="url(#g_crop)" opacity="0.15"/>
+      <rect width="120" height="120" rx="20" fill="none" stroke="url(#g_crop)" stroke-width="1.5" opacity="0.4"/>
+      <g transform="translate(60 60)">
+        <g stroke="#f472b6" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M -20 -8 L -20 -20 L -8 -20"/>
+      <path d="M 8 -20 L 20 -20 L 20 -8"/>
+      <path d="M 20 8 L 20 20 L 8 20"/>
+      <path d="M -8 20 L -20 20 L -20 8"/>
+    </g>
+      </g>
+    </svg>

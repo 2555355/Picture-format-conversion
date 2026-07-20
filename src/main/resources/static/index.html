@@ -1,0 +1,1810 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Studio · 图片工坊</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-0: #07070d;
+            --bg-1: #0d0d18;
+            --bg-2: #15151f;
+            --bg-3: #1f1f2c;
+            --surface: rgba(20, 20, 32, 0.7);
+            --surface-2: rgba(30, 30, 45, 0.8);
+            --surface-3: rgba(40, 40, 58, 0.9);
+            --border: rgba(255, 255, 255, 0.08);
+            --border-2: rgba(255, 255, 255, 0.16);
+            --text: #f5f5fa;
+            --text-dim: #a1a1b5;
+            --text-faint: #6b6b80;
+            --primary: #8b5cf6;
+            --primary-2: #ec4899;
+            --primary-3: #06b6d4;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --danger: #ef4444;
+            --gradient-1: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #f97316 100%);
+            --gradient-2: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%);
+            --gradient-3: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
+            --gradient-cool: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
+            --shadow-sm: 0 2px 8px rgba(0,0,0,0.3);
+            --shadow-md: 0 8px 32px rgba(0,0,0,0.4);
+            --shadow-lg: 0 24px 60px rgba(0,0,0,0.5);
+            --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.3);
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html, body { height: 100%; }
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: var(--bg-0);
+            color: var(--text);
+            min-height: 100vh;
+            overflow: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
+        }
+        /* Layered backgrounds: hero image + radial orbs + film grain noise */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url('/images/hero-bg.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.55;
+            filter: blur(0px) saturate(1.1);
+            z-index: -3;
+            pointer-events: none;
+        }
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: url('/images/noise.png');
+            background-size: 200px 200px;
+            background-repeat: repeat;
+            opacity: 0.6;
+            mix-blend-mode: overlay;
+            z-index: -2;
+            pointer-events: none;
+        }
+        .vignette {
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse at center, transparent 0%, rgba(7,7,13,0.5) 70%, rgba(7,7,13,0.9) 100%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .app {
+            position: relative;
+            z-index: 1;
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            grid-template-rows: 72px 1fr;
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* Header */
+        .header {
+            grid-column: 1 / -1;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 24px;
+            background: rgba(13, 13, 24, 0.65);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-bottom: 1px solid var(--border);
+            z-index: 10;
+            position: relative;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; right: 0; height: 1px;
+            background: linear-gradient(90deg, transparent, var(--primary), var(--primary-2), var(--primary-3), transparent);
+            opacity: 0.4;
+        }
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .logo-icon {
+            width: 44px;
+            height: 44px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            filter: drop-shadow(0 4px 16px rgba(139, 92, 246, 0.5));
+            transition: transform 0.3s;
+        }
+        .logo-icon:hover { transform: rotate(-8deg) scale(1.05); }
+        .logo-icon img { width: 100%; height: 100%; }
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+        .logo-title {
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: -0.02em;
+            background: var(--gradient-1);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .logo-sub {
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 500;
+            margin-top: 2px;
+            letter-spacing: 0.02em;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .header-btn {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 9px 16px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            transition: all 0.2s;
+            font-family: inherit;
+            backdrop-filter: blur(10px);
+        }
+        .header-btn:hover { background: var(--surface-3); border-color: var(--border-2); transform: translateY(-1px); }
+        .header-btn.primary {
+            background: var(--gradient-1);
+            border: none;
+            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5);
+            color: white;
+            font-weight: 600;
+        }
+        .header-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.6); }
+        .header-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .header-btn svg { width: 14px; height: 14px; fill: currentColor; }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(13, 13, 24, 0.6);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            overflow-x: hidden;
+            padding: 20px 14px;
+            position: relative;
+        }
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-track { background: transparent; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }
+        .sidebar::-webkit-scrollbar-thumb:hover { background: var(--border-2); }
+
+        .sidebar-section {
+            margin-bottom: 22px;
+            position: relative;
+        }
+        .sidebar-section-bg {
+            position: absolute;
+            inset: -8px -10px -8px -10px;
+            background-size: cover;
+            background-position: center;
+            opacity: 0.08;
+            border-radius: 14px;
+            z-index: -1;
+            mask-image: linear-gradient(180deg, black 0%, transparent 100%);
+        }
+        .sidebar-section-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 0 8px;
+            margin-bottom: 10px;
+        }
+        .sidebar-section-icon {
+            width: 16px;
+            height: 16px;
+            opacity: 0.7;
+        }
+        .sidebar-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+        .sidebar-section-line {
+            flex: 1;
+            height: 1px;
+            background: linear-gradient(90deg, var(--border-2), transparent);
+            margin-left: 6px;
+        }
+        .tool-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        .tool-btn {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 14px 8px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: inherit;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            font-size: 11px;
+            font-weight: 500;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        .tool-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: var(--gradient-1);
+            opacity: 0;
+            transition: opacity 0.25s;
+            z-index: -1;
+        }
+        .tool-btn::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 2px;
+            background: var(--gradient-1);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s;
+        }
+        .tool-btn:hover { border-color: var(--border-2); transform: translateY(-3px); box-shadow: var(--shadow-md); }
+        .tool-btn:hover::after { transform: scaleX(1); }
+        .tool-btn.active {
+            background: var(--gradient-1);
+            border-color: transparent;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
+            transform: translateY(-2px);
+        }
+        .tool-btn.active::after { transform: scaleX(1); }
+        .tool-btn-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            background: var(--bg-3);
+            transition: background 0.25s;
+        }
+        .tool-btn.active .tool-btn-icon { background: rgba(255,255,255,0.2); }
+        .tool-btn-icon img { width: 22px; height: 22px; }
+        .tool-btn-label { position: relative; z-index: 1; }
+
+        /* Main canvas area */
+        .main {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            position: relative;
+        }
+        .canvas-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 28px;
+            border-bottom: 1px solid var(--border);
+            background: rgba(13, 13, 24, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        .toolbar-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+        }
+        .info-chip {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            padding: 7px 12px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 12px;
+            color: var(--text-dim);
+            backdrop-filter: blur(10px);
+        }
+        .info-chip strong { color: var(--text); font-weight: 600; }
+        .info-chip svg { width: 13px; height: 13px; fill: currentColor; opacity: 0.7; }
+        .toolbar-tabs {
+            display: flex;
+            gap: 4px;
+            background: var(--surface-2);
+            padding: 4px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+        .tab-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-dim);
+            padding: 7px 16px;
+            border-radius: 9px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: inherit;
+        }
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+        }
+
+        .canvas-area {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 32px;
+            position: relative;
+            overflow: auto;
+        }
+        .canvas {
+            width: 100%;
+            height: 100%;
+            background-color: rgba(13, 13, 24, 0.4);
+            background-image:
+                linear-gradient(45deg, rgba(255,255,255,0.025) 25%, transparent 25%),
+                linear-gradient(-45deg, rgba(255,255,255,0.025) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(255,255,255,0.025) 75%),
+                linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.025) 75%);
+            background-size: 24px 24px;
+            background-position: 0 0, 0 12px, 12px -12px, -12px 0;
+            border-radius: 20px;
+            border: 1px solid var(--border-2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(20px);
+            box-shadow: var(--shadow-md);
+        }
+        .canvas img {
+            max-width: 92%;
+            max-height: 92%;
+            object-fit: contain;
+            border-radius: 12px;
+            box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+            animation: imageFadeIn 0.4s ease-out;
+        }
+        @keyframes imageFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: none; }
+        }
+        .canvas-placeholder {
+            text-align: center;
+            color: var(--text-faint);
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+        .canvas-placeholder-illust {
+            width: 200px;
+            height: 200px;
+            filter: drop-shadow(0 20px 40px rgba(139, 92, 246, 0.3));
+            animation: float 6s ease-in-out infinite;
+        }
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        .canvas-placeholder h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            margin-bottom: 4px;
+            letter-spacing: -0.02em;
+        }
+        .canvas-placeholder p { font-size: 14px; color: var(--text-dim); max-width: 360px; line-height: 1.6; }
+        .canvas-placeholder-features {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 8px;
+        }
+        .canvas-placeholder-features span {
+            padding: 6px 12px;
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            font-size: 11px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+        .select-file-btn {
+            background: var(--gradient-1);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 14px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-family: inherit;
+            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
+            transition: all 0.2s;
+            margin-top: 8px;
+        }
+        .select-file-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(139, 92, 246, 0.6); }
+        .select-file-btn svg { width: 18px; height: 18px; fill: currentColor; }
+
+        .drop-overlay {
+            position: absolute;
+            inset: 16px;
+            background: rgba(139, 92, 246, 0.2);
+            border: 3px dashed var(--primary);
+            border-radius: 16px;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 5;
+            backdrop-filter: blur(8px);
+        }
+        .drop-overlay.active { display: flex; animation: pulse 1.5s ease-in-out infinite; }
+        @keyframes pulse {
+            0%, 100% { box-shadow: inset 0 0 60px rgba(139, 92, 246, 0.2); }
+            50% { box-shadow: inset 0 0 100px rgba(139, 92, 246, 0.4); }
+        }
+        .drop-overlay-content {
+            text-align: center;
+            color: var(--text);
+        }
+        .drop-overlay-content svg { width: 64px; height: 64px; fill: var(--primary); margin-bottom: 12px; }
+        .drop-overlay-content h2 { font-size: 24px; font-weight: 700; }
+
+        /* Properties panel */
+        .properties {
+            position: fixed;
+            top: 72px;
+            right: 0;
+            bottom: 0;
+            width: 380px;
+            background: rgba(13, 13, 24, 0.85);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border-left: 1px solid var(--border);
+            padding: 24px;
+            overflow-y: auto;
+            transform: translateX(100%);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 20;
+            position: relative;
+        }
+        .properties::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            background: var(--gradient-1);
+            opacity: 0.6;
+        }
+        .properties.open { transform: translateX(0); }
+        .properties::-webkit-scrollbar { width: 6px; }
+        .properties::-webkit-scrollbar-track { background: transparent; }
+        .properties::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }
+
+        .properties-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 24px;
+            padding-bottom: 18px;
+            border-bottom: 1px solid var(--border);
+        }
+        .properties-title {
+            font-size: 17px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            letter-spacing: -0.01em;
+        }
+        .properties-title-icon {
+            width: 40px;
+            height: 40px;
+            background: var(--gradient-1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+            flex-shrink: 0;
+        }
+        .properties-title-icon img { width: 24px; height: 24px; }
+        .close-btn {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            width: 34px;
+            height: 34px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .close-btn:hover { background: var(--surface-3); color: var(--text); transform: rotate(90deg); }
+        .close-btn svg { width: 14px; height: 14px; fill: currentColor; }
+
+        .field {
+            margin-bottom: 18px;
+        }
+        .field-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-dim);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+        .field-value {
+            color: var(--primary);
+            font-weight: 700;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 12px;
+            text-transform: none;
+            padding: 2px 8px;
+            background: rgba(139, 92, 246, 0.12);
+            border-radius: 6px;
+        }
+        .field-input,
+        .field-select {
+            width: 100%;
+            padding: 11px 14px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-size: 14px;
+            font-family: inherit;
+            transition: all 0.2s;
+        }
+        .field-input:focus,
+        .field-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
+            background: var(--bg-3);
+        }
+        .field-select {
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a1a1b5'><path d='M7 10l5 5 5-5z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 10px center;
+            background-size: 20px;
+            padding-right: 36px;
+            cursor: pointer;
+        }
+        .field-select option { background: var(--bg-2); color: var(--text); }
+        .field-range {
+            width: 100%;
+            -webkit-appearance: none;
+            appearance: none;
+            height: 6px;
+            background: var(--bg-3);
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+        }
+        .field-range::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: var(--gradient-1);
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(139, 92, 246, 0.6);
+            transition: transform 0.15s;
+        }
+        .field-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
+        .field-range::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: var(--primary);
+            border-radius: 50%;
+            cursor: pointer;
+            border: none;
+        }
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+        .color-input-wrap {
+            display: flex;
+            gap: 8px;
+        }
+        .color-input-wrap input[type="color"] {
+            width: 46px;
+            height: 44px;
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            cursor: pointer;
+            padding: 4px;
+        }
+        .color-input-wrap input[type="text"] { flex: 1; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; }
+        .color-input-wrap input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-input-wrap input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
+
+        .btn {
+            width: 100%;
+            padding: 13px 16px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            letter-spacing: 0.01em;
+        }
+        .btn-primary {
+            background: var(--gradient-1);
+            color: white;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
+        }
+        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(139, 92, 246, 0.55); }
+        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
+        .btn-secondary {
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(10px);
+        }
+        .btn-secondary:hover { background: var(--surface-3); border-color: var(--border-2); }
+        .btn-group { display: flex; gap: 8px; }
+        .btn-group .btn { flex: 1; }
+
+        /* Loading overlay */
+        .loader {
+            position: absolute;
+            inset: 0;
+            background: rgba(7, 7, 13, 0.8);
+            backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+            border-radius: 20px;
+        }
+        .loader.active { display: flex; }
+        .loader-content { text-align: center; }
+        .spinner {
+            width: 56px;
+            height: 56px;
+            border: 3px solid var(--border-2);
+            border-top-color: var(--primary);
+            border-right-color: var(--primary-2);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto 14px;
+        }
+        .loader-text {
+            font-size: 13px;
+            color: var(--text-dim);
+            font-weight: 500;
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        /* Toast notifications */
+        .toast-container {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .toast {
+            min-width: 300px;
+            padding: 14px 18px;
+            border-radius: 14px;
+            color: white;
+            font-size: 13px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid rgba(255,255,255,0.1);
+            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .toast.success { background: rgba(16, 185, 129, 0.95); }
+        .toast.error { background: rgba(239, 68, 68, 0.95); }
+        .toast.info { background: rgba(6, 182, 212, 0.95); }
+        .toast svg { width: 18px; height: 18px; fill: white; flex-shrink: 0; }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: none; opacity: 1; } }
+
+        /* Result area */
+        .result-area {
+            width: 100%;
+            height: 100%;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            overflow: auto;
+        }
+        .ascii-box {
+            background: #000;
+            color: #00ff88;
+            padding: 20px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 8px;
+            line-height: 1;
+            white-space: pre;
+            overflow: auto;
+            flex: 1;
+            border: 1px solid var(--border);
+        }
+        .base64-box {
+            background: var(--bg-2);
+            border: 1px solid var(--border);
+            padding: 16px;
+            border-radius: 12px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 11px;
+            word-break: break-all;
+            overflow: auto;
+            flex: 1;
+            color: var(--text-dim);
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+            gap: 12px;
+            padding: 4px;
+        }
+        .info-card {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            padding: 18px;
+            border-radius: 14px;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+        }
+        .info-card::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; height: 3px;
+            background: var(--gradient-1);
+        }
+        .info-card-label {
+            font-size: 11px;
+            color: var(--text-faint);
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            font-weight: 600;
+        }
+        .info-card-value {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text);
+            margin-top: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            letter-spacing: -0.02em;
+        }
+        .info-card-value small { font-size: 12px; color: var(--text-dim); font-weight: 500; margin-left: 4px; }
+
+        .wm-file-zone {
+            background: var(--bg-2);
+            border: 2px dashed var(--border-2);
+            border-radius: 12px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 13px;
+            color: var(--text-dim);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        .wm-file-zone:hover { border-color: var(--primary); background: var(--bg-3); color: var(--text); }
+        .wm-file-zone svg { width: 24px; height: 24px; fill: currentColor; }
+
+        /* Mobile responsive */
+        @media (max-width: 1100px) {
+            .properties { width: 340px; }
+        }
+        @media (max-width: 900px) {
+            .app { grid-template-columns: 90px 1fr; }
+            .tool-grid { grid-template-columns: 1fr; }
+            .tool-btn { padding: 10px 4px; font-size: 10px; gap: 4px; }
+            .tool-btn-icon { width: 28px; height: 28px; }
+            .properties { width: 100%; }
+            .sidebar-section-title, .sidebar-section-line, .sidebar-section-icon { display: none; }
+            .logo-text { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="vignette"></div>
+    <div class="app">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <div class="logo-icon"><img src="/images/logo.svg" alt="IS"></div>
+                <div class="logo-text">
+                    <div class="logo-title">Image Studio</div>
+                    <div class="logo-sub">专业图片处理工作台 · 20+ 种工具</div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button class="header-btn" id="newFileBtn">
+                    <svg viewBox="0 0 24 24"><path d="M19 13v6H5v-6H3v8h18v-8h-2zm-6 .67l2.59-2.58L17 12.5l-5 5-5-5 1.41-1.41L11 13.67V3h2v10.67z"/></svg>
+                    新建
+                </button>
+                <button class="header-btn" id="useAsInputBtn" disabled>
+                    <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
+                    套用为输入
+                </button>
+                <button class="header-btn primary" id="downloadBtn" disabled>
+                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
+                    下载结果
+                </button>
+            </div>
+        </header>
+
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-section" data-bg="basic">
+                <div class="sidebar-section-bg" style="background-image:url('/images/cat-basic.jpg')"></div>
+                <div class="sidebar-section-header">
+                    <svg class="sidebar-section-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
+                    <div class="sidebar-section-title">基础工具</div>
+                    <div class="sidebar-section-line"></div>
+                </div>
+                <div class="tool-grid">
+                    <button class="tool-btn" data-tool="convert">
+                        <div class="tool-btn-icon"><img src="/images/tool-convert.svg" alt=""></div>
+                        <div class="tool-btn-label">格式转换</div>
+                    </button>
+                    <button class="tool-btn" data-tool="resize">
+                        <div class="tool-btn-icon"><img src="/images/tool-resize.svg" alt=""></div>
+                        <div class="tool-btn-label">缩放</div>
+                    </button>
+                    <button class="tool-btn" data-tool="crop">
+                        <div class="tool-btn-icon"><img src="/images/tool-crop.svg" alt=""></div>
+                        <div class="tool-btn-label">裁剪</div>
+                    </button>
+                    <button class="tool-btn" data-tool="rotate">
+                        <div class="tool-btn-icon"><img src="/images/tool-rotate.svg" alt=""></div>
+                        <div class="tool-btn-label">旋转/翻转</div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-section" data-bg="filter">
+                <div class="sidebar-section-bg" style="background-image:url('/images/cat-filter.jpg')"></div>
+                <div class="sidebar-section-header">
+                    <svg class="sidebar-section-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM7 13h2v-2H7v2zm4-4h2V7h-2v2zm0 4h2v-2h-2v2zm4 0h2v-2h-2v2z"/></svg>
+                    <div class="sidebar-section-title">色彩滤镜</div>
+                    <div class="sidebar-section-line"></div>
+                </div>
+                <div class="tool-grid">
+                    <button class="tool-btn" data-tool="filters">
+                        <div class="tool-btn-icon"><img src="/images/tool-filter.svg" alt=""></div>
+                        <div class="tool-btn-label">滤镜</div>
+                    </button>
+                    <button class="tool-btn" data-tool="adjust">
+                        <div class="tool-btn-icon"><img src="/images/tool-adjust.svg" alt=""></div>
+                        <div class="tool-btn-label">色彩调整</div>
+                    </button>
+                    <button class="tool-btn" data-tool="effects">
+                        <div class="tool-btn-icon"><img src="/images/tool-effects.svg" alt=""></div>
+                        <div class="tool-btn-label">艺术效果</div>
+                    </button>
+                    <button class="tool-btn" data-tool="blur">
+                        <div class="tool-btn-icon"><img src="/images/tool-blur.svg" alt=""></div>
+                        <div class="tool-btn-label">模糊/锐化</div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-section" data-bg="decorate">
+                <div class="sidebar-section-bg" style="background-image:url('/images/cat-decorate.jpg')"></div>
+                <div class="sidebar-section-header">
+                    <svg class="sidebar-section-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 11h-1V3c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v8H3c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2zM6 3h12v8H6V3z"/></svg>
+                    <div class="sidebar-section-title">装饰</div>
+                    <div class="sidebar-section-line"></div>
+                </div>
+                <div class="tool-grid">
+                    <button class="tool-btn" data-tool="watermark">
+                        <div class="tool-btn-icon"><img src="/images/tool-watermark.svg" alt=""></div>
+                        <div class="tool-btn-label">水印</div>
+                    </button>
+                    <button class="tool-btn" data-tool="border">
+                        <div class="tool-btn-icon"><img src="/images/tool-border.svg" alt=""></div>
+                        <div class="tool-btn-label">边框/圆角</div>
+                    </button>
+                </div>
+            </div>
+
+            <div class="sidebar-section" data-bg="tools">
+                <div class="sidebar-section-bg" style="background-image:url('/images/cat-tools.jpg')"></div>
+                <div class="sidebar-section-header">
+                    <svg class="sidebar-section-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
+                    <div class="sidebar-section-title">实用工具</div>
+                    <div class="sidebar-section-line"></div>
+                </div>
+                <div class="tool-grid">
+                    <button class="tool-btn" data-tool="info">
+                        <div class="tool-btn-icon"><img src="/images/tool-info.svg" alt=""></div>
+                        <div class="tool-btn-label">图片信息</div>
+                    </button>
+                    <button class="tool-btn" data-tool="ascii">
+                        <div class="tool-btn-icon"><img src="/images/tool-ascii.svg" alt=""></div>
+                        <div class="tool-btn-label">ASCII</div>
+                    </button>
+                    <button class="tool-btn" data-tool="base64">
+                        <div class="tool-btn-icon"><img src="/images/tool-base64.svg" alt=""></div>
+                        <div class="tool-btn-label">Base64</div>
+                    </button>
+                    <button class="tool-btn" data-tool="thumbnail">
+                        <div class="tool-btn-icon"><img src="/images/tool-thumbnail.svg" alt=""></div>
+                        <div class="tool-btn-label">缩略图</div>
+                    </button>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main canvas -->
+        <main class="main">
+            <div class="canvas-toolbar">
+                <div class="toolbar-info">
+                    <div class="info-chip" id="fileChip" style="display:none;">
+                        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
+                        <span><strong id="fileName">-</strong> · <span id="fileSize">-</span></span>
+                    </div>
+                    <div class="info-chip" id="dimensionsChip" style="display:none;">
+                        <svg viewBox="0 0 24 24"><path d="M3 5v14h18V5H3zm16 12H5V7h14v10z"/></svg>
+                        <span><strong id="dimensions">-</strong></span>
+                    </div>
+                </div>
+                <div class="toolbar-tabs">
+                    <button class="tab-btn active" id="tabImage">图像</button>
+                    <button class="tab-btn" id="tabResult">结果</button>
+                </div>
+            </div>
+            <div class="canvas-area" id="canvasArea">
+                <div class="canvas" id="canvas">
+                    <div class="canvas-placeholder" id="placeholder">
+                        <img src="/images/empty-illustration.svg" class="canvas-placeholder-illust" alt="">
+                        <h3>将图片拖入此处开始处理</h3>
+                        <p>支持 PNG、JPG、GIF、BMP、WEBP、TIFF、PSD 等格式<br>提供 20+ 种专业图片处理工具</p>
+                        <div class="canvas-placeholder-features">
+                            <span>格式转换</span>
+                            <span>缩放裁剪</span>
+                            <span>滤镜</span>
+                            <span>水印</span>
+                            <span>艺术效果</span>
+                            <span>ASCII</span>
+                        </div>
+                        <button class="select-file-btn" id="selectFileBtn">
+                            <svg viewBox="0 0 24 24"><path d="M19 13v6H5v-6H3v8h18v-8h-2zm-6 .67l2.59-2.58L17 12.5l-5 5-5-5 1.41-1.41L11 13.67V3h2v10.67z"/></svg>
+                            选择本地图片
+                        </button>
+                    </div>
+                    <img id="previewImage" style="display:none;">
+                    <div class="drop-overlay" id="dropOverlay">
+                        <div class="drop-overlay-content">
+                            <svg viewBox="0 0 24 24"><path d="M19 13v6H5v-6H3v8h18v-8h-2zm-6 .67l2.59-2.58L17 12.5l-5 5-5-5 1.41-1.41L11 13.67V3h2v10.67z"/></svg>
+                            <h2>松开鼠标上传</h2>
+                        </div>
+                    </div>
+                    <div class="loader" id="loader">
+                        <div class="loader-content">
+                            <div class="spinner"></div>
+                            <div class="loader-text" id="loaderText">处理中...</div>
+                        </div>
+                    </div>
+                </div>
+                <input type="file" id="fileInput" accept="image/*" hidden>
+            </div>
+        </main>
+    </div>
+
+    <!-- Properties drawer -->
+    <div class="properties" id="properties">
+        <div class="properties-header">
+            <div class="properties-title">
+                <div class="properties-title-icon" id="propIcon">
+                    <img src="/images/tool-convert.svg" alt="">
+                </div>
+                <span id="propTitle">工具</span>
+            </div>
+            <button class="close-btn" id="closeProp">
+                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+            </button>
+        </div>
+        <div id="propContent"></div>
+    </div>
+
+    <!-- Toast container -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script>
+        let currentFile = null;
+        let lastResult = null;
+        let lastResultBlobUrl = null;
+        let lastBase64 = null;
+        let currentTool = null;
+
+        const fileInput = document.getElementById('fileInput');
+        const canvasArea = document.getElementById('canvasArea');
+        const placeholder = document.getElementById('placeholder');
+        const previewImage = document.getElementById('previewImage');
+        const loader = document.getElementById('loader');
+        const loaderText = document.getElementById('loaderText');
+        const dropOverlay = document.getElementById('dropOverlay');
+        const properties = document.getElementById('properties');
+        const propContent = document.getElementById('propContent');
+        const propTitle = document.getElementById('propTitle');
+        const propIcon = document.getElementById('propIcon');
+        const fileChip = document.getElementById('fileChip');
+        const fileName = document.getElementById('fileName');
+        const fileSize = document.getElementById('fileSize');
+        const dimensionsChip = document.getElementById('dimensionsChip');
+        const dimensionsEl = document.getElementById('dimensions');
+        const useAsInputBtn = document.getElementById('useAsInputBtn');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const newFileBtn = document.getElementById('newFileBtn');
+        const toastContainer = document.getElementById('toastContainer');
+
+        // Tool configurations
+        const tools = {
+            convert: {
+                title: '格式转换',
+                icon: '/images/tool-convert.svg',
+                fields: [
+                    { type: 'select', id: 'format', label: '目标格式', value: 'png', options: [
+                        { v: 'png', t: 'PNG · 无损' },
+                        { v: 'jpeg', t: 'JPEG · 有损压缩' },
+                        { v: 'gif', t: 'GIF · 动画支持' },
+                        { v: 'bmp', t: 'BMP · 位图' },
+                        { v: 'tiff', t: 'TIFF · 高质量' }
+                    ]},
+                    { type: 'range', id: 'quality', label: '质量', min: 10, max: 100, value: 90, suffix: '%' },
+                ],
+                action: async (vals) => callApi('convert', { format: vals.format, quality: vals.quality / 100 })
+            },
+            resize: {
+                title: '缩放',
+                icon: '/images/tool-resize.svg',
+                fields: [
+                    { type: 'group', items: [
+                        { type: 'number', id: 'width', label: '宽度', value: 800 },
+                        { type: 'number', id: 'height', label: '高度', value: -1 },
+                    ]},
+                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
+                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }, { v: 'bmp', t: 'BMP' }
+                    ]},
+                    { type: 'divider' },
+                    { type: 'range', id: 'scale', label: '按百分比缩放', min: 5, max: 200, value: 50, suffix: '%' },
+                ],
+                action: async (vals) => vals.scale !== 50
+                    ? callApi('scale', { percent: vals.scale, format: vals.format })
+                    : callApi('resize', { width: vals.width, height: vals.height, format: vals.format })
+            },
+            crop: {
+                title: '裁剪',
+                icon: '/images/tool-crop.svg',
+                fields: [
+                    { type: 'group', items: [
+                        { type: 'number', id: 'x', label: 'X 起点', value: 0 },
+                        { type: 'number', id: 'y', label: 'Y 起点', value: 0 },
+                    ]},
+                    { type: 'group', items: [
+                        { type: 'number', id: 'w', label: '裁剪宽度', value: 200 },
+                        { type: 'number', id: 'h', label: '裁剪高度', value: 200 },
+                    ]},
+                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
+                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
+                    ]},
+                ],
+                action: async (vals) => callApi('crop', { x: vals.x, y: vals.y, width: vals.w, height: vals.h, format: vals.format })
+            },
+            rotate: {
+                title: '旋转/翻转',
+                icon: '/images/tool-rotate.svg',
+                fields: [
+                    { type: 'select', id: 'degrees', label: '旋转角度', value: '90', options: [
+                        { v: '90', t: '90°' }, { v: '180', t: '180°' }, { v: '270', t: '270°' },
+                        { v: '45', t: '45°' }, { v: '15', t: '15°' }, { v: '30', t: '30°' }, { v: '60', t: '60°' }
+                    ]},
+                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
+                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
+                    ]},
+                    { type: 'divider' },
+                    { type: 'group', items: [
+                        { type: 'button', id: 'flipH', label: '水平翻转' },
+                        { type: 'button', id: 'flipV', label: '垂直翻转' },
+                    ]},
+                ],
+                action: async (vals) => {
+                    if (vals.action === 'flipH') return callApi('flip', { direction: 'horizontal', format: vals.format });
+                    if (vals.action === 'flipV') return callApi('flip', { direction: 'vertical', format: vals.format });
+                    return callApi('rotate', { degrees: vals.degrees, format: vals.format });
+                }
+            },
+            filters: {
+                title: '滤镜',
+                icon: '/images/tool-filter.svg',
+                fields: [
+                    { type: 'button', id: 'grayscale', label: '⚫ 黑白滤镜', primary: true },
+                    { type: 'button', id: 'sepia', label: '🟫 复古棕褐', primary: true },
+                    { type: 'button', id: 'invert', label: '🔄 颜色反转 (底片)', primary: true },
+                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
+                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
+                    ]},
+                ],
+                action: async (vals) => {
+                    const map = { grayscale: 'grayscale', sepia: 'sepia', invert: 'invert' };
+                    return callApi(map[vals.action], { format: vals.format });
+                }
+            },
+            adjust: {
+                title: '色彩调整',
+                icon: '/images/tool-adjust.svg',
+                fields: [
+                    { type: 'range', id: 'brightness', label: '亮度', min: -100, max: 100, value: 0, suffix: '' },
+                    { type: 'range', id: 'contrast', label: '对比度', min: 0, max: 30, value: 10, suffix: '', valueDisplay: v => (v * 0.1).toFixed(1) },
+                    { type: 'divider' },
+                    { type: 'range', id: 'hue', label: '色相偏移', min: -100, max: 100, value: 0, suffix: '' },
+                    { type: 'range', id: 'saturation', label: '饱和度', min: -100, max: 100, value: 0, suffix: '' },
+                    { type: 'range', id: 'brightHsb', label: '亮度 (HSB)', min: -100, max: 100, value: 0, suffix: '' },
+                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
+                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
+                    ]},
+                    { type: 'button', id: 'applyBC', label: '✨ 应用亮度/对比度', primary: true },
+                    { type: 'button', id: 'applyHSB', label: '✨ 应用 HSB 调整', primary: true },
+                ],
+                action: async (vals) => {
+                    if (vals.action === 'applyBC') {
+                        return callApi('brightness-contrast', {
+                            brightness: parseFloat(vals.brightness),
+                            contrast: parseFloat(vals.contrast) * 0.1,
+                            format: vals.format
+                        });
+                    } else if (vals.action === 'applyHSB') {
+                        return callApi('hsb', {
+                            hue: parseFloat(vals.hue) / 100,
+                            saturation: parseFloat(vals.saturation) / 100,
+                            brightness: parseFloat(vals.brightHsb) / 100,
+                            format: vals.format
+                        });
+                    }
+                }
+            },
+            effects: {
+                title: '艺术效果',
+                icon: '/images/tool-effects.svg',
+                fields: [
+                    { type: 'range', id: 'pixelSize', label: '像素化块大小', min: 2, max: 50, value: 10, suffix: 'px' },
+                    { type: 'button', id: 'pixelate', label: '✨ 应用像素化', primary: true },
+                    { type: 'divider' },
+                    { type: 'range', id: 'posterLevels', label: '色调分离级别', min: 2, max: 20, value: 4, suffix: '' },
+                    { type: 'button', id: 'posterize', label: '✨ 应用色调分离', primary: true },
+                    { type: 'divider' },
+                    { type: 'range', id: 'vignette', label: '晕影强度', min: 0, max: 100, value: 50, suffix: '%' },
+                    { type: 'button', id: 'applyVignette', label: '✨ 应用晕影', primary: true },
+                ],
+                action: async (vals) => {
+                    if (vals.action === 'pixelate') return callApi('pixelate', { pixelSize: vals.pixelSize });
+                    if (vals.action === 'posterize') return callApi('posterize', { levels: vals.posterLevels });
+                    if (vals.action === 'applyVignette') return callApi('vignette', { strength: parseFloat(vals.vignette) / 100 });
+                }
+            },
+            blur: {
+                title: '模糊/锐化',
+                icon: '/images/tool-blur.svg',
+                fields: [
+                    { type: 'range', id: 'blurRadius', label: '高斯模糊半径', min: 1, max: 20, value: 5, suffix: '' },
+                    { type: 'button', id: 'applyBlur', label: '✨ 应用高斯模糊', primary: true },
+                    { type: 'divider' },
+                    { type: 'button', id: 'applySharpen', label: '✨ 应用锐化', primary: true },
+                ],
+                action: async (vals) => {
+                    if (vals.action === 'applyBlur') return callApi('blur', { radius: vals.blurRadius });
+                    if (vals.action === 'applySharpen') return callApi('sharpen', {});
+                }
+            },
+            watermark: {
+                title: '水印',
+                icon: '/images/tool-watermark.svg',
+                fields: [
+                    { type: 'text', id: 'wmText', label: '水印文字', value: '© Image Studio' },
+                    { type: 'group', items: [
+                        { type: 'select', id: 'wmPosition', label: '位置', value: 'center', options: [
+                            { v: 'center', t: '居中' }, { v: 'top-left', t: '左上' },
+                            { v: 'top-right', t: '右上' }, { v: 'bottom-left', t: '左下' }, { v: 'bottom-right', t: '右下' }
+                        ]},
+                        { type: 'number', id: 'wmFontSize', label: '字号', value: 32 },
+                    ]},
+                    { type: 'color', id: 'wmColor', label: '颜色', value: '#ffffff' },
+                    { type: 'range', id: 'wmAlpha', label: '透明度', min: 10, max: 100, value: 80, suffix: '%' },
+                    { type: 'button', id: 'applyTextWm', label: '✨ 添加文字水印', primary: true },
+                    { type: 'divider' },
+                    { type: 'file', id: 'wmImage', label: '水印图片' },
+                    { type: 'group', items: [
+                        { type: 'select', id: 'wmImgPosition', label: '图片水印位置', value: 'center', options: [
+                            { v: 'center', t: '居中' }, { v: 'bottom-right', t: '右下' }, { v: 'top-left', t: '左上' }
+                        ]},
+                        { type: 'range', id: 'wmScale', label: '水印缩放', min: 5, max: 100, value: 30, suffix: '%' },
+                    ]},
+                    { type: 'button', id: 'applyImgWm', label: '✨ 添加图片水印', primary: true },
+                ],
+                action: async (vals) => {
+                    if (vals.action === 'applyTextWm') {
+                        return callApi('watermark/text', {
+                            text: vals.wmText,
+                            position: vals.wmPosition,
+                            fontSize: vals.wmFontSize,
+                            color: vals.wmColor.replace('#', ''),
+                            alpha: parseFloat(vals.wmAlpha) / 100
+                        });
+                    } else if (vals.action === 'applyImgWm') {
+                        const wmFile = document.getElementById('wmImageFile').files[0];
+                        if (!wmFile) { showToast('请先选择水印图片', 'error'); return null; }
+                        return callApiMultiPart('watermark/image', {
+                            watermark: wmFile,
+                            position: vals.wmImgPosition,
+                            scale: vals.wmScale,
+                            alpha: 0.7
+                        });
+                    }
+                }
+            },
+            border: {
+                title: '边框/圆角',
+                icon: '/images/tool-border.svg',
+                fields: [
+                    { type: 'number', id: 'borderWidth', label: '边框宽度', value: 20 },
+                    { type: 'color', id: 'borderColor', label: '边框颜色', value: '#000000' },
+                    { type: 'button', id: 'applyBorder', label: '✨ 应用边框', primary: true },
+                    { type: 'divider' },
+                    { type: 'range', id: 'cornerRadius', label: '圆角半径', min: 0, max: 200, value: 50, suffix: 'px' },
+                    { type: 'button', id: 'applyCorner', label: '✨ 应用圆角', primary: true },
+                ],
+                action: async (vals) => {
+                    if (vals.action === 'applyBorder') return callApi('border', { width: vals.borderWidth, color: vals.borderColor.replace('#', '') });
+                    if (vals.action === 'applyCorner') return callApi('round-corners', { radius: vals.cornerRadius });
+                }
+            },
+            info: {
+                title: '图片信息',
+                icon: '/images/tool-info.svg',
+                fields: [{ type: 'button', id: 'getInfo', label: '🔍 获取图片详细信息', primary: true }],
+                action: async () => callApi('info', {})
+            },
+            ascii: {
+                title: 'ASCII 艺术',
+                icon: '/images/tool-ascii.svg',
+                fields: [
+                    { type: 'range', id: 'asciiWidth', label: 'ASCII 宽度', min: 40, max: 200, value: 100, suffix: '字符' },
+                    { type: 'button', id: 'genAscii', label: '✨ 生成 ASCII 艺术', primary: true },
+                ],
+                action: async (vals) => callApiText('ascii', { width: vals.asciiWidth })
+            },
+            base64: {
+                title: 'Base64 编码',
+                icon: '/images/tool-base64.svg',
+                fields: [
+                    { type: 'select', id: 'b64Format', label: '编码格式', value: 'png', options: [
+                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
+                    ]},
+                    { type: 'button', id: 'genBase64', label: '✨ 生成 Base64', primary: true },
+                ],
+                action: async (vals) => callApiJson('base64', { format: vals.b64Format })
+            },
+            thumbnail: {
+                title: '缩略图',
+                icon: '/images/tool-thumbnail.svg',
+                fields: [
+                    { type: 'number', id: 'maxSize', label: '最大边长', value: 200 },
+                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
+                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
+                    ]},
+                    { type: 'button', id: 'genThumb', label: '✨ 生成缩略图', primary: true },
+                ],
+                action: async (vals) => callApi('thumbnail', { maxSize: vals.maxSize, format: vals.format })
+            },
+        };
+
+        // Toast notifications
+        function showToast(msg, type = 'info') {
+            const toast = document.createElement('div');
+            toast.className = 'toast ' + type;
+            const icon = type === 'success'
+                ? '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
+                : type === 'error'
+                ? '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>'
+                : '<svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>';
+            toast.innerHTML = icon + '<span>' + msg + '</span>';
+            toastContainer.appendChild(toast);
+            setTimeout(() => { toast.style.animation = 'slideIn 0.3s reverse'; setTimeout(() => toast.remove(), 300); }, 3000);
+        }
+
+        // File handling
+        fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
+        document.getElementById('selectFileBtn').addEventListener('click', () => fileInput.click());
+        newFileBtn.addEventListener('click', () => { resetApp(); fileInput.click(); });
+
+        canvasArea.addEventListener('dragover', e => { e.preventDefault(); dropOverlay.classList.add('active'); });
+        canvasArea.addEventListener('dragleave', e => { if (!canvasArea.contains(e.relatedTarget)) dropOverlay.classList.remove('active'); });
+        canvasArea.addEventListener('drop', e => {
+            e.preventDefault();
+            dropOverlay.classList.remove('active');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/') && !/\.(png|jpg|jpeg|gif|bmp|webp|tiff?|psd)$/i.test(file.name)) {
+                showToast('请选择有效的图片文件', 'error'); return;
+            }
+            currentFile = file;
+            fileChip.style.display = 'flex';
+            fileName.textContent = file.name;
+            fileSize.textContent = formatSize(file.size);
+            const url = URL.createObjectURL(file);
+            previewImage.src = url;
+            previewImage.onload = () => {
+                dimensionsChip.style.display = 'flex';
+                dimensionsEl.textContent = previewImage.naturalWidth + ' × ' + previewImage.naturalHeight + ' px';
+                previewImage.style.display = 'block';
+                placeholder.style.display = 'none';
+            };
+            showToast('图片已加载', 'success');
+        }
+
+        function formatSize(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(2) + ' MB';
+        }
+
+        function resetApp() {
+            currentFile = null;
+            previewImage.src = '';
+            previewImage.style.display = 'none';
+            placeholder.style.display = 'flex';
+            fileChip.style.display = 'none';
+            dimensionsChip.style.display = 'none';
+            useAsInputBtn.disabled = true;
+            downloadBtn.disabled = true;
+            if (lastResultBlobUrl) URL.revokeObjectURL(lastResultBlobUrl);
+            lastResult = null;
+            lastResultBlobUrl = null;
+            lastBase64 = null;
+            showResultMode('image');
+        }
+
+        // Tool selection
+        document.querySelectorAll('.tool-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const tool = btn.dataset.tool;
+                if (!tool) return;
+                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                currentTool = tool;
+                showProperties(tool);
+            });
+        });
+
+        document.getElementById('closeProp').addEventListener('click', () => {
+            properties.classList.remove('open');
+            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
+            currentTool = null;
+        });
+
+        function showProperties(toolName) {
+            const tool = tools[toolName];
+            if (!tool) return;
+            propTitle.textContent = tool.title;
+            propIcon.innerHTML = '<img src="' + tool.icon + '" alt="">';
+            propContent.innerHTML = '';
+            tool.fields.forEach(field => {
+                if (field.type === 'divider') {
+                    const hr = document.createElement('hr');
+                    hr.style.cssText = 'border:none;border-top:1px solid var(--border);margin:18px 0;';
+                    propContent.appendChild(hr);
+                } else if (field.type === 'group') {
+                    const row = document.createElement('div');
+                    row.className = 'field-row';
+                    field.items.forEach(item => row.appendChild(buildField(item)));
+                    propContent.appendChild(row);
+                } else {
+                    propContent.appendChild(buildField(field));
+                }
+            });
+            properties.classList.add('open');
+        }
+
+        function buildField(field) {
+            const wrapper = document.createElement('div');
+            wrapper.className = 'field';
+            if (field.type === 'button') {
+                const btn = document.createElement('button');
+                btn.className = 'btn ' + (field.primary ? 'btn-primary' : 'btn-secondary');
+                btn.textContent = field.label;
+                btn.dataset.action = field.id;
+                btn.addEventListener('click', () => executeAction(field.id));
+                wrapper.appendChild(btn);
+            } else {
+                const labelRow = document.createElement('div');
+                labelRow.className = 'field-label';
+                const label = document.createElement('span');
+                label.textContent = field.label;
+                labelRow.appendChild(label);
+                if (['range', 'number', 'text', 'color'].includes(field.type)) {
+                    const value = document.createElement('span');
+                    value.className = 'field-value';
+                    value.id = 'val_' + field.id;
+                    const display = field.valueDisplay || (v => field.suffix !== undefined ? v + field.suffix : v);
+                    value.textContent = display(field.value);
+                    labelRow.appendChild(value);
+                }
+                wrapper.appendChild(labelRow);
+
+                let input;
+                if (field.type === 'range') {
+                    input = document.createElement('input');
+                    input.type = 'range';
+                    input.className = 'field-range';
+                    input.min = field.min; input.max = field.max; input.value = field.value;
+                    const display = field.valueDisplay || (v => field.suffix !== undefined ? v + field.suffix : v);
+                    input.addEventListener('input', () => { value.textContent = display(input.value); });
+                } else if (field.type === 'select') {
+                    input = document.createElement('select');
+                    input.className = 'field-select';
+                    field.options.forEach(opt => {
+                        const option = document.createElement('option');
+                        option.value = opt.v; option.textContent = opt.t;
+                        if (opt.v === field.value) option.selected = true;
+                        input.appendChild(option);
+                    });
+                } else if (field.type === 'number') {
+                    input = document.createElement('input');
+                    input.type = 'number';
+                    input.className = 'field-input';
+                    input.value = field.value;
+                } else if (field.type === 'text') {
+                    input = document.createElement('input');
+                    input.type = 'text';
+                    input.className = 'field-input';
+                    input.value = field.value;
+                } else if (field.type === 'color') {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'color-input-wrap';
+                    input = document.createElement('input');
+                    input.type = 'color';
+                    input.value = field.value;
+                    input.style.width = '46px'; input.style.height = '44px';
+                    const text = document.createElement('input');
+                    text.type = 'text';
+                    text.className = 'field-input';
+                    text.value = field.value;
+                    text.style.fontFamily = "'JetBrains Mono', monospace";
+                    input.addEventListener('input', () => text.value = input.value);
+                    text.addEventListener('change', () => input.value = text.value);
+                    wrap.appendChild(input); wrap.appendChild(text);
+                    wrapper.appendChild(wrap);
+                    input.id = 'inp_' + field.id;
+                    text.id = 'inptext_' + field.id;
+                    return wrapper;
+                } else if (field.type === 'file') {
+                    const wrap = document.createElement('div');
+                    wrap.className = 'wm-file-zone';
+                    wrap.id = 'wmImageFileWrap';
+                    wrap.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 13v6H5v-6H3v8h18v-8h-2zm-6 .67l2.59-2.58L17 12.5l-5 5-5-5 1.41-1.41L11 13.67V3h2v10.67z"/></svg><div>点击或拖入水印图片</div>';
+                    input = document.createElement('input');
+                    input.type = 'file';
+                    input.id = 'wmImageFile';
+                    input.accept = 'image/*';
+                    input.style.display = 'none';
+                    input.addEventListener('change', () => {
+                        if (input.files[0]) wrap.querySelector('div').textContent = '已选择: ' + input.files[0].name;
+                    });
+                    wrap.addEventListener('click', () => input.click());
+                    wrap.addEventListener('dragover', e => e.preventDefault());
+                    wrap.addEventListener('drop', e => { e.preventDefault(); input.files = e.dataTransfer.files; if (input.files[0]) wrap.querySelector('div').textContent = '已选择: ' + input.files[0].name; });
+                    wrap.appendChild(input);
+                    wrapper.appendChild(wrap);
+                    return wrapper;
+                }
+                if (input) {
+                    input.id = 'inp_' + field.id;
+                    wrapper.appendChild(input);
+                }
+            }
+            return wrapper;
+        }
+
+        function getFieldValues() {
+            const values = {};
+            if (!currentTool) return values;
+            tools[currentTool].fields.forEach(field => {
+                if (field.type === 'divider') return;
+                if (field.type === 'group') {
+                    field.items.forEach(item => {
+                        if (item.type !== 'button') values[item.id] = document.getElementById('inp_' + item.id)?.value;
+                    });
+                } else if (field.type !== 'button') {
+                    if (field.type === 'color') values[field.id] = document.getElementById('inp_' + field.id)?.value;
+                    else values[field.id] = document.getElementById('inp_' + field.id)?.value;
+                }
+            });
+            return values;
+        }
+
+        async function executeAction(actionId) {
+            if (!currentFile) { showToast('请先上传图片', 'error'); return; }
+            if (!currentTool) return;
+            const values = getFieldValues();
+            values.action = actionId;
+            showLoader(true);
+            try {
+                const result = await tools[currentTool].action(values);
+                if (result) handleResult(result, actionId);
+            } catch (e) {
+                showToast('处理失败: ' + e.message, 'error');
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        function handleResult(result, actionId) {
+            if (actionId === 'getInfo' && result.width !== undefined) {
+                showInfoCard(result);
+            } else if (actionId === 'genBase64' && result.dataUri) {
+                lastBase64 = result.dataUri;
+                showBase64(result.dataUri, result.format);
+                showToast('Base64 已生成', 'success');
+            } else if (actionId === 'genAscii') {
+                showAscii(result);
+                showToast('ASCII 已生成', 'success');
+            } else if (result instanceof Blob) {
+                if (lastResultBlobUrl) URL.revokeObjectURL(lastResultBlobUrl);
+                lastResult = result;
+                lastResultBlobUrl = URL.createObjectURL(result);
+                previewImage.src = lastResultBlobUrl;
+                previewImage.style.display = 'block';
+                placeholder.style.display = 'none';
+                showResultMode('image');
+                downloadBtn.disabled = false;
+                useAsInputBtn.disabled = false;
+                showToast('处理完成 · ' + formatSize(result.size), 'success');
+            }
+        }
+
+        function showInfoCard(info) {
+            showResultMode('info');
+            document.getElementById('tabImage').classList.add('active');
+            document.getElementById('tabResult').classList.remove('active');
+            const grid = document.createElement('div');
+            grid.className = 'info-grid';
+            const items = [
+                { label: '宽度', value: info.width, unit: 'px' },
+                { label: '高度', value: info.height, unit: 'px' },
+                { label: '颜色分量', value: info.colorComponents, unit: '' },
+                { label: '透明通道', value: info.hasAlpha ? '有' : '无', unit: '' },
+                { label: '文件大小', value: formatSize(info.fileSize), unit: '' }
+            ];
+            items.forEach(it => {
+                const card = document.createElement('div');
+                card.className = 'info-card';
+                card.innerHTML = '<div class="info-card-label">' + it.label + '</div><div class="info-card-value">' + it.value + '<small>' + it.unit + '</small></div>';
+                grid.appendChild(card);
+            });
+            propContent.innerHTML = '';
+            propContent.appendChild(grid);
+        }
+
+        function showAscii(text) {
+            showResultMode('ascii');
+            const div = document.createElement('div');
+            div.className = 'ascii-box';
+            div.textContent = text;
+            propContent.innerHTML = '';
+            propContent.appendChild(div);
+        }
+
+        function showBase64(dataUri, format) {
+            showResultMode('base64');
+            const div = document.createElement('div');
+            div.className = 'base64-box';
+            div.textContent = dataUri;
+            propContent.innerHTML = '';
+            const info = document.createElement('div');
+            info.style.cssText = 'font-size:12px;color:var(--text-faint);margin-bottom:12px;';
+            info.textContent = '格式: ' + format + ' · 长度: ' + dataUri.length + ' 字符';
+            propContent.appendChild(info);
+            propContent.appendChild(div);
+            const copyBtn = document.createElement('button');
+            copyBtn.className = 'btn btn-secondary';
+            copyBtn.style.marginTop = '12px';
+            copyBtn.textContent = '复制到剪贴板';
+            copyBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(dataUri).then(() => showToast('已复制', 'success'));
+            });
+            propContent.appendChild(copyBtn);
+        }
+
+        function showResultMode(mode) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            if (mode === 'result') document.getElementById('tabResult').classList.add('active');
+            else document.getElementById('tabImage').classList.add('active');
+        }
+
+        document.getElementById('tabImage').addEventListener('click', () => { showResultMode('image'); });
+        document.getElementById('tabResult').addEventListener('click', () => { showResultMode('result'); });
+
+        function showLoader(active, text) {
+            if (active) {
+                loader.classList.add('active');
+                if (text) loaderText.textContent = text;
+            } else {
+                loader.classList.remove('active');
+            }
+        }
+
+        async function callApi(endpoint, params) {
+            if (!currentFile) { showToast('请先上传图片', 'error'); return null; }
+            const fd = new FormData();
+            fd.append('file', currentFile);
+            for (const [k, v] of Object.entries(params)) fd.append(k, v);
+            showLoader(true);
+            try {
+                const res = await fetch('/api/' + endpoint, { method: 'POST', body: fd });
+                if (!res.ok) throw new Error(await res.text());
+                return await res.blob();
+            } catch (e) {
+                showToast('请求失败: ' + e.message, 'error');
+                return null;
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        async function callApiMultiPart(endpoint, params) {
+            if (!currentFile) { showToast('请先上传图片', 'error'); return null; }
+            const fd = new FormData();
+            fd.append('file', currentFile);
+            for (const [k, v] of Object.entries(params)) {
+                if (v instanceof File) fd.append(k, v);
+                else fd.append(k, v);
+            }
+            showLoader(true);
+            try {
+                const res = await fetch('/api/' + endpoint, { method: 'POST', body: fd });
+                if (!res.ok) throw new Error(await res.text());
+                return await res.blob();
+            } catch (e) {
+                showToast('请求失败: ' + e.message, 'error');
+                return null;
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        async function callApiJson(endpoint, params) {
+            if (!currentFile) { showToast('请先上传图片', 'error'); return null; }
+            const fd = new FormData();
+            fd.append('file', currentFile);
+            for (const [k, v] of Object.entries(params)) fd.append(k, v);
+            showLoader(true);
+            try {
+                const res = await fetch('/api/' + endpoint, { method: 'POST', body: fd });
+                if (!res.ok) throw new Error(await res.text());
+                return await res.json();
+            } catch (e) {
+                showToast('请求失败: ' + e.message, 'error');
+                return null;
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        async function callApiText(endpoint, params) {
+            if (!currentFile) { showToast('请先上传图片', 'error'); return null; }
+            const fd = new FormData();
+            fd.append('file', currentFile);
+            for (const [k, v] of Object.entries(params)) fd.append(k, v);
+            showLoader(true);
+            try {
+                const res = await fetch('/api/' + endpoint, { method: 'POST', body: fd });
+                if (!res.ok) throw new Error(await res.text());
+                return await res.text();
+            } catch (e) {
+                showToast('请求失败: ' + e.message, 'error');
+                return null;
+            } finally {
+                showLoader(false);
+            }
+        }
+
+        // Download
+        downloadBtn.addEventListener('click', () => {
+            if (!lastResult) { showToast('请先处理图片', 'error'); return; }
+            const ext = lastResult.type.split('/')[1] || 'png';
+            const a = document.createElement('a');
+            a.href = lastResultBlobUrl;
+            a.download = 'image-studio-' + Date.now() + '.' + ext;
+            a.click();
+            showToast('下载已开始', 'success');
+        });
+
+        // Use as input
+        useAsInputBtn.addEventListener('click', () => {
+            if (!lastResult) return;
+            const newFile = new File([lastResult], 'result-' + Date.now() + '.png', { type: lastResult.type });
+            handleFile(newFile);
+            showToast('已套用为新输入', 'success');
+        });
+    </script>
+</body>
+</html>

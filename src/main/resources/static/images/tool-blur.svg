@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+      <defs>
+        <linearGradient id="g_blur" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#06b6d4"/>
+          <stop offset="100%" stop-color="#3b82f6"/>
+        </linearGradient>
+      </defs>
+      <rect width="120" height="120" rx="20" fill="url(#g_blur)" opacity="0.15"/>
+      <rect width="120" height="120" rx="20" fill="none" stroke="url(#g_blur)" stroke-width="1.5" opacity="0.4"/>
+      <g transform="translate(60 60)">
+        <g stroke="#60a5fa" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0.7">
+      <circle cx="0" cy="0" r="20" opacity="0.3"/>
+      <circle cx="0" cy="0" r="14" opacity="0.5"/>
+      <circle cx="0" cy="0" r="8" opacity="0.7"/>
+      <circle cx="0" cy="0" r="3" fill="#60a5fa"/>
+    </g>
+      </g>
+    </svg>

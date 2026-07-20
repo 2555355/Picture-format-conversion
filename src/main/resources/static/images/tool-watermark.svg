@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+      <defs>
+        <linearGradient id="g_watermark" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="#06b6d4"/>
+          <stop offset="100%" stop-color="#8b5cf6"/>
+        </linearGradient>
+      </defs>
+      <rect width="120" height="120" rx="20" fill="url(#g_watermark)" opacity="0.15"/>
+      <rect width="120" height="120" rx="20" fill="none" stroke="url(#g_watermark)" stroke-width="1.5" opacity="0.4"/>
+      <g transform="translate(60 60)">
+        <g stroke="#22d3ee" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="-18" y="-14" width="36" height="28" rx="3"/>
+      <path d="M -10 -4 L 10 -4 M -10 2 L 6 2 M -10 8 L 2 8" stroke-width="1.5" opacity="0.6"/>
+      <circle cx="18" cy="-18" r="3" fill="#a78bfa" stroke="none"/>
+    </g>
+      </g>
+    </svg>
