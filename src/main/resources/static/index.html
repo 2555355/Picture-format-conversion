@@ -600,14 +600,15 @@
         .field-select {
             width: 100%;
             padding: 11px 14px;
-            background: var(--bg-2);
-            border: 1px solid var(--border);
+            background: var(--bg-3);
+            border: 1px solid var(--border-2);
             border-radius: 12px;
             color: var(--text);
             font-size: 14px;
             font-family: inherit;
             transition: all 0.2s;
         }
+        .field-input::placeholder { color: var(--text-faint); }
         .field-input:focus,
         .field-select:focus {
             outline: none;
@@ -617,14 +618,21 @@
         }
         .field-select {
             appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23a1a1b5'><path d='M7 10l5 5 5-5z'/></svg>");
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23f5f5fa'><path d='M7 10l5 5 5-5z'/></svg>");
             background-repeat: no-repeat;
             background-position: right 10px center;
             background-size: 20px;
             padding-right: 36px;
             cursor: pointer;
         }
-        .field-select option { background: var(--bg-2); color: var(--text); }
+        /* Let options use native browser styling so they are always readable */
+        .field-select option,
+        .field-select option:checked {
+            background: #ffffff;
+            color: #1a1a2c;
+            font-family: inherit;
+        }
         .field-range {
             width: 100%;
             -webkit-appearance: none;
@@ -982,7 +990,7 @@
                 transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
                 z-index: 60;
                 padding: 70px 14px 20px;
-                background: rgba(7, 7, 13, 0.96);
+                background: rgba(35, 35, 52, 0.97);
                 backdrop-filter: blur(28px) saturate(180%);
                 -webkit-backdrop-filter: blur(28px) saturate(180%);
             }
@@ -993,8 +1001,21 @@
             .sidebar .sidebar-section-title { display: block; }
             .sidebar-section-line { display: block !important; }
             .tool-grid { grid-template-columns: 1fr 1fr; }
-            .tool-btn { padding: 12px 6px; font-size: 11px; gap: 6px; }
-            .tool-btn-icon { width: 30px; height: 30px; }
+            .tool-btn {
+                padding: 12px 6px;
+                font-size: 11px;
+                gap: 6px;
+                background: rgba(50, 50, 70, 0.85);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+                color: #ffffff;
+            }
+            .tool-btn-icon {
+                width: 30px;
+                height: 30px;
+                background: rgba(255, 255, 255, 0.12);
+            }
+            .tool-btn-icon img { width: 22px; height: 22px; }
+            .sidebar-section-title { color: #ffffff; opacity: 0.85; }
 
             /* Properties becomes bottom sheet */
             .properties {
@@ -1005,12 +1026,12 @@
                 max-height: 88vh;
                 border-radius: 20px 20px 0 0;
                 border-left: none;
-                border-top: 1px solid var(--border);
+                border-top: 1px solid var(--border-2);
                 padding: 16px 18px 28px;
                 transform: translateY(100%);
                 transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
                 z-index: 70;
-                background: rgba(7, 7, 13, 0.97);
+                background: rgba(28, 28, 42, 0.98);
                 backdrop-filter: blur(28px) saturate(180%);
                 -webkit-backdrop-filter: blur(28px) saturate(180%);
             }
