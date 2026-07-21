@@ -39,7 +39,8 @@
             android:layout_marginTop="8dp"
             android:text="正在启动本地服务…"
             android:textColor="#CCFFFFFF"
-            android:textSize="13sp" />
+            android:textSize="13sp"
+            android:gravity="center" />
 
         <ProgressBar
             android:id="@+id/progressBar"
@@ -48,6 +49,29 @@
             android:layout_height="32dp"
             android:layout_marginTop="20dp"
             android:indeterminateTint="@android:color/white" />
+
+        <TextView
+            android:id="@+id/permText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:text=""
+            android:textColor="#FFD7D7"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:visibility="gone"
+            tools:visibility="visible" />
+
+        <Button
+            android:id="@+id/permBtn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:paddingStart="24dp"
+            android:paddingEnd="24dp"
+            android:text="授予后台运行权限"
+            android:visibility="gone"
+            tools:visibility="visible" />
 
         <Button
             android:id="@+id/openBtn"
