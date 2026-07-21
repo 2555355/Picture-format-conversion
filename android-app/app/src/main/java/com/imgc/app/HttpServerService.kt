@@ -11,10 +11,8 @@ import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
 
-/**
- * 前台服务：在后台持续运行 HttpServer，
- * 这样用户切到浏览器后服务不会被立刻回收。
- */
+// Foreground service: keeps HttpServer running in background
+// so the service survives when user switches to browser
 class HttpServerService : Service() {
 
     private val tag = "HttpServerService"

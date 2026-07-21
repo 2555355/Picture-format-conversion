@@ -7,16 +7,11 @@ import org.json.JSONObject
 import java.io.ByteArrayInputStream
 import java.io.InputStream
 
-/**
- * 嵌入式 HTTP 服务器（基于 NanoHTTPD）
- *
- * 端点：
- *   GET  /            -> 返回 assets/index.html
- *   GET  /static/*    -> 返回 assets 中的静态资源
- *   POST /api/{action} -> 图片处理
- *
- * 端口：8080（与本机 Spring Boot 一致，方便复用前端代码）
- */
+// Embedded HTTP server based on NanoHTTPD
+// GET  /            -> assets/index.html
+// GET  /static/*    -> assets resources
+// POST /api/{action} -> image processing
+// Port: 8080
 class HttpServer(
     private val ctx: Context,
     port: Int = 8080
@@ -40,12 +35,11 @@ class HttpServer(
                 else -> newFixedLengthResponse(Response.Status.NOT_FOUND, "text/plain", "404 Not Found")
             }
         } catch (t: Throwable) {
-            Log.e(tag, "serve error: ${t.message}", t)
-            newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "text/plain", "500 ${t.message}")
+            Log.e(tag, "serve error: " + t.message, t)
+            newFixedLengthResponse(Response.Status.INTERNAL_ERROR, "text/plain", "500 " + t.message)
         }
     }
 
-    /** 读取 assets 资源 */
     private fun serveAsset(path: String, mime: String): Response {
         return try {
             val input: InputStream = ctx.assets.open(path)
@@ -58,22 +52,18 @@ class HttpServer(
         }
     }
 
-    /** 处理 /api/{action} POST 请求 */
     private fun handleImageAction(session: IHTTPSession, action: String): Response {
-        // NanoHTTPD 需要先解析 body；files 里存的是上传文件
         val params = mutableMapOf<String, String>()
         val files = mutableMapOf<String, String>()
         session.parseBody(files)
 
-        // 收集表单参数
         session.parameters.forEach { (k, v) -> if (v.isNotEmpty()) params[k] = v[0] }
 
-        // 找上传文件（"file" 字段）
         val uploadedPath = files["file"]
         if (uploadedPath == null) {
             return newFixedLengthResponse(
                 Response.Status.BAD_REQUEST, "text/plain",
-                "缺少 file 字段"
+                "missing file field"
             )
         }
         val fileBytes = java.io.File(uploadedPath).readBytes()
@@ -87,7 +77,6 @@ class HttpServer(
                 Response.Status.INTERNAL_ERROR, "text/plain", result.error
             )
             result.isText && result.dataUri != null -> {
-                // base64 -> 返回 JSON { base64, dataUri }
                 val json = JSONObject().apply {
                     put("base64", result.text ?: "")
                     put("dataUri", result.dataUri)
@@ -95,7 +84,6 @@ class HttpServer(
                 newFixedLengthResponse(Response.Status.OK, "application/json", json)
             }
             result.isText -> {
-                // ASCII -> 纯文本
                 newFixedLengthResponse(Response.Status.OK, "text/plain; charset=utf-8", result.text ?: "")
             }
             else -> {
@@ -106,7 +94,7 @@ class HttpServer(
                     Response.Status.OK, result.contentType,
                     ByteArrayInputStream(bytes), bytes.size.toLong()
                 )
-                resp.addHeader("Content-Disposition", "attachment; filename=\"${result.filename}\"")
+                resp.addHeader("Content-Disposition", "attachment; filename=\"" + result.filename + "\"")
                 resp
             }
         }

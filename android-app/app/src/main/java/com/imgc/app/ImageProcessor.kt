@@ -7,7 +7,6 @@ import android.graphics.Canvas
 import android.graphics.Color
 import android.graphics.ColorMatrix
 import android.graphics.ColorMatrixColorFilter
-import android.graphics.LinearGradient
 import android.graphics.Matrix
 import android.graphics.Paint
 import android.graphics.PorterDuff
@@ -16,34 +15,26 @@ import android.graphics.Rect
 import android.graphics.RectF
 import android.graphics.Shader
 import android.graphics.Typeface
-import android.graphics.drawable.GradientDrawable
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.InputStream
 import java.util.Base64
 
-/**
- * 图片处理器 —— 用 Android 原生 Bitmap/Canvas 实现
- *
- * 对应 Spring Boot 后端的所有 API 端点：
- *   convert, resize, scale, rotate, flip, grayscale, invert, sepia,
- *   brightness-contrast, blur, sharpen, pixelate, vignette, border,
- *   round-corners, thumbnail, watermark-text, ascii, base64
- */
+// Image processor using Android native Bitmap/Canvas
+// Supports all 19 actions from the Spring Boot version
 object ImageProcessor {
 
-    /** 处理结果：成功 = bytes + contentType + filename；失败 = null + 错误消息 */
+    // Result: success = bytes + contentType + filename; failure = error message
     data class Result(
         val bytes: ByteArray? = null,
         val contentType: String = "image/png",
         val filename: String = "converted.png",
-        val text: String? = null,        // 文本类响应（ASCII/Base64）
+        val text: String? = null,
         val isText: Boolean = false,
         val dataUri: String? = null,
         val error: String? = null
     )
 
-    /** 入口：根据 action 路由到对应处理函数 */
+    // Entry: route to handler by action name
     fun process(action: String, params: Map<String, String>, fileBytes: ByteArray, fileName: String): Result {
         return try {
             val opts = BitmapFactory.Options().apply { inPreferredConfig = Bitmap.Config.ARGB_8888 }
