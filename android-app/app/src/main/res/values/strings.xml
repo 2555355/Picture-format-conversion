@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">图画工坊</string>
+    <string name="channel_name">图片服务</string>
+    <string name="channel_desc">本地图片处理服务运行中</string>
+</resources>
