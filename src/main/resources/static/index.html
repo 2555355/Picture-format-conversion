@@ -1877,6 +1877,10 @@
         }
 
         // Tool selection
+        const matchMediaSafe = (q) => {
+            if (typeof window.matchMedia === 'function') return window.matchMedia(q);
+            return { matches: window.innerWidth <= 768, addListener: () => {}, removeListener: () => {} };
+        };
         document.querySelectorAll('.tool-btn').forEach(btn => {
             btn.addEventListener('click', () => {
                 const tool = btn.dataset.tool;
@@ -1886,7 +1890,7 @@
                 currentTool = tool;
                 showProperties(tool);
                 // On mobile, close the sidebar drawer after picking a tool
-                if (window.matchMedia('(max-width: 768px)').matches) closeSidebar();
+                if (matchMediaSafe('(max-width: 768px)').matches) closeSidebar();
             });
         });
 
@@ -1936,7 +1940,11 @@
             if (!localStorage.getItem('imgstudio_onboarded')) {
                 setTimeout(openOnboarding, 400);
             }
-        } catch (e) { setTimeout(openOnboarding, 400); }
+        } catch (e) { /* localStorage unavailable, do not auto-popup */ }
+        // Click on backdrop (outside the card) closes onboarding
+        onboarding.addEventListener('click', (e) => {
+            if (e.target === onboarding) closeOnboarding();
+        });
 
         // Touch swipe-down to close properties (bottom sheet on mobile)
         (function() {
@@ -1944,7 +1952,7 @@
             const handle = sheet.querySelector('.sheet-handle');
             let startY = 0, startTransform = 0, dragging = false;
             function onStart(e) {
-                if (!window.matchMedia('(max-width: 768px)').matches) return;
+                if (!matchMediaSafe('(max-width: 768px)').matches) return;
                 if (!sheet.classList.contains('open')) return;
                 dragging = true;
                 startY = (e.touches ? e.touches[0].clientY : e.clientY);
