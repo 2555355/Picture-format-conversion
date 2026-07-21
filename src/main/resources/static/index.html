@@ -2,2350 +2,852 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>Image Studio · 图片工坊</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <title>图片工坊 · 简易版</title>
     <style>
+        /* ============ 极简主题 ============ */
         :root {
-            --bg-0: #f4f5fb;
-            --bg-1: #ffffff;
-            --bg-2: #f8f9fd;
-            --bg-3: #eef0f7;
-            --surface: rgba(255, 255, 255, 0.75);
-            --surface-2: rgba(255, 255, 255, 0.85);
-            --surface-3: rgba(255, 255, 255, 0.95);
-            --border: rgba(20, 20, 60, 0.08);
-            --border-2: rgba(20, 20, 60, 0.16);
+            --bg: #f5f6fa;
+            --card: #ffffff;
             --text: #1a1a2e;
-            --text-dim: #4a4a66;
-            --text-faint: #8a8aa3;
-            --primary: #7c3aed;
-            --primary-2: #ec4899;
-            --primary-3: #06b6d4;
-            --accent: #f59e0b;
-            --success: #10b981;
-            --danger: #ef4444;
-            --gradient-1: linear-gradient(135deg, #8b5cf6 0%, #ec4899 50%, #f97316 100%);
-            --gradient-2: linear-gradient(135deg, #06b6d4 0%, #8b5cf6 50%, #ec4899 100%);
-            --gradient-3: linear-gradient(135deg, #10b981 0%, #06b6d4 100%);
-            --gradient-cool: linear-gradient(135deg, #06b6d4 0%, #3b82f6 100%);
-            --shadow-sm: 0 2px 8px rgba(60, 60, 120, 0.08);
-            --shadow-md: 0 8px 32px rgba(60, 60, 120, 0.12);
-            --shadow-lg: 0 24px 60px rgba(60, 60, 120, 0.18);
-            --shadow-glow: 0 0 40px rgba(139, 92, 246, 0.25);
+            --text-dim: #5a5a78;
+            --primary: #6c5ce7;
+            --primary-d: #5a4bd1;
+            --primary-l: #edeaff;
+            --border: #e8e8f0;
+            --success: #00b894;
+            --danger: #ff4757;
+            --shadow: 0 4px 20px rgba(108, 92, 231, 0.15);
         }
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html, body { height: 100%; }
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-            background: var(--bg-0);
+        * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+        html, body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background: var(--bg);
             color: var(--text);
             min-height: 100vh;
-            overflow: hidden;
             -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-            font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11', 'ss01';
         }
-        /* Layered backgrounds: hero image (soft tint) + film grain noise */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url('/images/hero-bg.jpg');
-            background-size: cover;
-            background-position: center;
-            opacity: 0.22;
-            filter: saturate(1.2);
-            z-index: -3;
-            pointer-events: none;
-        }
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: url('/images/noise.png');
-            background-size: 200px 200px;
-            background-repeat: repeat;
-            opacity: 0.25;
-            mix-blend-mode: multiply;
-            z-index: -2;
-            pointer-events: none;
-        }
-        .vignette {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse at center, transparent 0%, rgba(244, 245, 251, 0) 60%, rgba(220, 224, 240, 0.6) 100%);
-            z-index: -1;
-            pointer-events: none;
-        }
+        body { padding: 16px; padding-bottom: 40px; }
 
-        .app {
-            position: relative;
-            z-index: 1;
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            grid-template-rows: 72px 1fr;
-            height: 100vh;
-            width: 100vw;
-        }
-
-        /* Header */
-        .header {
-            grid-column: 1 / -1;
+        /* ============ 顶部标题 ============ */
+        .topbar {
+            max-width: 720px;
+            margin: 0 auto 20px;
+            padding: 12px 0;
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            padding: 0 24px;
-            background: #ffffff;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            border-bottom: 1px solid var(--border);
-            z-index: 10;
-            position: relative;
+            gap: 12px;
         }
-        .header::before {
-            content: '';
-            position: absolute;
-            bottom: 0; left: 0; right: 0; height: 1px;
-            background: linear-gradient(90deg, transparent, var(--primary), var(--primary-2), var(--primary-3), transparent);
-            opacity: 0.4;
-        }
-        .logo {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-        }
-        .logo-icon {
-            width: 44px;
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            filter: drop-shadow(0 4px 16px rgba(139, 92, 246, 0.5));
-            transition: transform 0.3s;
-        }
-        .logo-icon:hover { transform: rotate(-8deg) scale(1.05); }
-        .logo-icon img { width: 100%; height: 100%; }
-        .logo-text {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.1;
-        }
-        .logo-title {
-            font-weight: 800;
-            font-size: 18px;
-            letter-spacing: -0.02em;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        .logo-sub {
-            font-size: 11px;
-            color: var(--text-dim);
-            font-weight: 500;
-            margin-top: 2px;
-            letter-spacing: 0.02em;
-        }
-        .header-actions {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .header-btn {
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 9px 16px;
-            border-radius: 12px;
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            transition: all 0.2s;
-            font-family: inherit;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-        }
-        .header-btn:hover { background: var(--surface-3); border-color: var(--border-2); transform: translateY(-1px); }
-        .header-btn.primary {
-            background: var(--gradient-1);
-            border: none;
-            box-shadow: 0 4px 20px rgba(139, 92, 246, 0.5);
-            color: white;
-            font-weight: 600;
-        }
-        .header-btn.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(139, 92, 246, 0.6); }
-        .header-btn:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-        .header-btn svg { width: 14px; height: 14px; fill: currentColor; }
-
-        /* Sidebar */
-        .sidebar {
-            background: #ffffff;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            border-right: 1px solid var(--border);
-            overflow-y: auto;
-            overflow-x: hidden;
-            padding: 20px 14px;
-            position: relative;
-        }
-        .sidebar::-webkit-scrollbar { width: 6px; }
-        .sidebar::-webkit-scrollbar-track { background: transparent; }
-        .sidebar::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }
-        .sidebar::-webkit-scrollbar-thumb:hover { background: var(--border-2); }
-
-        .sidebar-section {
-            margin-bottom: 22px;
-            position: relative;
-        }
-        .sidebar-section-bg {
-            position: absolute;
-            inset: -8px -10px -8px -10px;
-            background-size: cover;
-            background-position: center;
-            opacity: 0.08;
-            border-radius: 14px;
-            z-index: -1;
-            mask-image: linear-gradient(180deg, black 0%, transparent 100%);
-        }
-        .sidebar-section-header {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 0 8px;
-            margin-bottom: 10px;
-        }
-        .sidebar-section-icon {
-            width: 16px;
-            height: 16px;
-            opacity: 0.7;
-        }
-        .sidebar-section-title {
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-        }
-        .sidebar-section-line {
-            flex: 1;
-            height: 1px;
-            background: linear-gradient(90deg, var(--border-2), transparent);
-            margin-left: 6px;
-        }
-        .tool-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 8px;
-        }
-        .tool-btn {
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            color: var(--text);
-            padding: 14px 8px;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-            font-family: inherit;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 8px;
-            font-size: 11px;
-            font-weight: 500;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-        }
-        .tool-btn::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: var(--gradient-1);
-            opacity: 0;
-            transition: opacity 0.25s;
-            z-index: -1;
-        }
-        .tool-btn::after {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 2px;
-            background: var(--gradient-1);
-            transform: scaleX(0);
-            transform-origin: left;
-            transition: transform 0.3s;
-        }
-        .tool-btn:hover { border-color: var(--border-2); transform: translateY(-3px); box-shadow: var(--shadow-md); }
-        .tool-btn:hover::after { transform: scaleX(1); }
-        .tool-btn.active {
-            background: var(--gradient-1);
-            border-color: transparent;
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
-            transform: translateY(-2px);
-        }
-        .tool-btn.active::after { transform: scaleX(1); }
-        .tool-btn-icon {
-            width: 32px;
-            height: 32px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            border-radius: 8px;
-            background: var(--bg-3);
-            transition: background 0.25s;
-        }
-        .tool-btn.active .tool-btn-icon { background: rgba(255,255,255,0.2); }
-        .tool-btn-icon img { width: 22px; height: 22px; }
-        .tool-btn-label { position: relative; z-index: 1; }
-
-        /* Main canvas area */
-        .main {
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            position: relative;
-        }
-        .canvas-toolbar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 14px 28px;
-            border-bottom: 1px solid var(--border);
-            background: #ffffff;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-        }
-        .toolbar-info {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-size: 13px;
-        }
-        .info-chip {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-            padding: 7px 12px;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
+        .topbar .icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
             border-radius: 10px;
-            font-size: 12px;
-            color: var(--text-dim);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 18px;
+            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
         }
-        .info-chip strong { color: var(--text); font-weight: 600; }
-        .info-chip svg { width: 13px; height: 13px; fill: currentColor; opacity: 0.7; }
-        .toolbar-tabs {
-            display: flex;
-            gap: 4px;
-            background: var(--surface-2);
-            padding: 4px;
-            border-radius: 12px;
-            border: 1px solid var(--border);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
+        .topbar h1 {
+            font-size: 20px; font-weight: 700;
+            flex: 1;
         }
-        .tab-btn {
-            background: transparent;
-            border: none;
-            color: var(--text-dim);
-            padding: 7px 16px;
-            border-radius: 9px;
-            font-size: 12px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-family: inherit;
-        }
-        .tab-btn:hover { color: var(--text); }
-        .tab-btn.active {
-            background: var(--gradient-1);
-            color: white;
-            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.4);
+        .topbar .subtitle {
+            font-size: 12px; color: var(--text-dim); font-weight: 500;
         }
 
-        .canvas-area {
-            flex: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 32px;
-            position: relative;
-            overflow: auto;
+        /* ============ 卡片容器 ============ */
+        .card {
+            max-width: 720px;
+            margin: 0 auto 16px;
+            background: var(--card);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
         }
-        .canvas {
-            width: 100%;
-            height: 100%;
-            background-color: rgba(255, 255, 255, 0.55);
-            background-image:
-                linear-gradient(45deg, rgba(0,0,0,0.04) 25%, transparent 25%),
-                linear-gradient(-45deg, rgba(0,0,0,0.04) 25%, transparent 25%),
-                linear-gradient(45deg, transparent 75%, rgba(0,0,0,0.04) 75%),
-                linear-gradient(-45deg, transparent 75%, rgba(255,255,255,0.025) 75%);
-            background-size: 24px 24px;
-            background-position: 0 0, 0 12px, 12px -12px, -12px 0;
-            border-radius: 20px;
-            border: 1px solid var(--border-2);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            box-shadow: var(--shadow-md);
-        }
-        .canvas img {
-            max-width: 92%;
-            max-height: 92%;
-            object-fit: contain;
-            border-radius: 12px;
-            box-shadow: 0 24px 60px rgba(0,0,0,0.6);
-            animation: imageFadeIn 0.4s ease-out;
-        }
-        @keyframes imageFadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: none; }
-        }
-        .canvas-placeholder {
+
+        /* ============ 上传区 ============ */
+        .upload-area {
+            border: 2px dashed var(--primary);
+            border-radius: 14px;
+            padding: 36px 20px;
             text-align: center;
-            color: var(--text-faint);
-            padding: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--primary-l);
+        }
+        .upload-area:active, .upload-area:hover {
+            background: #e0d8ff;
+            border-color: var(--primary-d);
+        }
+        .upload-area .upload-icon {
+            font-size: 40px; margin-bottom: 8px;
+        }
+        .upload-area .upload-title {
+            font-size: 16px; font-weight: 600; margin-bottom: 4px;
+        }
+        .upload-area .upload-hint {
+            font-size: 12px; color: var(--text-dim);
+        }
+        #fileInput { display: none; }
+
+        /* ============ 图片预览 ============ */
+        .preview {
+            margin-top: 16px;
+            display: none;
+        }
+        .preview.show { display: block; }
+        .preview-img-wrap {
+            position: relative;
+            background: #f0f0f5;
+            border-radius: 12px;
+            overflow: hidden;
+            min-height: 120px;
             display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 16px;
+            justify-content: center;
         }
-        .canvas-placeholder-illust {
-            width: 200px;
-            height: 200px;
-            filter: drop-shadow(0 20px 40px rgba(139, 92, 246, 0.3));
-            animation: float 6s ease-in-out infinite;
+        .preview-img-wrap img {
+            max-width: 100%;
+            max-height: 300px;
+            display: block;
         }
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        .canvas-placeholder h3 {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text);
-            margin-bottom: 4px;
-            letter-spacing: -0.02em;
-        }
-        .canvas-placeholder p { font-size: 14px; color: var(--text-dim); max-width: 360px; line-height: 1.6; }
-        .canvas-placeholder-features {
+        .preview-info {
+            margin-top: 10px;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
             gap: 8px;
             flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 8px;
         }
-        .canvas-placeholder-features span {
-            padding: 6px 12px;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            border-radius: 20px;
-            font-size: 11px;
-            color: var(--text-dim);
-            font-weight: 500;
-        }
-        .select-file-btn {
-            background: var(--gradient-1);
-            color: white;
-            border: none;
-            padding: 14px 32px;
-            border-radius: 14px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 10px;
-            font-family: inherit;
-            box-shadow: 0 8px 24px rgba(139, 92, 246, 0.5);
-            transition: all 0.2s;
-            margin-top: 8px;
-        }
-        .select-file-btn:hover { transform: translateY(-2px); box-shadow: 0 12px 32px rgba(139, 92, 246, 0.6); }
-        .select-file-btn svg { width: 18px; height: 18px; fill: currentColor; }
-
-        .drop-overlay {
-            position: absolute;
-            inset: 16px;
-            background: rgba(139, 92, 246, 0.2);
-            border: 3px dashed var(--primary);
-            border-radius: 16px;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 5;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-        }
-        .drop-overlay.active { display: flex; animation: pulse 1.5s ease-in-out infinite; }
-        @keyframes pulse {
-            0%, 100% { box-shadow: inset 0 0 60px rgba(139, 92, 246, 0.2); }
-            50% { box-shadow: inset 0 0 100px rgba(139, 92, 246, 0.4); }
-        }
-        .drop-overlay-content {
-            text-align: center;
-            color: var(--text);
-        }
-        .drop-overlay-content svg { width: 64px; height: 64px; fill: var(--primary); margin-bottom: 12px; }
-        .drop-overlay-content h2 { font-size: 24px; font-weight: 700; }
-
-        /* Properties panel */
-        .properties {
-            position: fixed;
-            top: 72px;
-            right: 0;
-            bottom: 0;
-            width: 380px;
-            background: #ffffff;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            border-left: 1px solid var(--border);
-            padding: 24px;
-            overflow-y: auto;
-            transform: translateX(100%);
-            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 20;
-            box-shadow: -10px 0 40px rgba(0, 0, 0, 0.08);
-        }
-        .properties.open {
-            transform: translateX(0);
-        }
-        .properties::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--gradient-1);
-            opacity: 0.6;
-        }
-        .properties.open { transform: translateX(0); }
-        .properties::-webkit-scrollbar { width: 6px; }
-        .properties::-webkit-scrollbar-track { background: transparent; }
-        .properties::-webkit-scrollbar-thumb { background: var(--bg-3); border-radius: 3px; }
-
-        .properties-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-            padding-bottom: 18px;
-            border-bottom: 1px solid var(--border);
-        }
-        .properties-title {
-            font-size: 17px;
-            font-weight: 700;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            letter-spacing: -0.01em;
-        }
-        .properties-title-icon {
-            width: 40px;
-            height: 40px;
-            background: var(--gradient-1);
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
-            flex-shrink: 0;
-        }
-        .properties-title-icon img { width: 24px; height: 24px; }
-        .close-btn {
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            width: 34px;
-            height: 34px;
-            border-radius: 10px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s;
-        }
-        .close-btn:hover { background: var(--surface-3); color: var(--text); transform: rotate(90deg); }
-        .close-btn svg { width: 14px; height: 14px; fill: currentColor; }
-
-        .field {
-            margin-bottom: 18px;
-        }
-        .field-label {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            font-size: 11px;
-            font-weight: 700;
-            color: var(--text-dim);
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-        }
-        .field-value {
-            color: var(--primary);
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 12px;
-            text-transform: none;
-            padding: 2px 8px;
-            background: rgba(139, 92, 246, 0.12);
-            border-radius: 6px;
-        }
-        .field-input,
-        .field-select {
-            width: 100%;
-            padding: 11px 14px;
-            background: var(--bg-3);
-            border: 1px solid var(--border-2);
-            border-radius: 12px;
-            color: var(--text);
-            font-size: 14px;
-            font-family: inherit;
-            transition: all 0.2s;
-        }
-        .field-input::placeholder { color: var(--text-faint); }
-        .field-input:focus,
-        .field-select:focus {
-            outline: none;
-            border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.18);
-            background: var(--bg-3);
-        }
-        .field-select {
-            appearance: none;
-            -webkit-appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%234a4a66'><path d='M7 10l5 5 5-5z'/></svg>");
-            background-repeat: no-repeat;
-            background-position: right 10px center;
-            background-size: 20px;
-            padding-right: 36px;
-            cursor: pointer;
-        }
-        /* Let options use native browser styling so they are always readable */
-        .field-select option,
-        .field-select option:checked {
-            background: #ffffff;
-            color: #1a1a2e;
-            font-family: inherit;
-        }
-        .field-range {
-            width: 100%;
-            -webkit-appearance: none;
-            appearance: none;
-            height: 6px;
-            background: var(--bg-3);
-            border-radius: 3px;
-            outline: none;
-            cursor: pointer;
-        }
-        .field-range::-webkit-slider-thumb {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 20px;
-            height: 20px;
-            background: var(--gradient-1);
-            border-radius: 50%;
-            cursor: pointer;
-            box-shadow: 0 2px 10px rgba(139, 92, 246, 0.6);
-            transition: transform 0.15s;
-        }
-        .field-range::-webkit-slider-thumb:hover { transform: scale(1.2); }
-        .field-range::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
-            background: var(--primary);
-            border-radius: 50%;
-            cursor: pointer;
-            border: none;
-        }
-        .field-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-        }
-        .color-input-wrap {
-            display: flex;
-            gap: 8px;
-        }
-        .color-input-wrap input[type="color"] {
-            width: 46px;
-            height: 44px;
-            background: var(--bg-2);
-            border: 1px solid var(--border);
-            border-radius: 12px;
-            cursor: pointer;
-            padding: 4px;
-        }
-        .color-input-wrap input[type="text"] { flex: 1; font-family: 'JetBrains Mono', monospace; text-transform: uppercase; }
-        .color-input-wrap input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
-        .color-input-wrap input[type="color"]::-webkit-color-swatch { border: none; border-radius: 8px; }
-
-        .btn {
-            width: 100%;
-            padding: 13px 16px;
-            border: none;
-            border-radius: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            font-family: inherit;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-            letter-spacing: 0.01em;
-        }
-        .btn-primary {
-            background: var(--gradient-1);
-            color: white;
-            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.4);
-        }
-        .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 8px 22px rgba(139, 92, 246, 0.55); }
-        .btn-primary:disabled { opacity: 0.4; cursor: not-allowed; transform: none; }
-        .btn-secondary {
-            background: var(--surface-2);
-            color: var(--text);
-            border: 1px solid var(--border);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-        }
-        .btn-secondary:hover { background: var(--surface-3); border-color: var(--border-2); }
-        .btn-group { display: flex; gap: 8px; }
-        .btn-group .btn { flex: 1; }
-
-        /* Loading overlay */
-        .loader {
-            position: absolute;
-            inset: 0;
-            background: rgba(244, 245, 251, 0.95);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 10;
-            border-radius: 20px;
-        }
-        .loader.active { display: flex; }
-        .loader-content { text-align: center; }
-        .spinner {
-            width: 56px;
-            height: 56px;
-            border: 3px solid var(--border-2);
-            border-top-color: var(--primary);
-            border-right-color: var(--primary-2);
-            border-radius: 50%;
-            animation: spin 0.8s linear infinite;
-            margin: 0 auto 14px;
-        }
-        .loader-text {
-            font-size: 13px;
-            color: var(--text-dim);
-            font-weight: 500;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-
-        /* Toast notifications */
-        .toast-container {
-            position: fixed;
-            bottom: 24px;
-            right: 24px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .toast {
-            min-width: 300px;
-            padding: 14px 18px;
-            border-radius: 14px;
-            color: white;
-            font-size: 13px;
-            font-weight: 500;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            box-shadow: var(--shadow-lg);
-            border: 1px solid rgba(255,255,255,0.1);
-            animation: slideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .toast.success { background: rgba(16, 185, 129, 0.95); }
-        .toast.error { background: rgba(239, 68, 68, 0.95); }
-        .toast.info { background: rgba(6, 182, 212, 0.95); }
-        .toast svg { width: 18px; height: 18px; fill: white; flex-shrink: 0; }
-        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: none; opacity: 1; } }
-
-        /* Result area */
-        .result-area {
-            width: 100%;
-            height: 100%;
-            padding: 16px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            overflow: auto;
-        }
-        .ascii-box {
-            background: #1a1a2e;
-            color: #00ff88;
-            padding: 20px;
-            border-radius: 12px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 8px;
-            line-height: 1;
-            white-space: pre;
-            overflow: auto;
-            flex: 1;
-            border: 1px solid var(--border);
-        }
-        .base64-box {
-            background: var(--bg-2);
-            border: 1px solid var(--border);
-            padding: 16px;
-            border-radius: 12px;
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 11px;
+        .preview-info .name {
+            font-size: 13px; font-weight: 600;
             word-break: break-all;
-            overflow: auto;
-            flex: 1;
-            color: var(--text-dim);
+            flex: 1; min-width: 0;
         }
-
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
-            gap: 12px;
-            padding: 4px;
+        .preview-info .meta {
+            font-size: 12px; color: var(--text-dim);
         }
-        .info-card {
-            background: var(--surface-2);
+        .btn-remove {
+            background: transparent;
             border: 1px solid var(--border);
-            padding: 18px;
-            border-radius: 14px;
-            text-align: left;
-            position: relative;
-            overflow: hidden;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-        }
-        .info-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0; height: 3px;
-            background: var(--gradient-1);
-        }
-        .info-card-label {
-            font-size: 11px;
-            color: var(--text-faint);
-            text-transform: uppercase;
-            letter-spacing: 0.06em;
-            font-weight: 600;
-        }
-        .info-card-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--text);
-            margin-top: 6px;
-            font-family: 'JetBrains Mono', monospace;
-            letter-spacing: -0.02em;
-        }
-        .info-card-value small { font-size: 12px; color: var(--text-dim); font-weight: 500; margin-left: 4px; }
-
-        .wm-file-zone {
-            background: var(--bg-2);
-            border: 2px dashed var(--border-2);
-            border-radius: 12px;
-            padding: 18px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-size: 13px;
             color: var(--text-dim);
+            padding: 5px 12px;
+            border-radius: 8px;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .btn-remove:active { background: #f0f0f5; }
+
+        /* ============ 功能列表 ============ */
+        .actions-card { display: none; }
+        .actions-card.show { display: block; }
+        .actions-title {
+            font-size: 14px; font-weight: 700;
+            margin-bottom: 14px;
+            display: flex; align-items: center; gap: 6px;
+        }
+        .actions-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+        }
+        @media (min-width: 600px) {
+            .actions-grid { grid-template-columns: repeat(3, 1fr); }
+        }
+        .action-btn {
+            background: var(--card);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 14px 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 13px;
+            font-weight: 600;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 8px;
+            gap: 6px;
+            transition: all 0.15s;
         }
-        .wm-file-zone:hover { border-color: var(--primary); background: var(--bg-3); color: var(--text); }
-        .wm-file-zone svg { width: 24px; height: 24px; fill: currentColor; }
+        .action-btn:active {
+            background: var(--primary-l);
+            border-color: var(--primary);
+            transform: scale(0.97);
+        }
+        .action-btn .emoji {
+            font-size: 24px;
+        }
 
-        /* ============ Touch / hint enhancements ============ */
-        .tool-tip {
-            font-size: 12px;
+        /* ============ 参数面板 (弹窗) ============ */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(20, 20, 60, 0.4);
+            display: none;
+            align-items: flex-end;
+            justify-content: center;
+            z-index: 1000;
+        }
+        .modal-overlay.show { display: flex; }
+        .modal {
+            background: var(--card);
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            border-radius: 18px 18px 0 0;
+            padding: 20px;
+            transform: translateY(100%);
+            transition: transform 0.25s ease-out;
+        }
+        .modal-overlay.show .modal { transform: translateY(0); }
+        @media (min-width: 600px) {
+            .modal-overlay { align-items: center; }
+            .modal { border-radius: 18px; }
+        }
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        .modal-header h3 {
+            font-size: 17px;
+        }
+        .modal-close {
+            background: var(--bg);
+            border: none;
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            font-size: 20px;
+            cursor: pointer;
             color: var(--text-dim);
-            background: rgba(139, 92, 246, 0.08);
-            border-left: 3px solid var(--primary);
+            font-family: inherit;
+        }
+        .modal-close:active { background: #e8e8f0; }
+        .modal-desc {
+            font-size: 13px;
+            color: var(--text-dim);
+            margin-bottom: 14px;
             padding: 10px 12px;
-            border-radius: 8px;
-            line-height: 1.55;
+            background: var(--bg);
+            border-radius: 10px;
+        }
+        .field {
             margin-bottom: 14px;
         }
-        .tool-tip strong { color: var(--text); font-weight: 600; }
-        .step-pill {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 22px; height: 22px;
-            border-radius: 50%;
-            background: var(--gradient-1);
-            color: #fff;
-            font-size: 12px;
-            font-weight: 700;
-            margin-right: 8px;
-            flex-shrink: 0;
-        }
-
-        /* Mobile-only hamburger + overlay (hidden on desktop) */
-        .menu-toggle {
-            display: none;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            color: var(--text);
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            cursor: pointer;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-        }
-        .menu-toggle svg { width: 20px; height: 20px; fill: currentColor; }
-        .sidebar-close {
-            display: none;
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            width: 36px;
-            height: 36px;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            color: var(--text);
-            border-radius: 10px;
-            cursor: pointer;
-            align-items: center;
-            justify-content: center;
-            z-index: 2;
-        }
-        .sidebar-close svg { width: 16px; height: 16px; fill: currentColor; }
-        @media (max-width: 768px) {
-            .sidebar-close { display: inline-flex; }
-        }
-        .mobile-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(20, 20, 60, 0.25);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            z-index: 150;
-            display: none;
-            opacity: 0;
-            transition: opacity 0.25s;
-        }
-        .mobile-overlay.show { display: block; opacity: 1; }
-
-        /* ============ Mobile responsive ============ */
-        @media (max-width: 1100px) {
-            .properties { width: 340px; }
-        }
-        @media (max-width: 900px) {
-            .app { grid-template-columns: 90px 1fr; }
-            .tool-grid { grid-template-columns: 1fr; }
-            .tool-btn { padding: 10px 4px; font-size: 10px; gap: 4px; }
-            .tool-btn-icon { width: 28px; height: 28px; }
-            .properties { width: 100%; }
-            .sidebar-section-title, .sidebar-section-line, .sidebar-section-icon { display: none; }
-            .logo-text { display: none; }
-        }
-        /* Phone layout */
-        @media (max-width: 768px) {
-            body { overflow: auto; }
-            .app {
-                grid-template-columns: 1fr;
-                grid-template-rows: 60px auto 1fr;
-                height: 100vh;
-                min-height: 100vh;
-            }
-            .header {
-                padding: 0 14px;
-                grid-column: 1;
-                position: sticky;
-                top: 0;
-            }
-            .menu-toggle { display: inline-flex; }
-            .logo-icon { width: 36px; height: 36px; }
-            .header-btn { padding: 8px 12px; font-size: 12px; border-radius: 10px; }
-            .header-btn .label-text { display: none; }
-            .header-actions { gap: 6px; }
-            .header-btn.primary { padding: 8px 14px; }
-
-            /* Sidebar becomes slide-in drawer */
-            .sidebar {
-                position: fixed;
-                top: 0; left: 0; bottom: 0;
-                width: 280px;
-                transform: translateX(-100%);
-                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-                z-index: 200;
-                padding: 70px 14px 20px;
-                background: #ffffff;
-                backdrop-filter: none;
-                -webkit-backdrop-filter: none;
-            }
-            .sidebar.open { transform: translateX(0); }
-            .sidebar .sidebar-section-title,
-            .sidebar .sidebar-section-line,
-            .sidebar .sidebar-section-icon { display: flex; }
-            .sidebar .sidebar-section-title { display: block; }
-            .sidebar-section-line { display: block !important; }
-            .tool-grid { grid-template-columns: 1fr 1fr; }
-            .tool-btn {
-                padding: 12px 6px;
-                font-size: 11px;
-                gap: 6px;
-                background: rgba(255, 255, 255, 0.9);
-                border: 1px solid var(--border-2);
-                color: var(--text);
-            }
-            .tool-btn-icon {
-                width: 30px;
-                height: 30px;
-                background: rgba(124, 58, 237, 0.1);
-            }
-            .tool-btn-icon img { width: 22px; height: 22px; }
-            .sidebar-section-title { color: var(--text-dim); opacity: 1; }
-
-            /* Properties becomes bottom sheet */
-            .properties {
-                position: fixed;
-                top: auto;
-                left: 0; right: 0; bottom: 0;
-                width: 100%;
-                max-height: 88vh;
-                border-radius: 20px 20px 0 0;
-                border-left: none;
-                border-top: 1px solid var(--border-2);
-                padding: 16px 18px 28px;
-                transform: translateY(100%);
-                transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-                z-index: 70;
-                background: #ffffff;
-                backdrop-filter: none;
-                -webkit-backdrop-filter: none;
-            }
-            .properties::before {
-                height: 4px;
-                background: var(--gradient-1);
-            }
-            .properties.open { transform: translateY(0); }
-            .properties-header { margin-bottom: 14px; padding-bottom: 12px; }
-            .properties-title { font-size: 15px; }
-            .properties-title-icon { width: 36px; height: 36px; }
-            .close-btn { width: 32px; height: 32px; }
-
-            /* Sheet drag handle */
-            .sheet-handle {
-                position: absolute;
-                top: 8px;
-                left: 50%;
-                transform: translateX(-50%);
-                width: 44px;
-                height: 5px;
-                background: var(--border-2);
-                border-radius: 3px;
-            }
-            .properties.open .sheet-handle { display: block; }
-            .sheet-handle { display: block; }
-
-            .field-input, .field-select {
-                padding: 13px 14px;
-                font-size: 15px; /* prevents iOS zoom */
-            }
-            .field-input, .field-select, .field-range, .btn { min-height: 44px; }
-            .btn { padding: 14px 16px; font-size: 15px; }
-            .btn-group .btn { min-height: 44px; }
-
-            .main { grid-row: 3; min-height: 50vh; }
-            .canvas-toolbar { padding: 10px 14px; flex-wrap: wrap; gap: 8px; }
-            .toolbar-info { flex-wrap: wrap; gap: 6px; }
-            .info-chip { padding: 6px 10px; font-size: 11px; }
-            .toolbar-tabs { font-size: 11px; }
-            .tab-btn { padding: 6px 12px; font-size: 11px; }
-            .canvas-area { padding: 16px; }
-            .canvas { border-radius: 14px; }
-            .canvas img { max-width: 100%; max-height: 100%; border-radius: 8px; }
-            .canvas-placeholder-illust { width: 140px; height: 140px; }
-            .canvas-placeholder h3 { font-size: 18px; }
-            .canvas-placeholder p { font-size: 13px; }
-            .select-file-btn { padding: 12px 24px; font-size: 14px; }
-
-            .toast-container {
-                bottom: 12px;
-                right: 12px;
-                left: 12px;
-            }
-            .toast { min-width: auto; width: 100%; font-size: 12px; padding: 12px 14px; }
-
-            .info-grid { grid-template-columns: repeat(2, 1fr); gap: 8px; }
-            .info-card { padding: 12px; }
-            .info-card-value { font-size: 18px; }
-            .ascii-box { font-size: 6px; padding: 12px; }
-            .base64-box { font-size: 10px; padding: 12px; }
-            .field-row { grid-template-columns: 1fr 1fr; gap: 8px; }
-        }
-        @media (max-width: 420px) {
-            .header-btn.primary .label-text { display: none; }
-            .header-btn.primary { padding: 8px 12px; }
-            .canvas-placeholder h3 { font-size: 16px; }
-            .canvas-placeholder p { font-size: 12px; }
-        }
-
-        /* Onboarding modal */
-        .onboarding {
-            position: fixed;
-            inset: 0;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.5);
-            backdrop-filter: none;
-            -webkit-backdrop-filter: none;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.3s;
-        }
-        .onboarding.show { opacity: 1; pointer-events: none; }
-        .onboarding.show .onboarding-card { pointer-events: auto; }
-        .onboarding-card {
-            background: rgba(255, 255, 255, 0.98);
-            border: 1px solid var(--border-2);
-            border-radius: 20px;
-            padding: 28px 24px 24px;
-            max-width: 420px;
-            width: 100%;
-            box-shadow: var(--shadow-lg);
-            position: relative;
-            overflow: hidden;
-        }
-        .onboarding-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 3px;
-            background: var(--gradient-1);
-        }
-        .onboarding-illust {
-            width: 88px;
-            height: 88px;
-            margin: 0 auto 16px;
+        .field-label {
             display: block;
-            filter: drop-shadow(0 12px 24px rgba(139, 92, 246, 0.4));
-            animation: float 6s ease-in-out infinite;
-        }
-        .onboarding h2 {
-            text-align: center;
-            font-size: 22px;
-            font-weight: 800;
-            margin-bottom: 6px;
-            background: var(--gradient-1);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            letter-spacing: -0.02em;
-        }
-        .onboarding .subtitle {
-            text-align: center;
-            color: var(--text-dim);
             font-size: 13px;
-            margin-bottom: 22px;
-        }
-        .onboarding-step {
-            display: flex;
-            align-items: flex-start;
-            padding: 12px 0;
-            border-bottom: 1px solid var(--border);
-        }
-        .onboarding-step:last-of-type { border-bottom: none; }
-        .onboarding-step-text {
-            font-size: 13px;
-            color: var(--text-dim);
-            line-height: 1.55;
-        }
-        .onboarding-step-text strong {
-            color: var(--text);
-            display: block;
-            font-size: 14px;
-            margin-bottom: 2px;
             font-weight: 600;
+            margin-bottom: 6px;
         }
-        .onboarding-actions {
+        .field-input {
+            width: 100%;
+            padding: 11px 12px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-family: inherit;
+            background: var(--card);
+            color: var(--text);
+        }
+        .field-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+        }
+        select.field-input {
+            -webkit-appearance: none;
+            appearance: none;
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path fill='%235a5a78' d='M6 9L1 3h10z'/></svg>");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            padding-right: 36px;
+        }
+        .field-row {
             display: flex;
             gap: 10px;
-            margin-top: 22px;
         }
-        .onboarding-actions .btn { flex: 1; }
-        .onboarding-skip {
-            background: var(--surface-2);
-            color: var(--text);
-            border: 1px solid var(--border);
-        }
-        .onboarding-go {
-            background: var(--gradient-1);
-            color: white;
-            box-shadow: 0 4px 14px rgba(139, 92, 246, 0.5);
-        }
-
-        /* Help button (always visible) */
-        .help-btn {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            background: var(--gradient-1);
-            color: white;
-            border: none;
-            cursor: pointer;
+        .field-row .field { flex: 1; }
+        .range-wrap {
             display: flex;
             align-items: center;
+            gap: 10px;
+        }
+        .range-wrap input[type="range"] {
+            flex: 1;
+            accent-color: var(--primary);
+        }
+        .range-value {
+            min-width: 50px;
+            text-align: right;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+        input[type="color"] {
+            width: 60px;
+            height: 40px;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            padding: 2px;
+        }
+
+        /* ============ 按钮 ============ */
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: inherit;
+            transition: background 0.15s;
+            margin-top: 8px;
+        }
+        .btn-primary:active { background: var(--primary-d); }
+        .btn-primary:disabled {
+            background: #b0a8e0;
+            cursor: not-allowed;
+        }
+        .btn-secondary {
+            width: 100%;
+            padding: 12px;
+            background: var(--bg);
+            color: var(--text);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+            margin-top: 8px;
+        }
+        .btn-secondary:active { background: #e8e8f0; }
+
+        /* ============ 结果区 ============ */
+        .result-card { display: none; }
+        .result-card.show { display: block; }
+        .result-img-wrap {
+            background: #f0f0f5;
+            border-radius: 12px;
+            padding: 12px;
+            text-align: center;
+            margin-bottom: 12px;
+        }
+        .result-img-wrap img {
+            max-width: 100%;
+            max-height: 400px;
+        }
+        .result-text {
+            background: #f0f0f5;
+            border-radius: 10px;
+            padding: 12px;
+            font-family: ui-monospace, "SF Mono", monospace;
+            font-size: 11px;
+            white-space: pre-wrap;
+            word-break: break-all;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 12px;
+        }
+
+        /* ============ Toast 提示 ============ */
+        .toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) translateY(-100px);
+            background: var(--text);
+            color: white;
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 500;
+            z-index: 2000;
+            transition: transform 0.25s;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            max-width: 90%;
+            text-align: center;
+        }
+        .toast.show { transform: translateX(-50%) translateY(0); }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+
+        /* ============ Loading ============ */
+        .loading-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(255, 255, 255, 0.8);
+            display: none;
+            align-items: center;
             justify-content: center;
-            box-shadow: 0 6px 20px rgba(139, 92, 246, 0.5);
-            z-index: 40;
-            transition: transform 0.2s;
+            z-index: 3000;
         }
-        .help-btn:hover { transform: scale(1.1); }
-        .help-btn svg { width: 22px; height: 22px; fill: currentColor; }
-        @media (max-width: 768px) {
-            .help-btn {
-                bottom: 14px;
-                right: 14px;
-                width: 40px;
-                height: 40px;
-            }
-            .help-btn svg { width: 20px; height: 20px; }
+        .loading-overlay.show { display: flex; }
+        .spinner {
+            width: 40px; height: 40px;
+            border: 4px solid var(--primary-l);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
         }
+        @keyframes spin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
-    <div class="vignette"></div>
-    <div class="app">
-        <!-- Header -->
-        <header class="header">
-            <div style="display:flex; align-items:center; gap:12px;">
-                <button class="menu-toggle" id="menuToggle" aria-label="打开工具菜单">
-                    <svg viewBox="0 0 24 24"><path d="M3 18h18v-2H3v2zm0-5h18v-2H3v2zm0-7v2h18V6H3z"/></svg>
-                </button>
-                <div class="logo">
-                    <div class="logo-icon"><img src="/images/logo.svg" alt="IS"></div>
-                    <div class="logo-text">
-                        <div class="logo-title">Image Studio</div>
-                        <div class="logo-sub">专业图片处理工作台 · 20+ 种工具</div>
-                    </div>
-                </div>
-            </div>
-            <div class="header-actions">
-                <button class="header-btn" id="newFileBtn">
-                    <svg viewBox="0 0 24 24"><path d="M19 13v6H5v-6H3v8h18v-8h-2zm-6 .67l2.59-2.58L17 12.5l-5 5-5-5 1.41-1.41L11 13.67V3h2v10.67z"/></svg>
-                    <span class="label-text">新建</span>
-                </button>
-                <button class="header-btn" id="useAsInputBtn" disabled>
-                    <svg viewBox="0 0 24 24"><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg>
-                    <span class="label-text">套用</span>
-                </button>
-                <button class="header-btn primary" id="downloadBtn" disabled>
-                    <svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z"/></svg>
-                    <span class="label-text">下载</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <button class="sidebar-close" id="sidebarClose" aria-label="关闭工具菜单">
-                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            </button>
-            <div class="sidebar-section" data-bg="basic">
-                <div class="sidebar-section-bg" style="background-image:url('/images/cat-basic.jpg')"></div>
-                <div class="sidebar-section-header">
-                    <svg class="sidebar-section-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 17v2h6v-2H3zM3 5v2h10V5H3zm10 16v-2h8v-2h-8v-2h-2v6h2zM7 9v2H3v2h4v2h2V9H7zm14 4v-2H11v2h10zm-6-4h2V7h4V5h-4V3h-2v6z"/></svg>
-                    <div class="sidebar-section-title">基础工具</div>
-                    <div class="sidebar-section-line"></div>
-                </div>
-                <div class="tool-grid">
-                    <button class="tool-btn" data-tool="convert">
-                        <div class="tool-btn-icon"><img src="/images/tool-convert.svg" alt=""></div>
-                        <div class="tool-btn-label">格式转换</div>
-                    </button>
-                    <button class="tool-btn" data-tool="resize">
-                        <div class="tool-btn-icon"><img src="/images/tool-resize.svg" alt=""></div>
-                        <div class="tool-btn-label">缩放</div>
-                    </button>
-                    <button class="tool-btn" data-tool="crop">
-                        <div class="tool-btn-icon"><img src="/images/tool-crop.svg" alt=""></div>
-                        <div class="tool-btn-label">裁剪</div>
-                    </button>
-                    <button class="tool-btn" data-tool="rotate">
-                        <div class="tool-btn-icon"><img src="/images/tool-rotate.svg" alt=""></div>
-                        <div class="tool-btn-label">旋转/翻转</div>
-                    </button>
-                </div>
-            </div>
-
-            <div class="sidebar-section" data-bg="filter">
-                <div class="sidebar-section-bg" style="background-image:url('/images/cat-filter.jpg')"></div>
-                <div class="sidebar-section-header">
-                    <svg class="sidebar-section-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zM7 13h2v-2H7v2zm4-4h2V7h-2v2zm0 4h2v-2h-2v2zm4 0h2v-2h-2v2z"/></svg>
-                    <div class="sidebar-section-title">色彩滤镜</div>
-                    <div class="sidebar-section-line"></div>
-                </div>
-                <div class="tool-grid">
-                    <button class="tool-btn" data-tool="filters">
-                        <div class="tool-btn-icon"><img src="/images/tool-filter.svg" alt=""></div>
-                        <div class="tool-btn-label">滤镜</div>
-                    </button>
-                    <button class="tool-btn" data-tool="adjust">
-                        <div class="tool-btn-icon"><img src="/images/tool-adjust.svg" alt=""></div>
-                        <div class="tool-btn-label">色彩调整</div>
-                    </button>
-                    <button class="tool-btn" data-tool="effects">
-                        <div class="tool-btn-icon"><img src="/images/tool-effects.svg" alt=""></div>
-                        <div class="tool-btn-label">艺术效果</div>
-                    </button>
-                    <button class="tool-btn" data-tool="blur">
-                        <div class="tool-btn-icon"><img src="/images/tool-blur.svg" alt=""></div>
-                        <div class="tool-btn-label">模糊/锐化</div>
-                    </button>
-                </div>
-            </div>
-
-            <div class="sidebar-section" data-bg="decorate">
-                <div class="sidebar-section-bg" style="background-image:url('/images/cat-decorate.jpg')"></div>
-                <div class="sidebar-section-header">
-                    <svg class="sidebar-section-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M21 11h-1V3c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v8H3c-1.1 0-2 .9-2 2v7c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2v-7c0-1.1-.9-2-2-2zM6 3h12v8H6V3z"/></svg>
-                    <div class="sidebar-section-title">装饰</div>
-                    <div class="sidebar-section-line"></div>
-                </div>
-                <div class="tool-grid">
-                    <button class="tool-btn" data-tool="watermark">
-                        <div class="tool-btn-icon"><img src="/images/tool-watermark.svg" alt=""></div>
-                        <div class="tool-btn-label">水印</div>
-                    </button>
-                    <button class="tool-btn" data-tool="border">
-                        <div class="tool-btn-icon"><img src="/images/tool-border.svg" alt=""></div>
-                        <div class="tool-btn-label">边框/圆角</div>
-                    </button>
-                </div>
-            </div>
-
-            <div class="sidebar-section" data-bg="tools">
-                <div class="sidebar-section-bg" style="background-image:url('/images/cat-tools.jpg')"></div>
-                <div class="sidebar-section-header">
-                    <svg class="sidebar-section-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>
-                    <div class="sidebar-section-title">实用工具</div>
-                    <div class="sidebar-section-line"></div>
-                </div>
-                <div class="tool-grid">
-                    <button class="tool-btn" data-tool="info">
-                        <div class="tool-btn-icon"><img src="/images/tool-info.svg" alt=""></div>
-                        <div class="tool-btn-label">图片信息</div>
-                    </button>
-                    <button class="tool-btn" data-tool="ascii">
-                        <div class="tool-btn-icon"><img src="/images/tool-ascii.svg" alt=""></div>
-                        <div class="tool-btn-label">ASCII</div>
-                    </button>
-                    <button class="tool-btn" data-tool="base64">
-                        <div class="tool-btn-icon"><img src="/images/tool-base64.svg" alt=""></div>
-                        <div class="tool-btn-label">Base64</div>
-                    </button>
-                    <button class="tool-btn" data-tool="thumbnail">
-                        <div class="tool-btn-icon"><img src="/images/tool-thumbnail.svg" alt=""></div>
-                        <div class="tool-btn-label">缩略图</div>
-                    </button>
-                </div>
-            </div>
-        </aside>
-
-        <!-- Main canvas -->
-        <main class="main">
-            <div class="canvas-toolbar">
-                <div class="toolbar-info">
-                    <div class="info-chip" id="fileChip" style="display:none;">
-                        <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg>
-                        <span><strong id="fileName">-</strong> · <span id="fileSize">-</span></span>
-                    </div>
-                    <div class="info-chip" id="dimensionsChip" style="display:none;">
-                        <svg viewBox="0 0 24 24"><path d="M3 5v14h18V5H3zm16 12H5V7h14v10z"/></svg>
-                        <span><strong id="dimensions">-</strong></span>
-                    </div>
-                </div>
-                <div class="toolbar-tabs">
-                    <button class="tab-btn active" id="tabImage">图像</button>
-                    <button class="tab-btn" id="tabResult">结果</button>
-                </div>
-            </div>
-            <div class="canvas-area" id="canvasArea">
-                <div class="canvas" id="canvas">
-                    <div class="canvas-placeholder" id="placeholder">
-                        <img src="/images/empty-illustration.svg" class="canvas-placeholder-illust" alt="">
-                        <h3>将图片拖入此处开始处理</h3>
-                        <p>支持 PNG、JPG、GIF、BMP、WEBP、TIFF、PSD 等格式<br>提供 20+ 种专业图片处理工具</p>
-                        <div class="canvas-placeholder-features">
-                            <span>格式转换</span>
-                            <span>缩放裁剪</span>
-                            <span>滤镜</span>
-                            <span>水印</span>
-                            <span>艺术效果</span>
-                            <span>ASCII</span>
-                        </div>
-                        <button class="select-file-btn" id="selectFileBtn">
-                            <svg viewBox="0 0 24 24"><path d="M19 13v6H5v-6H3v8h18v-8h-2zm-6 .67l2.59-2.58L17 12.5l-5 5-5-5 1.41-1.41L11 13.67V3h2v10.67z"/></svg>
-                            选择本地图片
-                        </button>
-                    </div>
-                    <img id="previewImage" style="display:none;">
-                    <div class="drop-overlay" id="dropOverlay">
-                        <div class="drop-overlay-content">
-                            <svg viewBox="0 0 24 24"><path d="M19 13v6H5v-6H3v8h18v-8h-2zm-6 .67l2.59-2.58L17 12.5l-5 5-5-5 1.41-1.41L11 13.67V3h2v10.67z"/></svg>
-                            <h2>松开鼠标上传</h2>
-                        </div>
-                    </div>
-                    <div class="loader" id="loader">
-                        <div class="loader-content">
-                            <div class="spinner"></div>
-                            <div class="loader-text" id="loaderText">处理中...</div>
-                        </div>
-                    </div>
-                </div>
-                <input type="file" id="fileInput" accept="image/*" hidden>
-            </div>
-        </main>
-    </div>
-
-    <!-- Mobile overlay (drawer backdrop) - placed BEFORE sidebar so sidebar stacks above it -->
-    <div class="mobile-overlay" id="mobileOverlay"></div>
-
-    <!-- Properties drawer (becomes bottom sheet on mobile) -->
-    <div class="properties" id="properties">
-        <div class="sheet-handle"></div>
-        <div class="properties-header">
-            <div class="properties-title">
-                <div class="properties-title-icon" id="propIcon">
-                    <img src="/images/tool-convert.svg" alt="">
-                </div>
-                <span id="propTitle">工具</span>
-            </div>
-            <button class="close-btn" id="closeProp">
-                <svg viewBox="0 0 24 24"><path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
-            </button>
+    <div class="topbar">
+        <div class="icon">图</div>
+        <div>
+            <h1>图片工坊</h1>
+            <div class="subtitle">上传 → 选功能 → 下载</div>
         </div>
-        <div id="propContent"></div>
     </div>
 
-    <!-- Toast container -->
-    <div class="toast-container" id="toastContainer"></div>
-
-    <!-- Help button (always visible, opens onboarding) -->
-    <button class="help-btn" id="helpBtn" aria-label="使用帮助">
-        <svg viewBox="0 0 24 24"><path d="M11 18h2v-2h-2v2zm1-16C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm0-14c-2.21 0-4 1.79-4 4h2c0-1.1.9-2 2-2s2 .9 2 2c0 2-3 1.75-3 5h2c0-2.25 3-2.5 3-5 0-2.21-1.79-4-4-4z"/></svg>
-    </button>
-
-    <!-- Onboarding modal -->
-    <div class="onboarding" id="onboarding">
-        <div class="onboarding-card">
-            <img src="/images/empty-illustration.svg" class="onboarding-illust" alt="">
-            <h2>欢迎使用图片工坊</h2>
-            <div class="subtitle">3 步即可完成图片处理 · 无需安装 · 完全免费</div>
-
-            <div class="onboarding-step">
-                <span class="step-pill">1</span>
-                <div class="onboarding-step-text">
-                    <strong>上传图片</strong>
-                    点击「选择本地图片」或将图片拖入画布，支持 PNG / JPG / WEBP / GIF / BMP / TIFF / PSD 等 20+ 格式
-                </div>
+    <!-- 1. 上传 -->
+    <div class="card">
+        <div class="upload-area" id="uploadArea">
+            <div class="upload-icon">📁</div>
+            <div class="upload-title">点击选择图片</div>
+            <div class="upload-hint">支持 PNG / JPG / GIF / BMP / WEBP / TIFF</div>
+        </div>
+        <input type="file" id="fileInput" accept="image/*">
+        <div class="preview" id="preview">
+            <div class="preview-img-wrap">
+                <img id="previewImg" alt="预览">
             </div>
-            <div class="onboarding-step">
-                <span class="step-pill">2</span>
-                <div class="onboarding-step-text">
-                    <strong>选择工具</strong>
-                    从左侧工具栏挑选需要的操作：格式转换、缩放裁剪、滤镜、水印、边框、ASCII 艺术等
+            <div class="preview-info">
+                <div>
+                    <div class="name" id="previewName"></div>
+                    <div class="meta" id="previewMeta"></div>
                 </div>
-            </div>
-            <div class="onboarding-step">
-                <span class="step-pill">3</span>
-                <div class="onboarding-step-text">
-                    <strong>下载结果</strong>
-                    右上角「下载」即可保存，也可点击「套用」将结果作为新输入继续处理
-                </div>
-            </div>
-
-            <div class="onboarding-actions">
-                <button class="btn onboarding-skip" id="onboardingSkip">稍后再说</button>
-                <button class="btn onboarding-go" id="onboardingGo">立即开始</button>
+                <button class="btn-remove" id="btnRemove">换一张</button>
             </div>
         </div>
     </div>
+
+    <!-- 2. 选功能 -->
+    <div class="card actions-card" id="actionsCard">
+        <div class="actions-title">选择功能</div>
+        <div class="actions-grid" id="actionsGrid"></div>
+    </div>
+
+    <!-- 3. 结果 -->
+    <div class="card result-card" id="resultCard">
+        <div class="actions-title">完成 ✓</div>
+        <div class="result-img-wrap" id="resultImgWrap">
+            <img id="resultImg" alt="结果">
+        </div>
+        <div class="result-text" id="resultText" style="display:none;"></div>
+        <button class="btn-primary" id="btnDownload">⬇️ 下载到本地</button>
+        <button class="btn-secondary" id="btnAgain">换功能再来一次</button>
+    </div>
+
+    <!-- 参数弹窗 -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <div class="modal-header">
+                <h3 id="modalTitle"></h3>
+                <button class="modal-close" id="modalClose">×</button>
+            </div>
+            <div class="modal-desc" id="modalDesc"></div>
+            <div id="modalFields"></div>
+            <button class="btn-primary" id="modalSubmit">开始处理</button>
+        </div>
+    </div>
+
+    <div class="toast" id="toast"></div>
+    <div class="loading-overlay" id="loading"><div class="spinner"></div></div>
 
     <script>
-        let currentFile = null;
-        let lastResult = null;
-        let lastResultBlobUrl = null;
-        let lastBase64 = null;
-        let currentTool = null;
+        // ============ 全局状态 ============
+        let currentFile = null;       // 当前上传的 File 对象
+        let currentAction = null;    // 当前选中的功能 key
+        let lastResultBlob = null;   // 上次结果 Blob
+        let lastResultName = '';     // 上次结果文件名
+        let lastResultIsText = false; // 上次结果是否为文本
 
+        // ============ DOM 引用 ============
+        const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
-        const canvasArea = document.getElementById('canvasArea');
-        const placeholder = document.getElementById('placeholder');
-        const previewImage = document.getElementById('previewImage');
-        const loader = document.getElementById('loader');
-        const loaderText = document.getElementById('loaderText');
-        const dropOverlay = document.getElementById('dropOverlay');
-        const properties = document.getElementById('properties');
-        const propContent = document.getElementById('propContent');
-        const propTitle = document.getElementById('propTitle');
-        const propIcon = document.getElementById('propIcon');
-        const fileChip = document.getElementById('fileChip');
-        const fileName = document.getElementById('fileName');
-        const fileSize = document.getElementById('fileSize');
-        const dimensionsChip = document.getElementById('dimensionsChip');
-        const dimensionsEl = document.getElementById('dimensions');
-        const useAsInputBtn = document.getElementById('useAsInputBtn');
-        const downloadBtn = document.getElementById('downloadBtn');
-        const newFileBtn = document.getElementById('newFileBtn');
-        const toastContainer = document.getElementById('toastContainer');
+        const preview = document.getElementById('preview');
+        const previewImg = document.getElementById('previewImg');
+        const previewName = document.getElementById('previewName');
+        const previewMeta = document.getElementById('previewMeta');
+        const btnRemove = document.getElementById('btnRemove');
+        const actionsCard = document.getElementById('actionsCard');
+        const actionsGrid = document.getElementById('actionsGrid');
+        const resultCard = document.getElementById('resultCard');
+        const resultImg = document.getElementById('resultImg');
+        const resultImgWrap = document.getElementById('resultImgWrap');
+        const resultText = document.getElementById('resultText');
+        const btnDownload = document.getElementById('btnDownload');
+        const btnAgain = document.getElementById('btnAgain');
+        const modalOverlay = document.getElementById('modalOverlay');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalDesc = document.getElementById('modalDesc');
+        const modalFields = document.getElementById('modalFields');
+        const modalClose = document.getElementById('modalClose');
+        const modalSubmit = document.getElementById('modalSubmit');
+        const toast = document.getElementById('toast');
+        const loading = document.getElementById('loading');
 
-        // Tool configurations
-        const tools = {
-            convert: {
-                title: '格式转换',
-                icon: '/images/tool-convert.svg',
-                tip: '<strong>把图片转换为其他格式</strong>。PNG 无损适合图标/截图；JPEG 体积小适合照片；GIF 支持动画；BMP/TIFF 适合高质量存档。',
-                fields: [
-                    { type: 'select', id: 'format', label: '目标格式', value: 'png', options: [
-                        { v: 'png', t: 'PNG · 无损' },
-                        { v: 'jpeg', t: 'JPEG · 有损压缩' },
-                        { v: 'gif', t: 'GIF · 动画支持' },
-                        { v: 'bmp', t: 'BMP · 位图' },
-                        { v: 'tiff', t: 'TIFF · 高质量' }
-                    ]},
-                    { type: 'range', id: 'quality', label: '质量', min: 10, max: 100, value: 90, suffix: '%' },
-                ],
-                action: async (vals) => callApi('convert', { format: vals.format, quality: vals.quality / 100 })
-            },
-            resize: {
-                title: '缩放',
-                icon: '/images/tool-resize.svg',
-                tip: '<strong>调整图片尺寸</strong>。设置宽高精确缩放；或拖动滑块按百分比整体缩放（-1 表示自动按比例计算）。',
-                fields: [
-                    { type: 'group', items: [
-                        { type: 'number', id: 'width', label: '宽度', value: 800 },
-                        { type: 'number', id: 'height', label: '高度', value: -1 },
-                    ]},
-                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
-                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }, { v: 'bmp', t: 'BMP' }
-                    ]},
-                    { type: 'divider' },
-                    { type: 'range', id: 'scale', label: '按百分比缩放', min: 5, max: 200, value: 50, suffix: '%' },
-                ],
-                action: async (vals) => vals.scale !== 50
-                    ? callApi('scale', { percent: vals.scale, format: vals.format })
-                    : callApi('resize', { width: vals.width, height: vals.height, format: vals.format })
-            },
-            crop: {
-                title: '裁剪',
-                icon: '/images/tool-crop.svg',
-                tip: '<strong>截取图片的矩形区域</strong>。设置起点坐标 (X, Y) 和裁剪宽高，单位为像素。',
-                fields: [
-                    { type: 'group', items: [
-                        { type: 'number', id: 'x', label: 'X 起点', value: 0 },
-                        { type: 'number', id: 'y', label: 'Y 起点', value: 0 },
-                    ]},
-                    { type: 'group', items: [
-                        { type: 'number', id: 'w', label: '裁剪宽度', value: 200 },
-                        { type: 'number', id: 'h', label: '裁剪高度', value: 200 },
-                    ]},
-                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
-                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
-                    ]},
-                ],
-                action: async (vals) => callApi('crop', { x: vals.x, y: vals.y, width: vals.w, height: vals.h, format: vals.format })
-            },
-            rotate: {
-                title: '旋转/翻转',
-                icon: '/images/tool-rotate.svg',
-                tip: '<strong>旋转或翻转图片</strong>。下拉选择旋转角度；或直接点击下方按钮进行水平/垂直翻转。',
-                fields: [
-                    { type: 'select', id: 'degrees', label: '旋转角度', value: '90', options: [
-                        { v: '90', t: '90°' }, { v: '180', t: '180°' }, { v: '270', t: '270°' },
-                        { v: '45', t: '45°' }, { v: '15', t: '15°' }, { v: '30', t: '30°' }, { v: '60', t: '60°' }
-                    ]},
-                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
-                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
-                    ]},
-                    { type: 'divider' },
-                    { type: 'group', items: [
-                        { type: 'button', id: 'flipH', label: '水平翻转' },
-                        { type: 'button', id: 'flipV', label: '垂直翻转' },
-                    ]},
-                ],
-                action: async (vals) => {
-                    if (vals.action === 'flipH') return callApi('flip', { direction: 'horizontal', format: vals.format });
-                    if (vals.action === 'flipV') return callApi('flip', { direction: 'vertical', format: vals.format });
-                    return callApi('rotate', { degrees: vals.degrees, format: vals.format });
-                }
-            },
-            filters: {
-                title: '滤镜',
-                icon: '/images/tool-filter.svg',
-                tip: '<strong>一键应用经典滤镜</strong>。黑白让照片复古；棕褐色呈怀旧风格；颜色反转会得到底片效果。',
-                fields: [
-                    { type: 'button', id: 'grayscale', label: '⚫ 黑白滤镜', primary: true },
-                    { type: 'button', id: 'sepia', label: '🟫 复古棕褐', primary: true },
-                    { type: 'button', id: 'invert', label: '🔄 颜色反转 (底片)', primary: true },
-                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
-                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
-                    ]},
-                ],
-                action: async (vals) => {
-                    const map = { grayscale: 'grayscale', sepia: 'sepia', invert: 'invert' };
-                    return callApi(map[vals.action], { format: vals.format });
-                }
-            },
-            adjust: {
-                title: '色彩调整',
-                icon: '/images/tool-adjust.svg',
-                tip: '<strong>微调图片色彩</strong>。拖动滑块预览效果，调好后点击下方对应按钮应用到图片。',
-                fields: [
-                    { type: 'range', id: 'brightness', label: '亮度', min: -100, max: 100, value: 0, suffix: '' },
-                    { type: 'range', id: 'contrast', label: '对比度', min: 0, max: 30, value: 10, suffix: '', valueDisplay: v => (v * 0.1).toFixed(1) },
-                    { type: 'divider' },
-                    { type: 'range', id: 'hue', label: '色相偏移', min: -100, max: 100, value: 0, suffix: '' },
-                    { type: 'range', id: 'saturation', label: '饱和度', min: -100, max: 100, value: 0, suffix: '' },
-                    { type: 'range', id: 'brightHsb', label: '亮度 (HSB)', min: -100, max: 100, value: 0, suffix: '' },
-                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
-                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
-                    ]},
-                    { type: 'button', id: 'applyBC', label: '✨ 应用亮度/对比度', primary: true },
-                    { type: 'button', id: 'applyHSB', label: '✨ 应用 HSB 调整', primary: true },
-                ],
-                action: async (vals) => {
-                    if (vals.action === 'applyBC') {
-                        return callApi('brightness-contrast', {
-                            brightness: parseFloat(vals.brightness),
-                            contrast: parseFloat(vals.contrast) * 0.1,
-                            format: vals.format
-                        });
-                    } else if (vals.action === 'applyHSB') {
-                        return callApi('hsb', {
-                            hue: parseFloat(vals.hue) / 100,
-                            saturation: parseFloat(vals.saturation) / 100,
-                            brightness: parseFloat(vals.brightHsb) / 100,
-                            format: vals.format
-                        });
-                    }
-                }
-            },
-            effects: {
-                title: '艺术效果',
-                icon: '/images/tool-effects.svg',
-                tip: '<strong>把图片变成艺术风格</strong>。像素化适合做马赛克；色调分离制作插画感；晕影添加边缘暗角让主体更突出。',
-                fields: [
-                    { type: 'range', id: 'pixelSize', label: '像素化块大小', min: 2, max: 50, value: 10, suffix: 'px' },
-                    { type: 'button', id: 'pixelate', label: '✨ 应用像素化', primary: true },
-                    { type: 'divider' },
-                    { type: 'range', id: 'posterLevels', label: '色调分离级别', min: 2, max: 20, value: 4, suffix: '' },
-                    { type: 'button', id: 'posterize', label: '✨ 应用色调分离', primary: true },
-                    { type: 'divider' },
-                    { type: 'range', id: 'vignette', label: '晕影强度', min: 0, max: 100, value: 50, suffix: '%' },
-                    { type: 'button', id: 'applyVignette', label: '✨ 应用晕影', primary: true },
-                ],
-                action: async (vals) => {
-                    if (vals.action === 'pixelate') return callApi('pixelate', { pixelSize: vals.pixelSize });
-                    if (vals.action === 'posterize') return callApi('posterize', { levels: vals.posterLevels });
-                    if (vals.action === 'applyVignette') return callApi('vignette', { strength: parseFloat(vals.vignette) / 100 });
-                }
-            },
-            blur: {
-                title: '模糊/锐化',
-                icon: '/images/tool-blur.svg',
-                tip: '<strong>模糊可隐藏细节或制作景深感</strong>；<strong>锐化则让边缘更清晰</strong>。半径越大模糊越强。',
-                fields: [
-                    { type: 'range', id: 'blurRadius', label: '高斯模糊半径', min: 1, max: 20, value: 5, suffix: '' },
-                    { type: 'button', id: 'applyBlur', label: '✨ 应用高斯模糊', primary: true },
-                    { type: 'divider' },
-                    { type: 'button', id: 'applySharpen', label: '✨ 应用锐化', primary: true },
-                ],
-                action: async (vals) => {
-                    if (vals.action === 'applyBlur') return callApi('blur', { radius: vals.blurRadius });
-                    if (vals.action === 'applySharpen') return callApi('sharpen', {});
-                }
-            },
-            watermark: {
-                title: '水印',
-                icon: '/images/tool-watermark.svg',
-                tip: '<strong>给图片添加保护水印</strong>。可输入文字水印，或上传图片作为 logo 水印；可设置位置、字号、透明度。',
-                fields: [
-                    { type: 'text', id: 'wmText', label: '水印文字', value: '© Image Studio' },
-                    { type: 'group', items: [
-                        { type: 'select', id: 'wmPosition', label: '位置', value: 'center', options: [
-                            { v: 'center', t: '居中' }, { v: 'top-left', t: '左上' },
-                            { v: 'top-right', t: '右上' }, { v: 'bottom-left', t: '左下' }, { v: 'bottom-right', t: '右下' }
-                        ]},
-                        { type: 'number', id: 'wmFontSize', label: '字号', value: 32 },
-                    ]},
-                    { type: 'color', id: 'wmColor', label: '颜色', value: '#ffffff' },
-                    { type: 'range', id: 'wmAlpha', label: '透明度', min: 10, max: 100, value: 80, suffix: '%' },
-                    { type: 'button', id: 'applyTextWm', label: '✨ 添加文字水印', primary: true },
-                    { type: 'divider' },
-                    { type: 'file', id: 'wmImage', label: '水印图片' },
-                    { type: 'group', items: [
-                        { type: 'select', id: 'wmImgPosition', label: '图片水印位置', value: 'center', options: [
-                            { v: 'center', t: '居中' }, { v: 'bottom-right', t: '右下' }, { v: 'top-left', t: '左上' }
-                        ]},
-                        { type: 'range', id: 'wmScale', label: '水印缩放', min: 5, max: 100, value: 30, suffix: '%' },
-                    ]},
-                    { type: 'button', id: 'applyImgWm', label: '✨ 添加图片水印', primary: true },
-                ],
-                action: async (vals) => {
-                    if (vals.action === 'applyTextWm') {
-                        return callApi('watermark/text', {
-                            text: vals.wmText,
-                            position: vals.wmPosition,
-                            fontSize: vals.wmFontSize,
-                            color: vals.wmColor.replace('#', ''),
-                            alpha: parseFloat(vals.wmAlpha) / 100
-                        });
-                    } else if (vals.action === 'applyImgWm') {
-                        const wmFile = document.getElementById('wmImageFile').files[0];
-                        if (!wmFile) { showToast('请先选择水印图片', 'error'); return null; }
-                        return callApiMultiPart('watermark/image', {
-                            watermark: wmFile,
-                            position: vals.wmImgPosition,
-                            scale: vals.wmScale,
-                            alpha: 0.7
-                        });
-                    }
-                }
-            },
-            border: {
-                title: '边框/圆角',
-                icon: '/images/tool-border.svg',
-                tip: '<strong>为图片加装饰</strong>。可加纯色边框；或对图片四角做圆角处理，适合做头像/卡片。',
-                fields: [
-                    { type: 'number', id: 'borderWidth', label: '边框宽度', value: 20 },
-                    { type: 'color', id: 'borderColor', label: '边框颜色', value: '#000000' },
-                    { type: 'button', id: 'applyBorder', label: '✨ 应用边框', primary: true },
-                    { type: 'divider' },
-                    { type: 'range', id: 'cornerRadius', label: '圆角半径', min: 0, max: 200, value: 50, suffix: 'px' },
-                    { type: 'button', id: 'applyCorner', label: '✨ 应用圆角', primary: true },
-                ],
-                action: async (vals) => {
-                    if (vals.action === 'applyBorder') return callApi('border', { width: vals.borderWidth, color: vals.borderColor.replace('#', '') });
-                    if (vals.action === 'applyCorner') return callApi('round-corners', { radius: vals.cornerRadius });
-                }
-            },
-            info: {
-                title: '图片信息',
-                icon: '/images/tool-info.svg',
-                tip: '<strong>查看图片详细元数据</strong>。包含宽高、颜色分量、透明通道、文件大小等。',
-                fields: [{ type: 'button', id: 'getInfo', label: '🔍 获取图片详细信息', primary: true }],
-                action: async () => callApi('info', {})
-            },
-            ascii: {
-                title: 'ASCII 艺术',
-                icon: '/images/tool-ascii.svg',
-                tip: '<strong>把图片变成字符画</strong>。宽度越大越精细；可复制到聊天或代码中使用。',
-                fields: [
-                    { type: 'range', id: 'asciiWidth', label: 'ASCII 宽度', min: 40, max: 200, value: 100, suffix: '字符' },
-                    { type: 'button', id: 'genAscii', label: '✨ 生成 ASCII 艺术', primary: true },
-                ],
-                action: async (vals) => callApiText('ascii', { width: vals.asciiWidth })
-            },
-            base64: {
-                title: 'Base64 编码',
-                icon: '/images/tool-base64.svg',
-                tip: '<strong>把图片转成文本数据</strong>。可直接嵌入 HTML/CSS，免去额外图片请求。',
-                fields: [
-                    { type: 'select', id: 'b64Format', label: '编码格式', value: 'png', options: [
-                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
-                    ]},
-                    { type: 'button', id: 'genBase64', label: '✨ 生成 Base64', primary: true },
-                ],
-                action: async (vals) => callApiJson('base64', { format: vals.b64Format })
-            },
-            thumbnail: {
-                title: '缩略图',
-                icon: '/images/tool-thumbnail.svg',
-                tip: '<strong>生成小尺寸预览图</strong>。设置最大边长（如 200），图片会按比例缩放，常用于列表预览。',
-                fields: [
-                    { type: 'number', id: 'maxSize', label: '最大边长', value: 200 },
-                    { type: 'select', id: 'format', label: '输出格式', value: 'png', options: [
-                        { v: 'png', t: 'PNG' }, { v: 'jpeg', t: 'JPEG' }
-                    ]},
-                    { type: 'button', id: 'genThumb', label: '✨ 生成缩略图', primary: true },
-                ],
-                action: async (vals) => callApi('thumbnail', { maxSize: vals.maxSize, format: vals.format })
-            },
-        };
-
-        // Toast notifications
-        function showToast(msg, type = 'info') {
-            const toast = document.createElement('div');
-            toast.className = 'toast ' + type;
-            const icon = type === 'success'
-                ? '<svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>'
-                : type === 'error'
-                ? '<svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>'
-                : '<svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>';
-            toast.innerHTML = icon + '<span>' + msg + '</span>';
-            toastContainer.appendChild(toast);
-            setTimeout(() => { toast.style.animation = 'slideIn 0.3s reverse'; setTimeout(() => toast.remove(), 300); }, 3000);
+        // ============ 工具函数 ============
+        function showToast(msg, type) {
+            toast.textContent = msg;
+            toast.className = 'toast show' + (type ? ' ' + type : '');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => toast.classList.remove('show'), 2500);
         }
+        function showLoading() { loading.classList.add('show'); }
+        function hideLoading() { loading.classList.remove('show'); }
 
-        // File handling
-        fileInput.addEventListener('change', e => { if (e.target.files.length) handleFile(e.target.files[0]); });
-        document.getElementById('selectFileBtn').addEventListener('click', () => fileInput.click());
-        newFileBtn.addEventListener('click', () => { resetApp(); fileInput.click(); });
-
-        canvasArea.addEventListener('dragover', e => { e.preventDefault(); dropOverlay.classList.add('active'); });
-        canvasArea.addEventListener('dragleave', e => { if (!canvasArea.contains(e.relatedTarget)) dropOverlay.classList.remove('active'); });
-        canvasArea.addEventListener('drop', e => {
-            e.preventDefault();
-            dropOverlay.classList.remove('active');
-            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
-        });
-
-        function handleFile(file) {
-            if (!file.type.startsWith('image/') && !/\.(png|jpg|jpeg|gif|bmp|webp|tiff?|psd)$/i.test(file.name)) {
-                showToast('请选择有效的图片文件', 'error'); return;
-            }
-            currentFile = file;
-            fileChip.style.display = 'flex';
-            fileName.textContent = file.name;
-            fileSize.textContent = formatSize(file.size);
-            const url = URL.createObjectURL(file);
-            previewImage.src = url;
-            previewImage.onload = () => {
-                dimensionsChip.style.display = 'flex';
-                dimensionsEl.textContent = previewImage.naturalWidth + ' × ' + previewImage.naturalHeight + ' px';
-                previewImage.style.display = 'block';
-                placeholder.style.display = 'none';
-            };
-            showToast('图片已加载', 'success');
-        }
-
-        function formatSize(bytes) {
+        function humanSize(bytes) {
             if (bytes < 1024) return bytes + ' B';
-            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
-            return (bytes / 1048576).toFixed(2) + ' MB';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1024 / 1024).toFixed(2) + ' MB';
         }
 
-        function resetApp() {
-            currentFile = null;
-            previewImage.src = '';
-            previewImage.style.display = 'none';
-            placeholder.style.display = 'flex';
-            fileChip.style.display = 'none';
-            dimensionsChip.style.display = 'none';
-            useAsInputBtn.disabled = true;
-            downloadBtn.disabled = true;
-            if (lastResultBlobUrl) URL.revokeObjectURL(lastResultBlobUrl);
-            lastResult = null;
-            lastResultBlobUrl = null;
-            lastBase64 = null;
-            showResultMode('image');
-        }
+        // ============ 功能定义 ============
+        const ACTIONS = [
+            { key: 'convert', label: '格式转换', emoji: '🔄', desc: '把图片转换成 PNG / JPG / GIF / BMP / TIFF 格式', fields: [
+                { name: 'format', label: '目标格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' },
+                { name: 'quality', label: '质量 (JPEG)', type: 'range', min: 0.3, max: 1, step: 0.05, value: 0.9, show: (v) => v.toFixed(2) }
+            ]},
+            { key: 'resize', label: '调整尺寸', emoji: '📐', desc: '按指定宽高缩放图片（会拉伸）', fields: [
+                { name: 'width', label: '宽度 (px)', type: 'number', value: 800, min: 1, max: 10000 },
+                { name: 'height', label: '高度 (px)', type: 'number', value: 600, min: 1, max: 10000 },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'scale', label: '按比例缩放', emoji: '🔍', desc: '按百分比缩放图片（保持宽高比）', fields: [
+                { name: 'percent', label: '缩放比例 (%)', type: 'range', min: 10, max: 200, step: 5, value: 50, show: (v) => v + '%' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'rotate', label: '旋转', emoji: '🔁', desc: '按角度旋转图片', fields: [
+                { name: 'degrees', label: '旋转角度', type: 'range', min: -180, max: 180, step: 1, value: 90, show: (v) => v + '°' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'flip', label: '翻转', emoji: '🔃', desc: '水平或垂直翻转图片', fields: [
+                { name: 'direction', label: '翻转方向', type: 'select', options: ['horizontal','vertical'], value: 'horizontal' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'grayscale', label: '黑白', emoji: '⚫', desc: '把图片变成灰度黑白照', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'invert', label: '反色', emoji: '🎨', desc: '反转图片颜色（底片效果）', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'sepia', label: '复古', emoji: '📷', desc: '添加复古棕色调', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'brightness-contrast', label: '亮度对比度', emoji: '☀️', desc: '调整亮度和对比度', fields: [
+                { name: 'brightness', label: '亮度', type: 'range', min: -1, max: 1, step: 0.05, value: 0.1, show: (v) => v.toFixed(2) },
+                { name: 'contrast', label: '对比度', type: 'range', min: -1, max: 1, step: 0.05, value: 0.1, show: (v) => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'blur', label: '模糊', emoji: '💨', desc: '高斯模糊图片', fields: [
+                { name: 'radius', label: '模糊半径', type: 'range', min: 1, max: 30, step: 1, value: 5, show: (v) => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'sharpen', label: '锐化', emoji: '🗡️', desc: '让图片更清晰', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'pixelate', label: '像素化', emoji: '🟦', desc: '马赛克效果', fields: [
+                { name: 'pixelSize', label: '像素大小', type: 'range', min: 2, max: 40, step: 1, value: 10, show: (v) => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'vignette', label: '暗角', emoji: '🌑', desc: '四周变暗效果', fields: [
+                { name: 'strength', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.5, show: (v) => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'border', label: '加边框', emoji: '⬜', desc: '给图片加边框', fields: [
+                { name: 'width', label: '边框宽度', type: 'range', min: 1, max: 50, step: 1, value: 10, show: (v) => v + 'px' },
+                { name: 'color', label: '边框颜色', type: 'color', value: '#000000' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'round-corners', label: '圆角', emoji: '🔷', desc: '把图片四角变圆', fields: [
+                { name: 'radius', label: '圆角半径', type: 'range', min: 1, max: 200, step: 1, value: 30, show: (v) => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'thumbnail', label: '缩略图', emoji: '🖼️', desc: '生成小尺寸缩略图', fields: [
+                { name: 'maxSize', label: '最大边长', type: 'range', min: 32, max: 500, step: 8, value: 128, show: (v) => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'watermark-text', label: '文字水印', emoji: '💧', desc: '在图片上加文字', fields: [
+                { name: 'text', label: '水印文字', type: 'text', value: '水印', placeholder: '输入文字' },
+                { name: 'position', label: '位置', type: 'select', options: ['center','top-left','top-right','bottom-left','bottom-right'], value: 'center' },
+                { name: 'fontSize', label: '字号', type: 'range', min: 12, max: 120, step: 2, value: 32, show: (v) => v + 'px' },
+                { name: 'color', label: '颜色', type: 'color', value: '#ffffff' },
+                { name: 'alpha', label: '透明度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.8, show: (v) => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'ascii', label: '字符画', emoji: '🔤', desc: '把图片转成 ASCII 字符画', fields: [
+                { name: 'width', label: '宽度 (字符数)', type: 'range', min: 40, max: 200, step: 10, value: 100, show: (v) => v + ' 字符' }
+            ]},
+            { key: 'base64', label: 'Base64', emoji: '📝', desc: '把图片转成 Base64 字符串', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]}
+        ];
 
-        // Tool selection
-        const matchMediaSafe = (q) => {
-            if (typeof window.matchMedia === 'function') return window.matchMedia(q);
-            return { matches: window.innerWidth <= 768, addListener: () => {}, removeListener: () => {} };
-        };
-        document.querySelectorAll('.tool-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                const tool = btn.dataset.tool;
-                if (!tool) return;
-                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                currentTool = tool;
-                showProperties(tool);
-                // On mobile, close the sidebar drawer after picking a tool
-                if (matchMediaSafe('(max-width: 768px)').matches) closeSidebar();
-            });
-        });
-
-        document.getElementById('closeProp').addEventListener('click', () => {
-            properties.classList.remove('open');
-            document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-            currentTool = null;
-        });
-
-        // Mobile drawer controls
-        const sidebar = document.querySelector('.sidebar');
-        const mobileOverlay = document.getElementById('mobileOverlay');
-        // Move mobile-overlay into .app (as first child) so it shares the .app
-        // stacking context and z-index ordering works correctly vs sidebar.
-        const appContainer = document.querySelector('.app');
-        if (appContainer && mobileOverlay.parentElement !== appContainer) {
-            appContainer.insertBefore(mobileOverlay, appContainer.firstChild);
-        }
-        const menuToggle = document.getElementById('menuToggle');
-        const sidebarClose = document.getElementById('sidebarClose');
-
-        function openSidebar() {
-            sidebar.classList.add('open');
-            mobileOverlay.classList.add('show');
-        }
-        function closeSidebar() {
-            sidebar.classList.remove('open');
-            mobileOverlay.classList.remove('show');
-        }
-        menuToggle.addEventListener('click', () => {
-            if (sidebar.classList.contains('open')) closeSidebar();
-            else openSidebar();
-        });
-        sidebarClose.addEventListener('click', closeSidebar);
-        mobileOverlay.addEventListener('click', closeSidebar);
-
-        // Onboarding modal
-        const onboarding = document.getElementById('onboarding');
-        const helpBtn = document.getElementById('helpBtn');
-        function openOnboarding() { onboarding.classList.add('show'); }
-        function closeOnboarding() {
-            onboarding.classList.remove('show');
-            try { localStorage.setItem('imgstudio_onboarded', '1'); } catch (e) {}
-        }
-        document.getElementById('onboardingSkip').addEventListener('click', closeOnboarding);
-        document.getElementById('onboardingGo').addEventListener('click', () => {
-            closeOnboarding();
-            fileInput.click();
-        });
-        helpBtn.addEventListener('click', openOnboarding);
-        // Onboarding is opt-in only (via help button). Never auto-show,
-        // because the full-screen overlay would intercept clicks on tool buttons
-        // and make the app appear unresponsive.
-        // Click on backdrop (outside the card) closes onboarding
-        onboarding.addEventListener('click', (e) => {
-            if (e.target === onboarding) closeOnboarding();
-        });
-
-        // Touch swipe-down to close properties (bottom sheet on mobile)
-        (function() {
-            const sheet = document.getElementById('properties');
-            const handle = sheet.querySelector('.sheet-handle');
-            let startY = 0, startTransform = 0, dragging = false;
-            function onStart(e) {
-                if (!matchMediaSafe('(max-width: 768px)').matches) return;
-                if (!sheet.classList.contains('open')) return;
-                dragging = true;
-                startY = (e.touches ? e.touches[0].clientY : e.clientY);
-                startTransform = 0;
-                sheet.style.transition = 'none';
-            }
-            function onMove(e) {
-                if (!dragging) return;
-                const dy = (e.touches ? e.touches[0].clientY : e.clientY) - startY;
-                if (dy <= 0) return;
-                sheet.style.transform = 'translateY(' + dy + 'px)';
-            }
-            function onEnd(e) {
-                if (!dragging) return;
-                dragging = false;
-                sheet.style.transition = '';
-                const dy = (e.changedTouches ? e.changedTouches[0].clientY : e.changedTouches ? e.changedTouches[0].clientY : 0) - startY;
-                sheet.style.transform = '';
-                if (dy > 100) {
-                    sheet.classList.remove('open');
-                    document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-                    currentTool = null;
-                }
-            }
-            if (handle) {
-                handle.addEventListener('touchstart', onStart, { passive: true });
-                handle.addEventListener('touchmove', onMove, { passive: true });
-                handle.addEventListener('touchend', onEnd);
-            }
-            // Also allow swipe-down from the header
-            const sheetHeader = sheet.querySelector('.properties-header');
-            if (sheetHeader) {
-                sheetHeader.addEventListener('touchstart', onStart, { passive: true });
-                sheetHeader.addEventListener('touchmove', onMove, { passive: true });
-                sheetHeader.addEventListener('touchend', onEnd);
-            }
-        })();
-
-        function showProperties(toolName) {
-            const tool = tools[toolName];
-            if (!tool) return;
-            propTitle.textContent = tool.title;
-            propIcon.innerHTML = '<img src="' + tool.icon + '" alt="">';
-            propContent.innerHTML = '';
-            // Insert tool usage hint at the top
-            if (tool.tip) {
-                const tip = document.createElement('div');
-                tip.className = 'tool-tip';
-                tip.innerHTML = tool.tip;
-                propContent.appendChild(tip);
-            }
-            tool.fields.forEach(field => {
-                if (field.type === 'divider') {
-                    const hr = document.createElement('hr');
-                    hr.style.cssText = 'border:none;border-top:1px solid var(--border);margin:18px 0;';
-                    propContent.appendChild(hr);
-                } else if (field.type === 'group') {
-                    const row = document.createElement('div');
-                    row.className = 'field-row';
-                    field.items.forEach(item => row.appendChild(buildField(item)));
-                    propContent.appendChild(row);
-                } else {
-                    propContent.appendChild(buildField(field));
-                }
-            });
-            properties.classList.add('open');
-        }
-
-        function buildField(field) {
-            const wrapper = document.createElement('div');
-            wrapper.className = 'field';
-            if (field.type === 'button') {
+        // ============ 渲染功能按钮 ============
+        function renderActions() {
+            actionsGrid.innerHTML = '';
+            ACTIONS.forEach(a => {
                 const btn = document.createElement('button');
-                btn.className = 'btn ' + (field.primary ? 'btn-primary' : 'btn-secondary');
-                btn.textContent = field.label;
-                btn.dataset.action = field.id;
-                btn.addEventListener('click', () => executeAction(field.id));
-                wrapper.appendChild(btn);
-            } else {
-                const labelRow = document.createElement('div');
-                labelRow.className = 'field-label';
-                const label = document.createElement('span');
+                btn.className = 'action-btn';
+                btn.innerHTML = '<span class="emoji">' + a.emoji + '</span><span>' + a.label + '</span>';
+                btn.addEventListener('click', () => openModal(a));
+                actionsGrid.appendChild(btn);
+            });
+        }
+
+        // ============ 上传 ============
+        uploadArea.addEventListener('click', () => fileInput.click());
+        fileInput.addEventListener('change', (e) => {
+            const f = e.target.files[0];
+            if (f) handleFile(f);
+        });
+        // 拖拽上传
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.style.background = '#e0d8ff'; });
+        uploadArea.addEventListener('dragleave', () => { uploadArea.style.background = ''; });
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.style.background = '';
+            const f = e.dataTransfer.files[0];
+            if (f) handleFile(f);
+        });
+
+        function handleFile(f) {
+            if (!f.type.startsWith('image/')) {
+                showToast('请选图片文件', 'error');
+                return;
+            }
+            currentFile = f;
+            const url = URL.createObjectURL(f);
+            previewImg.src = url;
+            previewName.textContent = f.name;
+            previewMeta.textContent = humanSize(f.size);
+            preview.classList.add('show');
+            actionsCard.classList.add('show');
+            resultCard.classList.remove('show');
+            // 滚动到功能区
+            setTimeout(() => actionsCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
+        }
+
+        btnRemove.addEventListener('click', () => {
+            currentFile = null;
+            fileInput.value = '';
+            preview.classList.remove('show');
+            actionsCard.classList.remove('show');
+            resultCard.classList.remove('show');
+        });
+
+        // ============ 弹窗 ============
+        function openModal(action) {
+            if (!currentFile) {
+                showToast('请先选择图片', 'error');
+                return;
+            }
+            currentAction = action;
+            modalTitle.textContent = action.emoji + ' ' + action.label;
+            modalDesc.textContent = action.desc;
+            modalFields.innerHTML = '';
+
+            action.fields.forEach(field => {
+                const wrap = document.createElement('div');
+                wrap.className = 'field';
+                const label = document.createElement('label');
+                label.className = 'field-label';
                 label.textContent = field.label;
-                labelRow.appendChild(label);
-                if (['range', 'number', 'text', 'color'].includes(field.type)) {
-                    const value = document.createElement('span');
-                    value.className = 'field-value';
-                    value.id = 'val_' + field.id;
-                    const display = field.valueDisplay || (v => field.suffix !== undefined ? v + field.suffix : v);
-                    value.textContent = display(field.value);
-                    labelRow.appendChild(value);
-                }
-                wrapper.appendChild(labelRow);
+                wrap.appendChild(label);
 
-                let input;
-                if (field.type === 'range') {
-                    input = document.createElement('input');
-                    input.type = 'range';
-                    input.className = 'field-range';
-                    input.min = field.min; input.max = field.max; input.value = field.value;
-                    const display = field.valueDisplay || (v => field.suffix !== undefined ? v + field.suffix : v);
-                    input.addEventListener('input', () => { value.textContent = display(input.value); });
-                } else if (field.type === 'select') {
-                    input = document.createElement('select');
-                    input.className = 'field-select';
+                if (field.type === 'select') {
+                    const sel = document.createElement('select');
+                    sel.className = 'field-input';
+                    sel.dataset.field = field.name;
                     field.options.forEach(opt => {
-                        const option = document.createElement('option');
-                        option.value = opt.v; option.textContent = opt.t;
-                        if (opt.v === field.value) option.selected = true;
-                        input.appendChild(option);
+                        const o = document.createElement('option');
+                        o.value = opt; o.textContent = opt;
+                        if (opt === field.value) o.selected = true;
+                        sel.appendChild(o);
                     });
-                } else if (field.type === 'number') {
-                    input = document.createElement('input');
-                    input.type = 'number';
-                    input.className = 'field-input';
-                    input.value = field.value;
-                } else if (field.type === 'text') {
-                    input = document.createElement('input');
-                    input.type = 'text';
-                    input.className = 'field-input';
-                    input.value = field.value;
+                    wrap.appendChild(sel);
+                } else if (field.type === 'range') {
+                    const row = document.createElement('div');
+                    row.className = 'range-wrap';
+                    const inp = document.createElement('input');
+                    inp.type = 'range';
+                    inp.min = field.min; inp.max = field.max; inp.step = field.step;
+                    inp.value = field.value;
+                    inp.dataset.field = field.name;
+                    const val = document.createElement('div');
+                    val.className = 'range-value';
+                    val.textContent = field.show ? field.show(parseFloat(field.value)) : field.value;
+                    inp.addEventListener('input', () => {
+                        val.textContent = field.show ? field.show(parseFloat(inp.value)) : inp.value;
+                    });
+                    row.appendChild(inp);
+                    row.appendChild(val);
+                    wrap.appendChild(row);
                 } else if (field.type === 'color') {
-                    const wrap = document.createElement('div');
-                    wrap.className = 'color-input-wrap';
-                    input = document.createElement('input');
-                    input.type = 'color';
-                    input.value = field.value;
-                    input.style.width = '46px'; input.style.height = '44px';
-                    const text = document.createElement('input');
-                    text.type = 'text';
-                    text.className = 'field-input';
-                    text.value = field.value;
-                    text.style.fontFamily = "'JetBrains Mono', monospace";
-                    input.addEventListener('input', () => text.value = input.value);
-                    text.addEventListener('change', () => input.value = text.value);
-                    wrap.appendChild(input); wrap.appendChild(text);
-                    wrapper.appendChild(wrap);
-                    input.id = 'inp_' + field.id;
-                    text.id = 'inptext_' + field.id;
-                    return wrapper;
-                } else if (field.type === 'file') {
-                    const wrap = document.createElement('div');
-                    wrap.className = 'wm-file-zone';
-                    wrap.id = 'wmImageFileWrap';
-                    wrap.innerHTML = '<svg viewBox="0 0 24 24"><path d="M19 13v6H5v-6H3v8h18v-8h-2zm-6 .67l2.59-2.58L17 12.5l-5 5-5-5 1.41-1.41L11 13.67V3h2v10.67z"/></svg><div>点击或拖入水印图片</div>';
-                    input = document.createElement('input');
-                    input.type = 'file';
-                    input.id = 'wmImageFile';
-                    input.accept = 'image/*';
-                    input.style.display = 'none';
-                    input.addEventListener('change', () => {
-                        if (input.files[0]) wrap.querySelector('div').textContent = '已选择: ' + input.files[0].name;
-                    });
-                    wrap.addEventListener('click', () => input.click());
-                    wrap.addEventListener('dragover', e => e.preventDefault());
-                    wrap.addEventListener('drop', e => { e.preventDefault(); input.files = e.dataTransfer.files; if (input.files[0]) wrap.querySelector('div').textContent = '已选择: ' + input.files[0].name; });
-                    wrap.appendChild(input);
-                    wrapper.appendChild(wrap);
-                    return wrapper;
+                    const inp = document.createElement('input');
+                    inp.type = 'color';
+                    inp.className = 'field-input';
+                    inp.value = field.value;
+                    inp.dataset.field = field.name;
+                    wrap.appendChild(inp);
+                } else {
+                    const inp = document.createElement('input');
+                    inp.type = field.type;
+                    inp.className = 'field-input';
+                    inp.value = field.value;
+                    if (field.placeholder) inp.placeholder = field.placeholder;
+                    if (field.min !== undefined) inp.min = field.min;
+                    if (field.max !== undefined) inp.max = field.max;
+                    inp.dataset.field = field.name;
+                    wrap.appendChild(inp);
                 }
-                if (input) {
-                    input.id = 'inp_' + field.id;
-                    wrapper.appendChild(input);
-                }
-            }
-            return wrapper;
-        }
-
-        function getFieldValues() {
-            const values = {};
-            if (!currentTool) return values;
-            tools[currentTool].fields.forEach(field => {
-                if (field.type === 'divider') return;
-                if (field.type === 'group') {
-                    field.items.forEach(item => {
-                        if (item.type !== 'button') values[item.id] = document.getElementById('inp_' + item.id)?.value;
-                    });
-                } else if (field.type !== 'button') {
-                    if (field.type === 'color') values[field.id] = document.getElementById('inp_' + field.id)?.value;
-                    else values[field.id] = document.getElementById('inp_' + field.id)?.value;
-                }
+                modalFields.appendChild(wrap);
             });
-            return values;
+
+            modalOverlay.classList.add('show');
         }
 
-        async function executeAction(actionId) {
-            if (!currentFile) { showToast('请先上传图片', 'error'); return; }
-            if (!currentTool) return;
-            const values = getFieldValues();
-            values.action = actionId;
-            showLoader(true);
+        modalClose.addEventListener('click', closeModal);
+        modalOverlay.addEventListener('click', (e) => {
+            if (e.target === modalOverlay) closeModal();
+        });
+        function closeModal() {
+            modalOverlay.classList.remove('show');
+        }
+
+        // ============ 提交处理 ============
+        modalSubmit.addEventListener('click', async () => {
+            if (!currentFile || !currentAction) return;
+            // 收集参数
+            const params = {};
+            const inputs = modalFields.querySelectorAll('input, select');
+            inputs.forEach(inp => {
+                const name = inp.dataset.field;
+                if (!name) return;
+                let val = inp.value;
+                if (inp.type === 'range' || inp.type === 'number') {
+                    val = parseFloat(val);
+                }
+                // 颜色去掉 #
+                if (inp.type === 'color') {
+                    val = val.replace('#', '');
+                }
+                params[name] = val;
+            });
+
+            closeModal();
+            showLoading();
             try {
-                const result = await tools[currentTool].action(values);
-                if (result) handleResult(result, actionId);
-            } catch (e) {
-                showToast('处理失败: ' + e.message, 'error');
-            } finally {
-                showLoader(false);
+                const result = await callApi(currentAction.key, params);
+                hideLoading();
+                showResult(result);
+            } catch (err) {
+                hideLoading();
+                showToast('处理失败: ' + (err.message || err), 'error');
+                console.error(err);
             }
-        }
+        });
 
-        function handleResult(result, actionId) {
-            if (actionId === 'getInfo' && result.width !== undefined) {
-                showInfoCard(result);
-            } else if (actionId === 'genBase64' && result.dataUri) {
-                lastBase64 = result.dataUri;
-                showBase64(result.dataUri, result.format);
-                showToast('Base64 已生成', 'success');
-            } else if (actionId === 'genAscii') {
-                showAscii(result);
-                showToast('ASCII 已生成', 'success');
-            } else if (result instanceof Blob) {
-                if (lastResultBlobUrl) URL.revokeObjectURL(lastResultBlobUrl);
-                lastResult = result;
-                lastResultBlobUrl = URL.createObjectURL(result);
-                previewImage.src = lastResultBlobUrl;
-                previewImage.style.display = 'block';
-                placeholder.style.display = 'none';
-                showResultMode('image');
-                downloadBtn.disabled = false;
-                useAsInputBtn.disabled = false;
-                showToast('处理完成 · ' + formatSize(result.size), 'success');
+        // ============ 调用后端 ============
+        async function callApi(actionKey, params) {
+            const formData = new FormData();
+            formData.append('file', currentFile);
+            Object.entries(params).forEach(([k, v]) => formData.append(k, v));
+
+            const endpoint = '/api/' + actionKey;
+            const resp = await fetch(endpoint, { method: 'POST', body: formData });
+            if (!resp.ok) {
+                const txt = await resp.text();
+                throw new Error('HTTP ' + resp.status + ': ' + txt.substring(0, 200));
             }
-        }
-
-        function showInfoCard(info) {
-            showResultMode('info');
-            document.getElementById('tabImage').classList.add('active');
-            document.getElementById('tabResult').classList.remove('active');
-            const grid = document.createElement('div');
-            grid.className = 'info-grid';
-            const items = [
-                { label: '宽度', value: info.width, unit: 'px' },
-                { label: '高度', value: info.height, unit: 'px' },
-                { label: '颜色分量', value: info.colorComponents, unit: '' },
-                { label: '透明通道', value: info.hasAlpha ? '有' : '无', unit: '' },
-                { label: '文件大小', value: formatSize(info.fileSize), unit: '' }
-            ];
-            items.forEach(it => {
-                const card = document.createElement('div');
-                card.className = 'info-card';
-                card.innerHTML = '<div class="info-card-label">' + it.label + '</div><div class="info-card-value">' + it.value + '<small>' + it.unit + '</small></div>';
-                grid.appendChild(card);
-            });
-            propContent.innerHTML = '';
-            propContent.appendChild(grid);
-        }
-
-        function showAscii(text) {
-            showResultMode('ascii');
-            const div = document.createElement('div');
-            div.className = 'ascii-box';
-            div.textContent = text;
-            propContent.innerHTML = '';
-            propContent.appendChild(div);
-        }
-
-        function showBase64(dataUri, format) {
-            showResultMode('base64');
-            const div = document.createElement('div');
-            div.className = 'base64-box';
-            div.textContent = dataUri;
-            propContent.innerHTML = '';
-            const info = document.createElement('div');
-            info.style.cssText = 'font-size:12px;color:var(--text-faint);margin-bottom:12px;';
-            info.textContent = '格式: ' + format + ' · 长度: ' + dataUri.length + ' 字符';
-            propContent.appendChild(info);
-            propContent.appendChild(div);
-            const copyBtn = document.createElement('button');
-            copyBtn.className = 'btn btn-secondary';
-            copyBtn.style.marginTop = '12px';
-            copyBtn.textContent = '复制到剪贴板';
-            copyBtn.addEventListener('click', () => {
-                navigator.clipboard.writeText(dataUri).then(() => showToast('已复制', 'success'));
-            });
-            propContent.appendChild(copyBtn);
-        }
-
-        function showResultMode(mode) {
-            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-            if (mode === 'result') document.getElementById('tabResult').classList.add('active');
-            else document.getElementById('tabImage').classList.add('active');
-        }
-
-        document.getElementById('tabImage').addEventListener('click', () => { showResultMode('image'); });
-        document.getElementById('tabResult').addEventListener('click', () => { showResultMode('result'); });
-
-        function showLoader(active, text) {
-            if (active) {
-                loader.classList.add('active');
-                if (text) loaderText.textContent = text;
+            const contentType = resp.headers.get('Content-Type') || '';
+            if (contentType.includes('text/plain')) {
+                // ASCII art
+                const text = await resp.text();
+                return { type: 'text', text };
+            } else if (contentType.includes('application/json')) {
+                // base64
+                const json = await resp.json();
+                return { type: 'json', json };
             } else {
-                loader.classList.remove('active');
+                // 图片
+                const blob = await resp.blob();
+                // 从 Content-Disposition 拿文件名
+                const cd = resp.headers.get('Content-Disposition') || '';
+                const m = cd.match(/filename="?([^"]+)"?/);
+                const name = m ? m[1] : ('result.' + (params.format || 'png'));
+                return { type: 'image', blob, name };
             }
         }
 
-        async function callApi(endpoint, params) {
-            if (!currentFile) { showToast('请先上传图片', 'error'); return null; }
-            const fd = new FormData();
-            fd.append('file', currentFile);
-            for (const [k, v] of Object.entries(params)) fd.append(k, v);
-            showLoader(true);
-            try {
-                const res = await fetch('/api/' + endpoint, { method: 'POST', body: fd });
-                if (!res.ok) throw new Error(await res.text());
-                return await res.blob();
-            } catch (e) {
-                showToast('请求失败: ' + e.message, 'error');
-                return null;
-            } finally {
-                showLoader(false);
+        // ============ 显示结果 ============
+        function showResult(result) {
+            resultCard.classList.add('show');
+            if (result.type === 'image') {
+                lastResultBlob = result.blob;
+                lastResultName = result.name;
+                lastResultIsText = false;
+                resultImg.src = URL.createObjectURL(result.blob);
+                resultImgWrap.style.display = '';
+                resultText.style.display = 'none';
+                resultText.textContent = '';
+            } else if (result.type === 'text') {
+                lastResultBlob = new Blob([result.text], { type: 'text/plain' });
+                lastResultName = 'ascii-art.txt';
+                lastResultIsText = true;
+                resultImgWrap.style.display = 'none';
+                resultText.style.display = 'block';
+                resultText.textContent = result.text;
+            } else if (result.type === 'json') {
+                const dataUri = result.json.dataUri || '';
+                lastResultBlob = new Blob([JSON.stringify(result.json, null, 2)], { type: 'application/json' });
+                lastResultName = 'base64.json';
+                lastResultIsText = true;
+                resultImgWrap.style.display = dataUri ? '' : 'none';
+                if (dataUri) resultImg.src = dataUri;
+                resultText.style.display = 'block';
+                resultText.textContent = result.json.base64 || JSON.stringify(result.json, null, 2);
             }
+            setTimeout(() => resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
         }
 
-        async function callApiMultiPart(endpoint, params) {
-            if (!currentFile) { showToast('请先上传图片', 'error'); return null; }
-            const fd = new FormData();
-            fd.append('file', currentFile);
-            for (const [k, v] of Object.entries(params)) {
-                if (v instanceof File) fd.append(k, v);
-                else fd.append(k, v);
-            }
-            showLoader(true);
-            try {
-                const res = await fetch('/api/' + endpoint, { method: 'POST', body: fd });
-                if (!res.ok) throw new Error(await res.text());
-                return await res.blob();
-            } catch (e) {
-                showToast('请求失败: ' + e.message, 'error');
-                return null;
-            } finally {
-                showLoader(false);
-            }
-        }
-
-        async function callApiJson(endpoint, params) {
-            if (!currentFile) { showToast('请先上传图片', 'error'); return null; }
-            const fd = new FormData();
-            fd.append('file', currentFile);
-            for (const [k, v] of Object.entries(params)) fd.append(k, v);
-            showLoader(true);
-            try {
-                const res = await fetch('/api/' + endpoint, { method: 'POST', body: fd });
-                if (!res.ok) throw new Error(await res.text());
-                return await res.json();
-            } catch (e) {
-                showToast('请求失败: ' + e.message, 'error');
-                return null;
-            } finally {
-                showLoader(false);
-            }
-        }
-
-        async function callApiText(endpoint, params) {
-            if (!currentFile) { showToast('请先上传图片', 'error'); return null; }
-            const fd = new FormData();
-            fd.append('file', currentFile);
-            for (const [k, v] of Object.entries(params)) fd.append(k, v);
-            showLoader(true);
-            try {
-                const res = await fetch('/api/' + endpoint, { method: 'POST', body: fd });
-                if (!res.ok) throw new Error(await res.text());
-                return await res.text();
-            } catch (e) {
-                showToast('请求失败: ' + e.message, 'error');
-                return null;
-            } finally {
-                showLoader(false);
-            }
-        }
-
-        // Download
-        downloadBtn.addEventListener('click', () => {
-            if (!lastResult) { showToast('请先处理图片', 'error'); return; }
-            const ext = lastResult.type.split('/')[1] || 'png';
+        // ============ 下载 / 重来 ============
+        btnDownload.addEventListener('click', () => {
+            if (!lastResultBlob) return;
+            const url = URL.createObjectURL(lastResultBlob);
             const a = document.createElement('a');
-            a.href = lastResultBlobUrl;
-            a.download = 'image-studio-' + Date.now() + '.' + ext;
+            a.href = url;
+            a.download = lastResultName;
+            document.body.appendChild(a);
             a.click();
-            showToast('下载已开始', 'success');
+            document.body.removeChild(a);
+            setTimeout(() => URL.revokeObjectURL(url), 1000);
+            showToast('已开始下载', 'success');
         });
 
-        // Use as input
-        useAsInputBtn.addEventListener('click', () => {
-            if (!lastResult) return;
-            const newFile = new File([lastResult], 'result-' + Date.now() + '.png', { type: lastResult.type });
-            handleFile(newFile);
-            showToast('已套用为新输入', 'success');
+        btnAgain.addEventListener('click', () => {
+            resultCard.classList.remove('show');
+            actionsCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
+
+        // ============ 初始化 ============
+        renderActions();
     </script>
 </body>
 </html>
