@@ -6,164 +6,373 @@
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
     <meta http-equiv="Pragma" content="no-cache">
     <meta http-equiv="Expires" content="0">
-    <title>图片工坊 · 简易版</title>
+    <title>图片工坊 · 现代版</title>
     <style>
-        /* ============ 极简主题 ============ */
+        /* ============ 主题变量 ============ */
         :root {
-            --bg: #f5f6fa;
-            --card: #ffffff;
+            --bg-1: #f0f2f8;
+            --bg-2: #e6e9f2;
+            --card-bg: rgba(255, 255, 255, 0.72);
+            --card-border: rgba(255, 255, 255, 0.9);
+            --card-solid: #ffffff;
             --text: #1a1a2e;
             --text-dim: #5a5a78;
+            --text-faint: #9a9ab0;
             --primary: #6c5ce7;
             --primary-d: #5a4bd1;
-            --primary-l: #edeaff;
-            --border: #e8e8f0;
+            --primary-l: rgba(108, 92, 231, 0.12);
+            --accent-1: #a29bfe;
+            --accent-2: #fd79a8;
+            --accent-3: #00cec9;
+            --border: rgba(20, 20, 60, 0.08);
+            --border-2: rgba(20, 20, 60, 0.14);
             --success: #00b894;
             --danger: #ff4757;
-            --shadow: 0 4px 20px rgba(108, 92, 231, 0.15);
+            --shadow-sm: 0 2px 8px rgba(60, 60, 120, 0.08);
+            --shadow-md: 0 8px 28px rgba(60, 60, 120, 0.14);
+            --shadow-lg: 0 20px 50px rgba(60, 60, 120, 0.22);
+            --glow: 0 0 30px rgba(108, 92, 231, 0.3);
+            --grad-1: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            --grad-2: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            --grad-3: linear-gradient(135deg, #00cec9 0%, #0984e3 100%);
+            --grad-hero: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 50%, #fd79a8 100%);
         }
+        [data-theme="dark"] {
+            --bg-1: #0a0a14;
+            --bg-2: #15152a;
+            --card-bg: rgba(30, 30, 50, 0.72);
+            --card-border: rgba(80, 80, 120, 0.3);
+            --card-solid: #1e1e32;
+            --text: #f0f0fa;
+            --text-dim: #b0b0c8;
+            --text-faint: #6a6a88;
+            --primary: #a29bfe;
+            --primary-d: #8e84f8;
+            --primary-l: rgba(162, 155, 254, 0.18);
+            --accent-1: #a29bfe;
+            --accent-2: #fd79a8;
+            --accent-3: #00cec9;
+            --border: rgba(255, 255, 255, 0.08);
+            --border-2: rgba(255, 255, 255, 0.18);
+            --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+            --shadow-md: 0 8px 28px rgba(0, 0, 0, 0.4);
+            --shadow-lg: 0 20px 50px rgba(0, 0, 0, 0.5);
+            --glow: 0 0 30px rgba(162, 155, 254, 0.4);
+            --grad-1: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 100%);
+            --grad-2: linear-gradient(135deg, #fd79a8 0%, #fdcb6e 100%);
+            --grad-3: linear-gradient(135deg, #00cec9 0%, #0984e3 100%);
+            --grad-hero: linear-gradient(135deg, #6c5ce7 0%, #a29bfe 50%, #fd79a8 100%);
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-        html, body {
+        html { scroll-behavior: smooth; }
+        body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
-            background: var(--bg);
+            background: var(--bg-1);
             color: var(--text);
             min-height: 100vh;
             -webkit-font-smoothing: antialiased;
+            transition: background 0.4s, color 0.4s;
+            overflow-x: hidden;
         }
-        body { padding: 16px; padding-bottom: 40px; }
+        /* 动态背景光斑 */
+        body::before, body::after {
+            content: '';
+            position: fixed;
+            border-radius: 50%;
+            filter: blur(80px);
+            z-index: -1;
+            pointer-events: none;
+            opacity: 0.5;
+            transition: opacity 0.4s;
+        }
+        body::before {
+            width: 500px; height: 500px;
+            background: var(--accent-1);
+            top: -150px; right: -150px;
+            animation: float1 18s ease-in-out infinite;
+        }
+        body::after {
+            width: 400px; height: 400px;
+            background: var(--accent-2);
+            bottom: -100px; left: -100px;
+            animation: float2 22s ease-in-out infinite;
+        }
+        @keyframes float1 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(-80px, 60px) scale(1.1); }
+        }
+        @keyframes float2 {
+            0%, 100% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(60px, -80px) scale(0.9); }
+        }
+        [data-theme="dark"] body::before,
+        [data-theme="dark"] body::after { opacity: 0.3; }
 
-        /* ============ 顶部标题 ============ */
+        .wrap {
+            max-width: 880px;
+            margin: 0 auto;
+            padding: 20px 16px 60px;
+        }
+
+        /* ============ 顶部 ============ */
         .topbar {
-            max-width: 720px;
-            margin: 0 auto 20px;
-            padding: 12px 0;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 14px;
+            padding: 14px 0 24px;
         }
-        .topbar .icon {
-            width: 36px; height: 36px;
-            background: linear-gradient(135deg, #6c5ce7, #a29bfe);
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            color: white; font-weight: 800; font-size: 18px;
-            box-shadow: 0 4px 12px rgba(108, 92, 231, 0.4);
-        }
-        .topbar h1 {
-            font-size: 20px; font-weight: 700;
+        .brand {
+            display: flex; align-items: center; gap: 12px;
             flex: 1;
         }
-        .topbar .subtitle {
-            font-size: 12px; color: var(--text-dim); font-weight: 500;
+        .brand-icon {
+            width: 44px; height: 44px;
+            background: var(--grad-hero);
+            border-radius: 13px;
+            display: flex; align-items: center; justify-content: center;
+            color: white; font-weight: 800; font-size: 20px;
+            box-shadow: var(--glow);
+            position: relative;
+            overflow: hidden;
         }
+        .brand-icon::after {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.3), transparent);
+        }
+        .brand-text h1 {
+            font-size: 22px; font-weight: 800;
+            letter-spacing: -0.02em;
+            background: var(--grad-hero);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        .brand-text .subtitle {
+            font-size: 12px; color: var(--text-dim); font-weight: 500;
+            margin-top: 2px;
+        }
+        .theme-toggle {
+            width: 44px; height: 44px;
+            border-radius: 13px;
+            border: 1px solid var(--border-2);
+            background: var(--card-bg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            cursor: pointer;
+            font-size: 20px;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.3s;
+            color: var(--text);
+        }
+        .theme-toggle:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .theme-toggle:active { transform: scale(0.95); }
 
-        /* ============ 卡片容器 ============ */
+        /* ============ 卡片 ============ */
         .card {
-            max-width: 720px;
-            margin: 0 auto 16px;
-            background: var(--card);
-            border-radius: 16px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--border);
+            background: var(--card-bg);
+            backdrop-filter: blur(24px) saturate(180%);
+            -webkit-backdrop-filter: blur(24px) saturate(180%);
+            border: 1px solid var(--card-border);
+            border-radius: 22px;
+            padding: 24px;
+            box-shadow: var(--shadow-md);
+            margin-bottom: 18px;
+            transition: all 0.3s;
+        }
+        .card-title {
+            font-size: 15px; font-weight: 700;
+            margin-bottom: 16px;
+            display: flex; align-items: center; gap: 8px;
+            color: var(--text);
+        }
+        .card-title .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            background: var(--grad-1);
+        }
+        .card-title .count {
+            margin-left: auto;
+            font-size: 12px; color: var(--text-dim);
+            background: var(--primary-l);
+            padding: 3px 10px;
+            border-radius: 10px;
+            font-weight: 600;
         }
 
         /* ============ 上传区 ============ */
         .upload-area {
             border: 2px dashed var(--primary);
-            border-radius: 14px;
-            padding: 36px 20px;
+            border-radius: 18px;
+            padding: 44px 20px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.3s;
             background: var(--primary-l);
+            position: relative;
+            overflow: hidden;
         }
-        .upload-area:active, .upload-area:hover {
-            background: #e0d8ff;
-            border-color: var(--primary-d);
+        .upload-area::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: var(--grad-1);
+            opacity: 0;
+            transition: opacity 0.3s;
+            z-index: -1;
         }
-        .upload-area .upload-icon {
-            font-size: 40px; margin-bottom: 8px;
+        .upload-area:hover, .upload-area:active {
+            transform: translateY(-2px);
+            box-shadow: var(--glow);
         }
-        .upload-area .upload-title {
-            font-size: 16px; font-weight: 600; margin-bottom: 4px;
+        .upload-area.dragover {
+            background: var(--grad-1);
+            border-color: transparent;
+            color: white;
         }
-        .upload-area .upload-hint {
-            font-size: 12px; color: var(--text-dim);
+        .upload-icon {
+            font-size: 48px;
+            margin-bottom: 10px;
+            display: inline-block;
+            animation: bounce 2.5s ease-in-out infinite;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-8px); }
+        }
+        .upload-area.dragover .upload-icon { animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .upload-title {
+            font-size: 17px; font-weight: 700; margin-bottom: 4px;
+        }
+        .upload-hint {
+            font-size: 13px; color: var(--text-dim);
         }
         #fileInput { display: none; }
 
-        /* ============ 图片预览 ============ */
-        .preview {
+        /* ============ 图片列表 ============ */
+        .image-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
             margin-top: 16px;
-            display: none;
         }
-        .preview.show { display: block; }
-        .preview-img-wrap {
+        .image-item {
             position: relative;
-            background: #f0f0f5;
-            border-radius: 12px;
+            background: var(--card-solid);
+            border-radius: 14px;
             overflow: hidden;
-            min-height: 120px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: var(--shadow-sm);
         }
-        .preview-img-wrap img {
-            max-width: 100%;
-            max-height: 300px;
+        .image-item:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+        }
+        .image-item.selected {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px var(--primary-l), var(--shadow-md);
+        }
+        .image-item img {
+            width: 100%;
+            height: 110px;
+            object-fit: cover;
             display: block;
+            background: var(--bg-2);
         }
-        .preview-info {
-            margin-top: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
+        .image-item .item-info {
+            padding: 8px 10px;
+            font-size: 11px;
+            font-weight: 600;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            color: var(--text);
         }
-        .preview-info .name {
-            font-size: 13px; font-weight: 600;
-            word-break: break-all;
-            flex: 1; min-width: 0;
+        .image-item .item-meta {
+            padding: 0 10px 8px;
+            font-size: 10px;
+            color: var(--text-faint);
         }
-        .preview-info .meta {
-            font-size: 12px; color: var(--text-dim);
+        .image-item .remove-btn {
+            position: absolute;
+            top: 6px; right: 6px;
+            width: 24px; height: 24px;
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(10px);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 14px;
+            cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
         }
-        .btn-remove {
-            background: transparent;
-            border: 1px solid var(--border);
-            color: var(--text-dim);
-            padding: 5px 12px;
-            border-radius: 8px;
+        .image-item .remove-btn:hover { background: var(--danger); transform: scale(1.1); }
+        .image-item .check-mark {
+            position: absolute;
+            top: 6px; left: 6px;
+            width: 24px; height: 24px;
+            background: var(--grad-1);
+            border-radius: 50%;
+            color: white;
             font-size: 12px;
+            display: none;
+            align-items: center; justify-content: center;
+            box-shadow: 0 2px 8px rgba(108, 92, 231, 0.4);
+        }
+        .image-item.selected .check-mark { display: flex; }
+        .image-item .badge {
+            position: absolute;
+            bottom: 6px; right: 6px;
+            background: rgba(0, 0, 0, 0.55);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 7px;
+            border-radius: 8px;
+        }
+
+        .list-actions {
+            margin-top: 14px;
+            display: flex; gap: 10px; flex-wrap: wrap;
+        }
+        .link-btn {
+            background: transparent;
+            color: var(--primary);
+            border: none;
+            font-size: 13px;
+            font-weight: 600;
             cursor: pointer;
             font-family: inherit;
+            padding: 6px 4px;
         }
-        .btn-remove:active { background: #f0f0f5; }
+        .link-btn:hover { text-decoration: underline; }
+        .link-btn.danger { color: var(--danger); }
 
-        /* ============ 功能列表 ============ */
+        /* ============ 功能网格 ============ */
         .actions-card { display: none; }
-        .actions-card.show { display: block; }
-        .actions-title {
-            font-size: 14px; font-weight: 700;
-            margin-bottom: 14px;
-            display: flex; align-items: center; gap: 6px;
+        .actions-card.show { display: block; animation: slideUp 0.4s ease; }
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .actions-grid {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 8px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
         }
-        @media (min-width: 600px) {
-            .actions-grid { grid-template-columns: repeat(3, 1fr); }
+        @media (max-width: 600px) {
+            .actions-grid { grid-template-columns: repeat(2, 1fr); }
         }
         .action-btn {
-            background: var(--card);
+            background: var(--card-solid);
             border: 1px solid var(--border);
             color: var(--text);
-            padding: 14px 10px;
-            border-radius: 12px;
+            padding: 18px 8px;
+            border-radius: 16px;
             cursor: pointer;
             font-family: inherit;
             font-size: 13px;
@@ -171,352 +380,559 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 6px;
-            transition: all 0.15s;
+            gap: 8px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
-        .action-btn:active {
-            background: var(--primary-l);
+        .action-btn::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: var(--grad-1);
+            opacity: 0;
+            transition: opacity 0.25s;
+            z-index: 0;
+        }
+        .action-btn > * { position: relative; z-index: 1; }
+        .action-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-md);
             border-color: var(--primary);
-            transform: scale(0.97);
         }
+        .action-btn:active { transform: scale(0.97); }
         .action-btn .emoji {
-            font-size: 24px;
+            font-size: 28px;
+            display: block;
         }
+        .action-btn .label {
+            display: block;
+        }
+        .action-btn .applied-tag {
+            position: absolute;
+            top: 6px; right: 6px;
+            background: var(--success);
+            color: white;
+            font-size: 9px;
+            padding: 2px 6px;
+            border-radius: 6px;
+            display: none;
+        }
+        .action-btn.applied .applied-tag { display: block; }
 
-        /* ============ 参数面板 (弹窗) ============ */
+        /* ============ 弹窗 ============ */
         .modal-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(20, 20, 60, 0.4);
+            background: rgba(10, 10, 30, 0.55);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: none;
             align-items: flex-end;
             justify-content: center;
             z-index: 1000;
+            animation: fadeIn 0.25s ease;
         }
         .modal-overlay.show { display: flex; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         .modal {
-            background: var(--card);
+            background: var(--card-solid);
             width: 100%;
-            max-width: 500px;
+            max-width: 520px;
             max-height: 90vh;
             overflow-y: auto;
-            border-radius: 18px 18px 0 0;
-            padding: 20px;
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
             transform: translateY(100%);
-            transition: transform 0.25s ease-out;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
         }
         .modal-overlay.show .modal { transform: translateY(0); }
         @media (min-width: 600px) {
-            .modal-overlay { align-items: center; }
-            .modal { border-radius: 18px; }
+            .modal-overlay { align-items: center; padding: 20px; }
+            .modal { border-radius: 24px; }
         }
         .modal-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 16px;
+            margin-bottom: 8px;
         }
         .modal-header h3 {
-            font-size: 17px;
+            font-size: 19px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .modal-header .modal-emoji {
+            font-size: 22px;
+            background: var(--primary-l);
+            padding: 8px;
+            border-radius: 10px;
         }
         .modal-close {
-            background: var(--bg);
+            background: var(--bg-2);
             border: none;
-            width: 32px; height: 32px;
+            width: 36px; height: 36px;
             border-radius: 50%;
-            font-size: 20px;
+            font-size: 22px;
             cursor: pointer;
             color: var(--text-dim);
             font-family: inherit;
+            transition: all 0.2s;
         }
-        .modal-close:active { background: #e8e8f0; }
+        .modal-close:hover { background: var(--border-2); color: var(--text); transform: rotate(90deg); }
         .modal-desc {
             font-size: 13px;
             color: var(--text-dim);
-            margin-bottom: 14px;
-            padding: 10px 12px;
-            background: var(--bg);
-            border-radius: 10px;
+            margin-bottom: 18px;
+            padding: 12px 14px;
+            background: var(--bg-2);
+            border-radius: 12px;
+            line-height: 1.5;
         }
         .field {
-            margin-bottom: 14px;
+            margin-bottom: 16px;
         }
         .field-label {
             display: block;
             font-size: 13px;
             font-weight: 600;
-            margin-bottom: 6px;
+            margin-bottom: 7px;
+            color: var(--text);
         }
         .field-input {
             width: 100%;
-            padding: 11px 12px;
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            padding: 12px 14px;
+            border: 1px solid var(--border-2);
+            border-radius: 12px;
             font-size: 14px;
             font-family: inherit;
-            background: var(--card);
+            background: var(--bg-2);
             color: var(--text);
+            transition: all 0.2s;
         }
         .field-input:focus {
             outline: none;
             border-color: var(--primary);
-            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.15);
+            box-shadow: 0 0 0 4px var(--primary-l);
         }
         select.field-input {
             -webkit-appearance: none;
             appearance: none;
-            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'><path fill='%235a5a78' d='M6 9L1 3h10z'/></svg>");
+            background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 14 14'><path fill='%236c5ce7' d='M7 10L2 4h10z'/></svg>");
             background-repeat: no-repeat;
-            background-position: right 12px center;
-            padding-right: 36px;
+            background-position: right 14px center;
+            padding-right: 40px;
+        }
+        select.field-input option {
+            background: var(--card-solid);
+            color: var(--text);
         }
         .field-row {
             display: flex;
-            gap: 10px;
+            gap: 12px;
         }
         .field-row .field { flex: 1; }
         .range-wrap {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 14px;
         }
         .range-wrap input[type="range"] {
             flex: 1;
             accent-color: var(--primary);
+            height: 6px;
         }
         .range-value {
-            min-width: 50px;
+            min-width: 60px;
             text-align: right;
-            font-size: 13px;
-            font-weight: 600;
+            font-size: 14px;
+            font-weight: 700;
             color: var(--primary);
+            font-variant-numeric: tabular-nums;
         }
         input[type="color"] {
-            width: 60px;
-            height: 40px;
-            border: 1px solid var(--border);
-            border-radius: 8px;
+            width: 70px;
+            height: 44px;
+            border: 1px solid var(--border-2);
+            border-radius: 12px;
             cursor: pointer;
-            padding: 2px;
+            padding: 4px;
+            background: var(--bg-2);
         }
+        .apply-scope {
+            background: var(--primary-l);
+            border-radius: 12px;
+            padding: 12px 14px;
+            margin-bottom: 14px;
+            font-size: 13px;
+            color: var(--text);
+        }
+        .apply-scope strong { color: var(--primary); }
 
         /* ============ 按钮 ============ */
         .btn-primary {
             width: 100%;
-            padding: 14px;
-            background: var(--primary);
+            padding: 15px;
+            background: var(--grad-1);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 14px;
             font-size: 15px;
             font-weight: 700;
             cursor: pointer;
             font-family: inherit;
-            transition: background 0.15s;
-            margin-top: 8px;
+            transition: all 0.2s;
+            margin-top: 10px;
+            box-shadow: 0 6px 20px rgba(108, 92, 231, 0.35);
+            position: relative;
+            overflow: hidden;
         }
-        .btn-primary:active { background: var(--primary-d); }
+        .btn-primary::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), transparent);
+        }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(108, 92, 231, 0.5); }
+        .btn-primary:active { transform: scale(0.98); }
         .btn-primary:disabled {
-            background: #b0a8e0;
+            background: var(--border-2);
+            box-shadow: none;
             cursor: not-allowed;
+            transform: none;
         }
         .btn-secondary {
             width: 100%;
-            padding: 12px;
-            background: var(--bg);
+            padding: 13px;
+            background: var(--bg-2);
             color: var(--text);
-            border: 1px solid var(--border);
-            border-radius: 10px;
+            border: 1px solid var(--border-2);
+            border-radius: 12px;
             font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             font-family: inherit;
-            margin-top: 8px;
+            margin-top: 10px;
+            transition: all 0.2s;
         }
-        .btn-secondary:active { background: #e8e8f0; }
+        .btn-secondary:hover { background: var(--border); }
+        .btn-secondary:active { transform: scale(0.98); }
 
-        /* ============ 结果区 ============ */
+        /* ============ 结果 ============ */
         .result-card { display: none; }
-        .result-card.show { display: block; }
-        .result-img-wrap {
-            background: #f0f0f5;
+        .result-card.show { display: block; animation: slideUp 0.4s ease; }
+        .result-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .result-item {
+            background: var(--card-solid);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: var(--shadow-sm);
+            transition: all 0.2s;
+        }
+        .result-item:hover { transform: translateY(-2px); box-shadow: var(--shadow-md); }
+        .result-item img {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: var(--bg-2);
+            display: block;
+        }
+        .result-item .r-info {
+            padding: 10px 12px;
+        }
+        .result-item .r-name {
+            font-size: 12px; font-weight: 600;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+            color: var(--text);
+        }
+        .result-item .r-meta {
+            font-size: 11px; color: var(--text-faint); margin-top: 2px;
+        }
+        .result-item .r-download {
+            margin-top: 8px;
+            width: 100%;
+            padding: 8px;
+            background: var(--primary-l);
+            color: var(--primary);
+            border: none;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: inherit;
+        }
+        .result-item .r-download:hover { background: var(--primary); color: white; }
+        .result-text-item {
+            background: var(--bg-2);
             border-radius: 12px;
-            padding: 12px;
-            text-align: center;
-            margin-bottom: 12px;
-        }
-        .result-img-wrap img {
-            max-width: 100%;
-            max-height: 400px;
-        }
-        .result-text {
-            background: #f0f0f5;
-            border-radius: 10px;
             padding: 12px;
             font-family: ui-monospace, "SF Mono", monospace;
             font-size: 11px;
             white-space: pre-wrap;
             word-break: break-all;
-            max-height: 300px;
+            max-height: 240px;
             overflow-y: auto;
-            margin-bottom: 12px;
+            margin-bottom: 8px;
+            color: var(--text);
         }
 
-        /* ============ Toast 提示 ============ */
+        /* ============ Toast ============ */
         .toast {
             position: fixed;
-            top: 20px;
+            top: 24px;
             left: 50%;
             transform: translateX(-50%) translateY(-100px);
-            background: var(--text);
-            color: white;
-            padding: 12px 20px;
-            border-radius: 10px;
+            background: var(--card-solid);
+            color: var(--text);
+            padding: 13px 22px;
+            border-radius: 14px;
             font-size: 14px;
-            font-weight: 500;
+            font-weight: 600;
             z-index: 2000;
-            transition: transform 0.25s;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+            transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--border-2);
             max-width: 90%;
             text-align: center;
+            display: flex; align-items: center; gap: 8px;
         }
         .toast.show { transform: translateX(-50%) translateY(0); }
-        .toast.error { background: var(--danger); }
-        .toast.success { background: var(--success); }
+        .toast.error { border-left: 4px solid var(--danger); }
+        .toast.success { border-left: 4px solid var(--success); }
 
         /* ============ Loading ============ */
         .loading-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(255, 255, 255, 0.8);
+            background: rgba(10, 10, 30, 0.6);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             display: none;
             align-items: center;
             justify-content: center;
             z-index: 3000;
+            flex-direction: column;
+            gap: 16px;
         }
         .loading-overlay.show { display: flex; }
         .spinner {
-            width: 40px; height: 40px;
-            border: 4px solid var(--primary-l);
+            width: 56px; height: 56px;
+            border: 5px solid var(--primary-l);
             border-top-color: var(--primary);
             border-radius: 50%;
             animation: spin 0.8s linear infinite;
         }
-        @keyframes spin { to { transform: rotate(360deg); } }
+        .loading-text {
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        /* ============ 进度条 ============ */
+        .progress-bar {
+            width: 100%;
+            height: 6px;
+            background: var(--bg-2);
+            border-radius: 3px;
+            overflow: hidden;
+            margin-top: 10px;
+            display: none;
+        }
+        .progress-bar.show { display: block; }
+        .progress-fill {
+            height: 100%;
+            background: var(--grad-1);
+            width: 0%;
+            transition: width 0.3s;
+            border-radius: 3px;
+        }
+
+        /* ============ 响应式 ============ */
+        @media (max-width: 600px) {
+            .wrap { padding: 16px 12px 50px; }
+            .card { padding: 18px; border-radius: 18px; }
+            .upload-area { padding: 32px 16px; }
+            .upload-icon { font-size: 40px; }
+            .upload-title { font-size: 16px; }
+            .brand-text h1 { font-size: 19px; }
+            .image-list { grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+            .image-item img { height: 90px; }
+        }
     </style>
 </head>
 <body>
-    <div class="topbar">
-        <div class="icon">图</div>
-        <div>
-            <h1>图片工坊</h1>
-            <div class="subtitle">上传 → 选功能 → 下载</div>
-        </div>
-    </div>
-
-    <!-- 1. 上传 -->
-    <div class="card">
-        <div class="upload-area" id="uploadArea">
-            <div class="upload-icon">📁</div>
-            <div class="upload-title">点击选择图片</div>
-            <div class="upload-hint">支持 PNG / JPG / GIF / BMP / WEBP / TIFF</div>
-        </div>
-        <input type="file" id="fileInput" accept="image/*">
-        <div class="preview" id="preview">
-            <div class="preview-img-wrap">
-                <img id="previewImg" alt="预览">
-            </div>
-            <div class="preview-info">
-                <div>
-                    <div class="name" id="previewName"></div>
-                    <div class="meta" id="previewMeta"></div>
+    <div class="wrap">
+        <!-- 顶部 -->
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-icon">图</div>
+                <div class="brand-text">
+                    <h1>图片工坊</h1>
+                    <div class="subtitle">批量处理 · 多种功能 · 现代界面</div>
                 </div>
-                <button class="btn-remove" id="btnRemove">换一张</button>
+            </div>
+            <button class="theme-toggle" id="themeToggle" aria-label="切换主题">
+                <span id="themeIcon">🌙</span>
+            </button>
+        </header>
+
+        <!-- 上传 -->
+        <div class="card">
+            <div class="card-title">
+                <span class="dot"></span>
+                <span>第一步 · 选择图片</span>
+                <span class="count" id="imageCount" style="display:none;">0 张</span>
+            </div>
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📁</div>
+                <div class="upload-title">点击或拖拽图片到这里</div>
+                <div class="upload-hint">支持多张 · PNG / JPG / GIF / BMP / WEBP / TIFF</div>
+            </div>
+            <input type="file" id="fileInput" accept="image/*" multiple>
+            <div class="image-list" id="imageList"></div>
+            <div class="list-actions" id="listActions" style="display:none;">
+                <button class="link-btn" id="selectAll">全选</button>
+                <button class="link-btn" id="selectNone">取消选择</button>
+                <button class="link-btn danger" id="clearAll">清空全部</button>
             </div>
         </div>
-    </div>
 
-    <!-- 2. 选功能 -->
-    <div class="card actions-card" id="actionsCard">
-        <div class="actions-title">选择功能</div>
-        <div class="actions-grid" id="actionsGrid"></div>
-    </div>
-
-    <!-- 3. 结果 -->
-    <div class="card result-card" id="resultCard">
-        <div class="actions-title">完成 ✓</div>
-        <div class="result-img-wrap" id="resultImgWrap">
-            <img id="resultImg" alt="结果">
+        <!-- 功能 -->
+        <div class="card actions-card" id="actionsCard">
+            <div class="card-title">
+                <span class="dot"></span>
+                <span>第二步 · 选择功能</span>
+            </div>
+            <div class="actions-grid" id="actionsGrid"></div>
+            <div class="progress-bar" id="progressBar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
         </div>
-        <div class="result-text" id="resultText" style="display:none;"></div>
-        <button class="btn-primary" id="btnDownload">⬇️ 下载到本地</button>
-        <button class="btn-secondary" id="btnAgain">换功能再来一次</button>
+
+        <!-- 结果 -->
+        <div class="card result-card" id="resultCard">
+            <div class="card-title">
+                <span class="dot"></span>
+                <span>完成 · 结果</span>
+                <span class="count" id="resultCount">0 张</span>
+            </div>
+            <div class="result-list" id="resultList"></div>
+            <button class="btn-primary" id="btnDownloadAll">⬇️ 全部下载 (ZIP)</button>
+            <button class="btn-secondary" id="btnAgain">换功能再来一次</button>
+        </div>
     </div>
 
-    <!-- 参数弹窗 -->
+    <!-- 弹窗 -->
     <div class="modal-overlay" id="modalOverlay">
         <div class="modal" id="modal">
             <div class="modal-header">
-                <h3 id="modalTitle"></h3>
+                <h3><span class="modal-emoji" id="modalEmoji"></span><span id="modalTitle"></span></h3>
                 <button class="modal-close" id="modalClose">×</button>
             </div>
             <div class="modal-desc" id="modalDesc"></div>
+            <div class="apply-scope" id="applyScope"></div>
             <div id="modalFields"></div>
             <button class="btn-primary" id="modalSubmit">开始处理</button>
         </div>
     </div>
 
     <div class="toast" id="toast"></div>
-    <div class="loading-overlay" id="loading"><div class="spinner"></div></div>
+    <div class="loading-overlay" id="loading">
+        <div class="spinner"></div>
+        <div class="loading-text" id="loadingText">处理中...</div>
+    </div>
 
     <script>
         // ============ 全局状态 ============
-        let currentFile = null;       // 当前上传的 File 对象
-        let currentAction = null;    // 当前选中的功能 key
-        let lastResultBlob = null;   // 上次结果 Blob
-        let lastResultName = '';     // 上次结果文件名
-        let lastResultIsText = false; // 上次结果是否为文本
+        let images = [];          // [{ file, url, id, selected }]
+        let currentAction = null;
+        let results = [];         // [{ name, blob, url, isText, text }]
+        let nextId = 1;
 
-        // ============ DOM 引用 ============
+        // ============ DOM ============
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
-        const preview = document.getElementById('preview');
-        const previewImg = document.getElementById('previewImg');
-        const previewName = document.getElementById('previewName');
-        const previewMeta = document.getElementById('previewMeta');
-        const btnRemove = document.getElementById('btnRemove');
+        const imageList = document.getElementById('imageList');
+        const imageCount = document.getElementById('imageCount');
+        const listActions = document.getElementById('listActions');
+        const selectAllBtn = document.getElementById('selectAll');
+        const selectNoneBtn = document.getElementById('selectNone');
+        const clearAllBtn = document.getElementById('clearAll');
         const actionsCard = document.getElementById('actionsCard');
         const actionsGrid = document.getElementById('actionsGrid');
         const resultCard = document.getElementById('resultCard');
-        const resultImg = document.getElementById('resultImg');
-        const resultImgWrap = document.getElementById('resultImgWrap');
-        const resultText = document.getElementById('resultText');
-        const btnDownload = document.getElementById('btnDownload');
+        const resultList = document.getElementById('resultList');
+        const resultCount = document.getElementById('resultCount');
+        const btnDownloadAll = document.getElementById('btnDownloadAll');
         const btnAgain = document.getElementById('btnAgain');
         const modalOverlay = document.getElementById('modalOverlay');
         const modalTitle = document.getElementById('modalTitle');
+        const modalEmoji = document.getElementById('modalEmoji');
         const modalDesc = document.getElementById('modalDesc');
         const modalFields = document.getElementById('modalFields');
         const modalClose = document.getElementById('modalClose');
         const modalSubmit = document.getElementById('modalSubmit');
+        const applyScope = document.getElementById('applyScope');
         const toast = document.getElementById('toast');
         const loading = document.getElementById('loading');
+        const loadingText = document.getElementById('loadingText');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const themeToggle = document.getElementById('themeToggle');
+        const themeIcon = document.getElementById('themeIcon');
 
-        // ============ 工具函数 ============
+        // ============ 工具 ============
         function showToast(msg, type) {
-            toast.textContent = msg;
+            toast.innerHTML = (type === 'success' ? '✓ ' : type === 'error' ? '✗ ' : '') + msg;
             toast.className = 'toast show' + (type ? ' ' + type : '');
             clearTimeout(toast._t);
-            toast._t = setTimeout(() => toast.classList.remove('show'), 2500);
+            toast._t = setTimeout(() => toast.classList.remove('show'), 2800);
         }
-        function showLoading() { loading.classList.add('show'); }
+        function showLoading(text) {
+            loadingText.textContent = text || '处理中...';
+            loading.classList.add('show');
+        }
         function hideLoading() { loading.classList.remove('show'); }
-
+        function showProgress(p) {
+            progressBar.classList.add('show');
+            progressFill.style.width = Math.round(p * 100) + '%';
+        }
+        function hideProgress() {
+            progressBar.classList.remove('show');
+            progressFill.style.width = '0%';
+        }
         function humanSize(bytes) {
             if (bytes < 1024) return bytes + ' B';
             if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
             return (bytes / 1024 / 1024).toFixed(2) + ' MB';
         }
+
+        // ============ 主题切换 ============
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+            try { localStorage.setItem('imgstudio_theme', theme); } catch (e) {}
+        }
+        function initTheme() {
+            let saved = null;
+            try { saved = localStorage.getItem('imgstudio_theme'); } catch (e) {}
+            if (saved === 'dark' || saved === 'light') {
+                applyTheme(saved);
+            } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                applyTheme('dark');
+            } else {
+                applyTheme('light');
+            }
+        }
+        themeToggle.addEventListener('click', () => {
+            const cur = document.documentElement.getAttribute('data-theme') || 'light';
+            applyTheme(cur === 'dark' ? 'light' : 'dark');
+        });
+        initTheme();
 
         // ============ 功能定义 ============
         const ACTIONS = [
@@ -599,13 +1015,12 @@
             ]}
         ];
 
-        // ============ 渲染功能按钮 ============
         function renderActions() {
             actionsGrid.innerHTML = '';
             ACTIONS.forEach(a => {
                 const btn = document.createElement('button');
                 btn.className = 'action-btn';
-                btn.innerHTML = '<span class="emoji">' + a.emoji + '</span><span>' + a.label + '</span>';
+                btn.innerHTML = '<span class="applied-tag">已应用</span><span class="emoji">' + a.emoji + '</span><span class="label">' + a.label + '</span>';
                 btn.addEventListener('click', () => openModal(a));
                 actionsGrid.appendChild(btn);
             });
@@ -614,53 +1029,99 @@
         // ============ 上传 ============
         uploadArea.addEventListener('click', () => fileInput.click());
         fileInput.addEventListener('change', (e) => {
-            const f = e.target.files[0];
-            if (f) handleFile(f);
+            const files = Array.from(e.target.files);
+            files.forEach(f => addImage(f));
+            fileInput.value = '';
         });
-        // 拖拽上传
-        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.style.background = '#e0d8ff'; });
-        uploadArea.addEventListener('dragleave', () => { uploadArea.style.background = ''; });
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => uploadArea.classList.remove('dragover'));
         uploadArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            uploadArea.style.background = '';
-            const f = e.dataTransfer.files[0];
-            if (f) handleFile(f);
+            uploadArea.classList.remove('dragover');
+            const files = Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/'));
+            files.forEach(f => addImage(f));
         });
 
-        function handleFile(f) {
-            if (!f.type.startsWith('image/')) {
-                showToast('请选图片文件', 'error');
+        function addImage(file) {
+            if (!file.type.startsWith('image/')) {
+                showToast('不是图片: ' + file.name, 'error');
                 return;
             }
-            currentFile = f;
-            const url = URL.createObjectURL(f);
-            previewImg.src = url;
-            previewName.textContent = f.name;
-            previewMeta.textContent = humanSize(f.size);
-            preview.classList.add('show');
+            const id = nextId++;
+            const url = URL.createObjectURL(file);
+            images.push({ id, file, url, selected: true });
+            renderImageList();
             actionsCard.classList.add('show');
             resultCard.classList.remove('show');
-            // 滚动到功能区
-            setTimeout(() => actionsCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 200);
         }
 
-        btnRemove.addEventListener('click', () => {
-            currentFile = null;
-            fileInput.value = '';
-            preview.classList.remove('show');
+        function renderImageList() {
+            imageList.innerHTML = '';
+            images.forEach(img => {
+                const div = document.createElement('div');
+                div.className = 'image-item' + (img.selected ? ' selected' : '');
+                div.innerHTML =
+                    '<img src="' + img.url + '" alt="">' +
+                    '<div class="check-mark">✓</div>' +
+                    '<button class="remove-btn" data-id="' + img.id + '">×</button>' +
+                    '<div class="badge">' + img.file.type.split('/')[1].toUpperCase() + '</div>' +
+                    '<div class="item-info">' + img.file.name + '</div>' +
+                    '<div class="item-meta">' + humanSize(img.file.size) + '</div>';
+                div.addEventListener('click', (e) => {
+                    if (e.target.classList.contains('remove-btn')) return;
+                    img.selected = !img.selected;
+                    renderImageList();
+                });
+                imageList.appendChild(div);
+            });
+            const count = images.length;
+            imageCount.textContent = count + ' 张';
+            imageCount.style.display = count > 0 ? '' : 'none';
+            listActions.style.display = count > 0 ? '' : 'none';
+            actionsCard.classList.toggle('show', count > 0);
+        }
+
+        imageList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('remove-btn')) {
+                const id = parseInt(e.target.dataset.id);
+                const idx = images.findIndex(i => i.id === id);
+                if (idx >= 0) {
+                    URL.revokeObjectURL(images[idx].url);
+                    images.splice(idx, 1);
+                    renderImageList();
+                }
+            }
+        });
+
+        selectAllBtn.addEventListener('click', () => {
+            images.forEach(i => i.selected = true);
+            renderImageList();
+        });
+        selectNoneBtn.addEventListener('click', () => {
+            images.forEach(i => i.selected = false);
+            renderImageList();
+        });
+        clearAllBtn.addEventListener('click', () => {
+            images.forEach(i => URL.revokeObjectURL(i.url));
+            images = [];
+            renderImageList();
             actionsCard.classList.remove('show');
             resultCard.classList.remove('show');
         });
 
         // ============ 弹窗 ============
         function openModal(action) {
-            if (!currentFile) {
-                showToast('请先选择图片', 'error');
+            const selected = images.filter(i => i.selected);
+            if (selected.length === 0) {
+                showToast('请先选择至少一张图片', 'error');
                 return;
             }
             currentAction = action;
-            modalTitle.textContent = action.emoji + ' ' + action.label;
+            modalEmoji.textContent = action.emoji;
+            modalTitle.textContent = action.label;
             modalDesc.textContent = action.desc;
+            applyScope.innerHTML = '将应用到 <strong>' + selected.length + '</strong> 张图片' +
+                (selected.length > 1 ? ' (批量处理)' : '');
             modalFields.innerHTML = '';
 
             action.fields.forEach(field => {
@@ -727,47 +1188,63 @@
         modalOverlay.addEventListener('click', (e) => {
             if (e.target === modalOverlay) closeModal();
         });
-        function closeModal() {
-            modalOverlay.classList.remove('show');
-        }
+        function closeModal() { modalOverlay.classList.remove('show'); }
 
-        // ============ 提交处理 ============
+        // ============ 提交 ============
         modalSubmit.addEventListener('click', async () => {
-            if (!currentFile || !currentAction) return;
-            // 收集参数
+            const selected = images.filter(i => i.selected);
+            if (selected.length === 0 || !currentAction) return;
+
             const params = {};
-            const inputs = modalFields.querySelectorAll('input, select');
-            inputs.forEach(inp => {
+            modalFields.querySelectorAll('input, select').forEach(inp => {
                 const name = inp.dataset.field;
                 if (!name) return;
                 let val = inp.value;
-                if (inp.type === 'range' || inp.type === 'number') {
-                    val = parseFloat(val);
-                }
-                // 颜色去掉 #
-                if (inp.type === 'color') {
-                    val = val.replace('#', '');
-                }
+                if (inp.type === 'range' || inp.type === 'number') val = parseFloat(val);
+                if (inp.type === 'color') val = val.replace('#', '');
                 params[name] = val;
             });
 
             closeModal();
-            showLoading();
+            results = [];
+            resultList.innerHTML = '';
+
+            // 单张: 用 loading overlay; 多张: 用进度条
+            const multi = selected.length > 1;
+            if (multi) {
+                showProgress(0);
+                showLoading('处理中 (0/' + selected.length + ')...');
+            } else {
+                showLoading('处理中...');
+            }
+
             try {
-                const result = await callApi(currentAction.key, params);
+                for (let i = 0; i < selected.length; i++) {
+                    const img = selected[i];
+                    loadingText.textContent = '处理中 (' + (i + 1) + '/' + selected.length + '): ' + img.file.name;
+                    const result = await callApi(currentAction.key, params, img.file);
+                    results.push(result);
+                    if (multi) showProgress((i + 1) / selected.length);
+                }
                 hideLoading();
-                showResult(result);
+                hideProgress();
+                showResults();
+                // 标记已应用
+                document.querySelectorAll('.action-btn').forEach(b => b.classList.remove('applied'));
+                const btns = actionsGrid.querySelectorAll('.action-btn');
+                const idx = ACTIONS.findIndex(a => a.key === currentAction.key);
+                if (idx >= 0 && btns[idx]) btns[idx].classList.add('applied');
             } catch (err) {
                 hideLoading();
+                hideProgress();
                 showToast('处理失败: ' + (err.message || err), 'error');
                 console.error(err);
             }
         });
 
-        // ============ 调用后端 ============
-        async function callApi(actionKey, params) {
+        async function callApi(actionKey, params, file) {
             const formData = new FormData();
-            formData.append('file', currentFile);
+            formData.append('file', file);
             Object.entries(params).forEach(([k, v]) => formData.append(k, v));
 
             const endpoint = '/api/' + actionKey;
@@ -777,68 +1254,85 @@
                 throw new Error('HTTP ' + resp.status + ': ' + txt.substring(0, 200));
             }
             const contentType = resp.headers.get('Content-Type') || '';
+            const cd = resp.headers.get('Content-Disposition') || '';
+            const m = cd.match(/filename="?([^"]+)"?/);
+            const baseName = (file.name || 'image').replace(/\.[^.]+$/, '');
+            const ext = params.format || 'png';
+
             if (contentType.includes('text/plain')) {
-                // ASCII art
                 const text = await resp.text();
-                return { type: 'text', text };
+                return { name: baseName + '-ascii.txt', blob: new Blob([text], { type: 'text/plain' }), isText: true, text };
             } else if (contentType.includes('application/json')) {
-                // base64
                 const json = await resp.json();
-                return { type: 'json', json };
+                return { name: baseName + '.json', blob: new Blob([JSON.stringify(json, null, 2)], { type: 'application/json' }), isText: true, text: json.base64 || JSON.stringify(json), dataUri: json.dataUri };
             } else {
-                // 图片
                 const blob = await resp.blob();
-                // 从 Content-Disposition 拿文件名
-                const cd = resp.headers.get('Content-Disposition') || '';
-                const m = cd.match(/filename="?([^"]+)"?/);
-                const name = m ? m[1] : ('result.' + (params.format || 'png'));
-                return { type: 'image', blob, name };
+                const name = m ? m[1] : (baseName + '-converted.' + ext);
+                return { name, blob, isText: false };
             }
         }
 
-        // ============ 显示结果 ============
-        function showResult(result) {
+        function showResults() {
             resultCard.classList.add('show');
-            if (result.type === 'image') {
-                lastResultBlob = result.blob;
-                lastResultName = result.name;
-                lastResultIsText = false;
-                resultImg.src = URL.createObjectURL(result.blob);
-                resultImgWrap.style.display = '';
-                resultText.style.display = 'none';
-                resultText.textContent = '';
-            } else if (result.type === 'text') {
-                lastResultBlob = new Blob([result.text], { type: 'text/plain' });
-                lastResultName = 'ascii-art.txt';
-                lastResultIsText = true;
-                resultImgWrap.style.display = 'none';
-                resultText.style.display = 'block';
-                resultText.textContent = result.text;
-            } else if (result.type === 'json') {
-                const dataUri = result.json.dataUri || '';
-                lastResultBlob = new Blob([JSON.stringify(result.json, null, 2)], { type: 'application/json' });
-                lastResultName = 'base64.json';
-                lastResultIsText = true;
-                resultImgWrap.style.display = dataUri ? '' : 'none';
-                if (dataUri) resultImg.src = dataUri;
-                resultText.style.display = 'block';
-                resultText.textContent = result.json.base64 || JSON.stringify(result.json, null, 2);
-            }
+            resultCount.textContent = results.length + ' 张';
+            resultList.innerHTML = '';
+            results.forEach((r, idx) => {
+                const url = URL.createObjectURL(r.blob);
+                r.url = url;
+                const item = document.createElement('div');
+                item.className = 'result-item';
+                if (r.isText) {
+                    if (r.dataUri) {
+                        item.innerHTML = '<img src="' + r.dataUri + '">' +
+                            '<div class="r-info"><div class="r-name">' + r.name + '</div>' +
+                            '<button class="r-download" data-idx="' + idx + '">下载</button></div>';
+                    } else {
+                        item.style.gridColumn = '1 / -1';
+                        item.innerHTML = '<div class="r-info"><div class="r-name">' + r.name + '</div>' +
+                            '<div class="result-text-item">' + (r.text || '').substring(0, 5000) + (r.text && r.text.length > 5000 ? '\n...(已截断)' : '') + '</div>' +
+                            '<button class="r-download" data-idx="' + idx + '">下载</button></div>';
+                    }
+                } else {
+                    item.innerHTML = '<img src="' + url + '">' +
+                        '<div class="r-info"><div class="r-name">' + r.name + '</div>' +
+                        '<div class="r-meta">' + humanSize(r.blob.size) + '</div>' +
+                        '<button class="r-download" data-idx="' + idx + '">下载</button></div>';
+                }
+                resultList.appendChild(item);
+            });
             setTimeout(() => resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' }), 100);
         }
 
-        // ============ 下载 / 重来 ============
-        btnDownload.addEventListener('click', () => {
-            if (!lastResultBlob) return;
-            const url = URL.createObjectURL(lastResultBlob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = lastResultName;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            setTimeout(() => URL.revokeObjectURL(url), 1000);
-            showToast('已开始下载', 'success');
+        // 单个下载
+        resultList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('r-download')) {
+                const idx = parseInt(e.target.dataset.idx);
+                const r = results[idx];
+                if (!r) return;
+                const a = document.createElement('a');
+                a.href = r.url;
+                a.download = r.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                showToast('已下载: ' + r.name, 'success');
+            }
+        });
+
+        // 全部下载 (逐个触发)
+        btnDownloadAll.addEventListener('click', async () => {
+            if (results.length === 0) return;
+            for (let i = 0; i < results.length; i++) {
+                const r = results[i];
+                const a = document.createElement('a');
+                a.href = r.url;
+                a.download = r.name;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                await new Promise(r => setTimeout(r, 200));
+            }
+            showToast('已下载 ' + results.length + ' 个文件', 'success');
         });
 
         btnAgain.addEventListener('click', () => {
