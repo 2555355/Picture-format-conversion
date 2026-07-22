@@ -4,29 +4,30 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="theme-color" content="#00f0ff">
-    <title>NEXUS · IMAGE FORGE</title>
+    <title>NEXUS // IMAGE FORGE · PILOT CONSOLE</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;800;900&family=Rajdhani:wght@300;400;500;600;700&family=Share+Tech+Mono&family=JetBrains+Mono:wght@400;600;800&display=swap" rel="stylesheet">
     <style>
         /* =========================================================
-           NEXUS · IMAGE FORGE — Sci-fi HUD theme
-           6 套子主题：cyberpunk / matrix / hologram / plasma / quantum / nebula
+           NEXUS // IMAGE FORGE — Pilot Console (cockpit HUD)
+           Inspired by mecha HUDs: 3D floating panels, tabs,
+           bracket frames, data readouts, scanlines, perspective.
+           6 套主题：cyberpunk / matrix / hologram / plasma / quantum / nebula
            ========================================================= */
 
-        /* ---- 默认 / Cyberpunk ---- */
         :root, [data-theme="cyberpunk"] {
-            --bg: #05060d;
-            --bg-2: #0a0d1a;
-            --bg-3: #0f1426;
-            --surface: rgba(13, 18, 33, 0.72);
-            --surface-2: rgba(20, 28, 48, 0.55);
-            --surface-3: rgba(28, 40, 65, 0.45);
-            --border: rgba(0, 240, 255, 0.28);
-            --border-soft: rgba(0, 240, 255, 0.12);
-            --text: #e6f6ff;
-            --text-2: #94b6d4;
-            --text-3: #5b7a9a;
+            --bg: #03040a;
+            --bg-2: #070a14;
+            --bg-3: #0c1024;
+            --panel: rgba(8, 14, 28, 0.72);
+            --panel-2: rgba(14, 24, 46, 0.55);
+            --panel-3: rgba(20, 36, 64, 0.45);
+            --line: rgba(0, 240, 255, 0.30);
+            --line-soft: rgba(0, 240, 255, 0.10);
+            --text: #d8f3ff;
+            --text-2: #82a8c8;
+            --text-3: #456680;
 
             --c1: #00f0ff;
             --c2: #ff2bd6;
@@ -37,160 +38,111 @@
             --success: #00ff9d;
 
             --grad: linear-gradient(120deg, #00f0ff 0%, #b400ff 50%, #ff2bd6 100%);
-            --grad-soft: linear-gradient(120deg, rgba(0,240,255,0.18), rgba(180,0,255,0.18), rgba(255,43,214,0.18));
+            --grad-soft: linear-gradient(120deg, rgba(0,240,255,0.20), rgba(180,0,255,0.18), rgba(255,43,214,0.20));
 
-            --glow-1: 0 0 12px rgba(0, 240, 255, 0.55), 0 0 32px rgba(0, 240, 255, 0.18);
-            --glow-2: 0 0 12px rgba(255, 43, 214, 0.55), 0 0 32px rgba(255, 43, 214, 0.18);
-            --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.55);
-            --ring: 0 0 0 1px rgba(0, 240, 255, 0.6), 0 0 18px rgba(0, 240, 255, 0.35);
+            --glow-1: 0 0 12px rgba(0, 240, 255, 0.55), 0 0 36px rgba(0, 240, 255, 0.18);
+            --glow-2: 0 0 12px rgba(255, 43, 214, 0.55), 0 0 36px rgba(255, 43, 214, 0.18);
+            --shadow-md: 0 12px 40px rgba(0, 0, 0, 0.6);
+            --shadow-lg: 0 24px 80px rgba(0, 0, 0, 0.7);
+            --ring: 0 0 0 1px rgba(0, 240, 255, 0.6), 0 0 24px rgba(0, 240, 255, 0.30);
         }
 
         [data-theme="matrix"] {
-            --bg: #000800;
-            --bg-2: #001400;
-            --bg-3: #002000;
-            --surface: rgba(0, 22, 8, 0.78);
-            --surface-2: rgba(0, 32, 12, 0.55);
-            --surface-3: rgba(0, 46, 18, 0.45);
-            --border: rgba(0, 255, 80, 0.30);
-            --border-soft: rgba(0, 255, 80, 0.12);
-            --text: #d6ffe1;
-            --text-2: #62c47a;
-            --text-3: #2e7a45;
-
-            --c1: #00ff66;
-            --c2: #7aff00;
-            --c3: #00cc55;
-            --c4: #b6ff3c;
-            --warn: #ffd700;
-            --danger: #ff5050;
-            --success: #00ff66;
-
+            --bg: #000800; --bg-2: #001400; --bg-3: #002000;
+            --panel: rgba(0, 22, 8, 0.78);
+            --panel-2: rgba(0, 32, 12, 0.55);
+            --panel-3: rgba(0, 46, 18, 0.45);
+            --line: rgba(0, 255, 80, 0.30);
+            --line-soft: rgba(0, 255, 80, 0.10);
+            --text: #d6ffe1; --text-2: #62c47a; --text-3: #2e7a45;
+            --c1: #00ff66; --c2: #7aff00; --c3: #00cc55; --c4: #b6ff3c;
+            --warn: #ffd700; --danger: #ff5050; --success: #00ff66;
             --grad: linear-gradient(120deg, #00ff66 0%, #b6ff3c 100%);
             --grad-soft: linear-gradient(120deg, rgba(0,255,102,0.20), rgba(182,255,60,0.20));
-            --glow-1: 0 0 12px rgba(0, 255, 102, 0.55), 0 0 32px rgba(0, 255, 102, 0.18);
-            --glow-2: 0 0 12px rgba(182, 255, 60, 0.55), 0 0 32px rgba(182, 255, 60, 0.18);
-            --shadow-md: 0 8px 32px rgba(0, 30, 10, 0.7);
-            --ring: 0 0 0 1px rgba(0, 255, 102, 0.6), 0 0 18px rgba(0, 255, 102, 0.35);
+            --glow-1: 0 0 12px rgba(0, 255, 102, 0.55), 0 0 36px rgba(0, 255, 102, 0.18);
+            --glow-2: 0 0 12px rgba(182, 255, 60, 0.55), 0 0 36px rgba(182, 255, 60, 0.18);
+            --shadow-md: 0 12px 40px rgba(0, 30, 10, 0.7);
+            --shadow-lg: 0 24px 80px rgba(0, 30, 10, 0.8);
+            --ring: 0 0 0 1px rgba(0, 255, 102, 0.6), 0 0 24px rgba(0, 255, 102, 0.30);
         }
 
         [data-theme="hologram"] {
-            --bg: #02060e;
-            --bg-2: #040c1a;
-            --bg-3: #061226;
-            --surface: rgba(8, 24, 48, 0.7);
-            --surface-2: rgba(14, 36, 64, 0.55);
-            --surface-3: rgba(22, 52, 90, 0.45);
-            --border: rgba(60, 180, 255, 0.32);
-            --border-soft: rgba(60, 180, 255, 0.12);
-            --text: #e0f3ff;
-            --text-2: #7eb6df;
-            --text-3: #4878a0;
-
-            --c1: #4cc9ff;
-            --c2: #00aaff;
-            --c3: #3a86ff;
-            --c4: #8be9ff;
-            --warn: #ffd166;
-            --danger: #ff5577;
-            --success: #06d6a0;
-
+            --bg: #02060e; --bg-2: #040c1a; --bg-3: #061226;
+            --panel: rgba(8, 24, 48, 0.7);
+            --panel-2: rgba(14, 36, 64, 0.55);
+            --panel-3: rgba(22, 52, 90, 0.45);
+            --line: rgba(60, 180, 255, 0.32);
+            --line-soft: rgba(60, 180, 255, 0.12);
+            --text: #e0f3ff; --text-2: #7eb6df; --text-3: #4878a0;
+            --c1: #4cc9ff; --c2: #00aaff; --c3: #3a86ff; --c4: #8be9ff;
+            --warn: #ffd166; --danger: #ff5577; --success: #06d6a0;
             --grad: linear-gradient(120deg, #4cc9ff 0%, #3a86ff 50%, #8be9ff 100%);
             --grad-soft: linear-gradient(120deg, rgba(76,201,255,0.20), rgba(58,134,255,0.20), rgba(139,233,255,0.20));
-            --glow-1: 0 0 12px rgba(76, 201, 255, 0.6), 0 0 32px rgba(76, 201, 255, 0.22);
-            --glow-2: 0 0 12px rgba(139, 233, 255, 0.55), 0 0 32px rgba(139, 233, 255, 0.18);
-            --shadow-md: 0 8px 32px rgba(0, 8, 20, 0.7);
-            --ring: 0 0 0 1px rgba(76, 201, 255, 0.6), 0 0 18px rgba(76, 201, 255, 0.35);
+            --glow-1: 0 0 12px rgba(76, 201, 255, 0.6), 0 0 36px rgba(76, 201, 255, 0.22);
+            --glow-2: 0 0 12px rgba(139, 233, 255, 0.55), 0 0 36px rgba(139, 233, 255, 0.18);
+            --shadow-md: 0 12px 40px rgba(0, 8, 20, 0.7);
+            --shadow-lg: 0 24px 80px rgba(0, 8, 20, 0.8);
+            --ring: 0 0 0 1px rgba(76, 201, 255, 0.6), 0 0 24px rgba(76, 201, 255, 0.30);
         }
 
         [data-theme="plasma"] {
-            --bg: #0a0210;
-            --bg-2: #160424;
-            --bg-3: #220838;
-            --surface: rgba(36, 12, 60, 0.7);
-            --surface-2: rgba(54, 18, 90, 0.55);
-            --surface-3: rgba(80, 30, 130, 0.45);
-            --border: rgba(255, 60, 200, 0.32);
-            --border-soft: rgba(255, 60, 200, 0.12);
-            --text: #ffe6f8;
-            --text-2: #d29ee0;
-            --text-3: #855694;
-
-            --c1: #ff3cb4;
-            --c2: #c850ff;
-            --c3: #ff77e9;
-            --c4: #8a4dff;
-            --warn: #ffcc44;
-            --danger: #ff4d6d;
-            --success: #5eead4;
-
+            --bg: #0a0210; --bg-2: #160424; --bg-3: #220838;
+            --panel: rgba(36, 12, 60, 0.7);
+            --panel-2: rgba(54, 18, 90, 0.55);
+            --panel-3: rgba(80, 30, 130, 0.45);
+            --line: rgba(255, 60, 200, 0.32);
+            --line-soft: rgba(255, 60, 200, 0.12);
+            --text: #ffe6f8; --text-2: #d29ee0; --text-3: #855694;
+            --c1: #ff3cb4; --c2: #c850ff; --c3: #ff77e9; --c4: #8a4dff;
+            --warn: #ffcc44; --danger: #ff4d6d; --success: #5eead4;
             --grad: linear-gradient(120deg, #ff3cb4 0%, #c850ff 50%, #8a4dff 100%);
             --grad-soft: linear-gradient(120deg, rgba(255,60,180,0.20), rgba(200,80,255,0.20), rgba(138,77,255,0.20));
-            --glow-1: 0 0 12px rgba(255, 60, 180, 0.55), 0 0 32px rgba(255, 60, 180, 0.18);
-            --glow-2: 0 0 12px rgba(200, 80, 255, 0.55), 0 0 32px rgba(200, 80, 255, 0.18);
-            --shadow-md: 0 8px 32px rgba(20, 0, 30, 0.7);
-            --ring: 0 0 0 1px rgba(255, 60, 180, 0.6), 0 0 18px rgba(255, 60, 180, 0.35);
+            --glow-1: 0 0 12px rgba(255, 60, 180, 0.55), 0 0 36px rgba(255, 60, 180, 0.18);
+            --glow-2: 0 0 12px rgba(200, 80, 255, 0.55), 0 0 36px rgba(200, 80, 255, 0.18);
+            --shadow-md: 0 12px 40px rgba(20, 0, 30, 0.7);
+            --shadow-lg: 0 24px 80px rgba(20, 0, 30, 0.8);
+            --ring: 0 0 0 1px rgba(255, 60, 180, 0.6), 0 0 24px rgba(255, 60, 180, 0.30);
         }
 
         [data-theme="quantum"] {
-            --bg: #0c0800;
-            --bg-2: #1a0e00;
-            --bg-3: #2a1604;
-            --surface: rgba(36, 18, 0, 0.72);
-            --surface-2: rgba(56, 28, 0, 0.55);
-            --surface-3: rgba(80, 40, 0, 0.45);
-            --border: rgba(255, 160, 32, 0.32);
-            --border-soft: rgba(255, 160, 32, 0.12);
-            --text: #fff0d6;
-            --text-2: #d4a76a;
-            --text-3: #856040;
-
-            --c1: #ff9a1a;
-            --c2: #ffb84d;
-            --c3: #ff5722;
-            --c4: #ffd166;
-            --warn: #ff8800;
-            --danger: #ff4444;
-            --success: #c0ff33;
-
+            --bg: #0c0800; --bg-2: #1a0e00; --bg-3: #2a1604;
+            --panel: rgba(36, 18, 0, 0.72);
+            --panel-2: rgba(56, 28, 0, 0.55);
+            --panel-3: rgba(80, 40, 0, 0.45);
+            --line: rgba(255, 160, 32, 0.32);
+            --line-soft: rgba(255, 160, 32, 0.12);
+            --text: #fff0d6; --text-2: #d4a76a; --text-3: #856040;
+            --c1: #ff9a1a; --c2: #ffb84d; --c3: #ff5722; --c4: #ffd166;
+            --warn: #ff8800; --danger: #ff4444; --success: #c0ff33;
             --grad: linear-gradient(120deg, #ff5722 0%, #ff9a1a 50%, #ffd166 100%);
             --grad-soft: linear-gradient(120deg, rgba(255,87,34,0.20), rgba(255,154,26,0.20), rgba(255,209,102,0.20));
-            --glow-1: 0 0 12px rgba(255, 154, 26, 0.6), 0 0 32px rgba(255, 154, 26, 0.20);
-            --glow-2: 0 0 12px rgba(255, 209, 102, 0.55), 0 0 32px rgba(255, 209, 102, 0.18);
-            --shadow-md: 0 8px 32px rgba(20, 8, 0, 0.7);
-            --ring: 0 0 0 1px rgba(255, 154, 26, 0.6), 0 0 18px rgba(255, 154, 26, 0.35);
+            --glow-1: 0 0 12px rgba(255, 154, 26, 0.6), 0 0 36px rgba(255, 154, 26, 0.20);
+            --glow-2: 0 0 12px rgba(255, 209, 102, 0.55), 0 0 36px rgba(255, 209, 102, 0.18);
+            --shadow-md: 0 12px 40px rgba(20, 8, 0, 0.7);
+            --shadow-lg: 0 24px 80px rgba(20, 8, 0, 0.8);
+            --ring: 0 0 0 1px rgba(255, 154, 26, 0.6), 0 0 24px rgba(255, 154, 26, 0.30);
         }
 
         [data-theme="nebula"] {
-            --bg: #06031a;
-            --bg-2: #0d0628;
-            --bg-3: #16093a;
-            --surface: rgba(22, 10, 52, 0.7);
-            --surface-2: rgba(36, 18, 78, 0.55);
-            --surface-3: rgba(56, 30, 116, 0.45);
-            --border: rgba(160, 110, 255, 0.32);
-            --border-soft: rgba(160, 110, 255, 0.12);
-            --text: #ece2ff;
-            --text-2: #b3a0e0;
-            --text-3: #6e5a9a;
-
-            --c1: #a06eff;
-            --c2: #ff6ec7;
-            --c3: #6effff;
-            --c4: #c780ff;
-            --warn: #ffcc66;
-            --danger: #ff5577;
-            --success: #80ffd4;
-
+            --bg: #06031a; --bg-2: #0d0628; --bg-3: #16093a;
+            --panel: rgba(22, 10, 52, 0.7);
+            --panel-2: rgba(36, 18, 78, 0.55);
+            --panel-3: rgba(56, 30, 116, 0.45);
+            --line: rgba(160, 110, 255, 0.32);
+            --line-soft: rgba(160, 110, 255, 0.12);
+            --text: #ece2ff; --text-2: #b3a0e0; --text-3: #6e5a9a;
+            --c1: #a06eff; --c2: #ff6ec7; --c3: #6effff; --c4: #c780ff;
+            --warn: #ffcc66; --danger: #ff5577; --success: #80ffd4;
             --grad: linear-gradient(120deg, #6effff 0%, #a06eff 50%, #ff6ec7 100%);
             --grad-soft: linear-gradient(120deg, rgba(110,255,255,0.18), rgba(160,110,255,0.20), rgba(255,110,199,0.18));
-            --glow-1: 0 0 12px rgba(160, 110, 255, 0.6), 0 0 32px rgba(160, 110, 255, 0.20);
-            --glow-2: 0 0 12px rgba(110, 255, 255, 0.5), 0 0 32px rgba(110, 255, 255, 0.18);
-            --shadow-md: 0 8px 32px rgba(6, 0, 24, 0.7);
-            --ring: 0 0 0 1px rgba(160, 110, 255, 0.6), 0 0 18px rgba(160, 110, 255, 0.35);
+            --glow-1: 0 0 12px rgba(160, 110, 255, 0.6), 0 0 36px rgba(160, 110, 255, 0.20);
+            --glow-2: 0 0 12px rgba(110, 255, 255, 0.5), 0 0 36px rgba(110, 255, 255, 0.18);
+            --shadow-md: 0 12px 40px rgba(6, 0, 24, 0.7);
+            --shadow-lg: 0 24px 80px rgba(6, 0, 24, 0.8);
+            --ring: 0 0 0 1px rgba(160, 110, 255, 0.6), 0 0 24px rgba(160, 110, 255, 0.30);
         }
 
-        /* ========== 基础 ========== */
+        /* ========== Base ========== */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html, body { height: 100%; }
         body {
@@ -201,7 +153,7 @@
             line-height: 1.55;
             -webkit-font-smoothing: antialiased;
             -moz-osx-font-smoothing: grayscale;
-            letter-spacing: 0.01em;
+            letter-spacing: 0.02em;
             overflow-x: hidden;
             min-height: 100vh;
             transition: background 0.5s ease, color 0.5s ease;
@@ -212,23 +164,23 @@
         ::selection { background: var(--c1); color: var(--bg); }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: var(--c1); }
 
-        /* ========== 背景：透视网格 + 星点 + 扫描线 ========== */
+        /* ========== 背景层 ========== */
         .bg-stage { position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
         .bg-grid {
-            position: absolute; inset: -50% -10% -10% -10%;
+            position: absolute; inset: -40% -10% -10% -10%;
             background-image:
                 linear-gradient(var(--c1) 1px, transparent 1px),
                 linear-gradient(90deg, var(--c1) 1px, transparent 1px);
             background-size: 60px 60px;
-            opacity: 0.07;
-            transform: perspective(800px) rotateX(58deg) translateY(20%);
+            opacity: 0.06;
+            transform: perspective(900px) rotateX(62deg) translateY(15%);
             transform-origin: 50% 100%;
-            mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 90%);
-            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 50%, transparent 90%);
-            animation: gridSlide 14s linear infinite;
+            mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, transparent 92%);
+            -webkit-mask-image: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, transparent 92%);
+            animation: gridSlide 16s linear infinite;
         }
         @keyframes gridSlide {
             0% { background-position: 0 0, 0 0; }
@@ -236,91 +188,78 @@
         }
         .bg-stars { position: absolute; inset: 0; width: 100%; height: 100%; }
         .bg-glow {
-            position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.30; mix-blend-mode: screen;
+            position: absolute; border-radius: 50%; filter: blur(140px); opacity: 0.32; mix-blend-mode: screen;
         }
-        .bg-glow.g1 { width: 520px; height: 520px; background: var(--c1); top: -150px; right: -120px; animation: float1 18s ease-in-out infinite; }
-        .bg-glow.g2 { width: 480px; height: 480px; background: var(--c2); bottom: -200px; left: -150px; animation: float2 22s ease-in-out infinite; }
-        .bg-glow.g3 { width: 360px; height: 360px; background: var(--c3); top: 30%; left: 50%; opacity: 0.18; animation: float3 26s ease-in-out infinite; }
-        @keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-60px,40px) scale(1.1)} }
-        @keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(50px,-30px) scale(1.08)} }
+        .bg-glow.g1 { width: 600px; height: 600px; background: var(--c1); top: -200px; right: -180px; animation: float1 20s ease-in-out infinite; }
+        .bg-glow.g2 { width: 520px; height: 520px; background: var(--c2); bottom: -240px; left: -180px; animation: float2 24s ease-in-out infinite; }
+        .bg-glow.g3 { width: 400px; height: 400px; background: var(--c3); top: 30%; left: 50%; opacity: 0.18; animation: float3 28s ease-in-out infinite; }
+        @keyframes float1 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(-80px,50px) scale(1.1)} }
+        @keyframes float2 { 0%,100%{transform:translate(0,0)} 50%{transform:translate(60px,-40px) scale(1.08)} }
         @keyframes float3 { 0%,100%{transform:translate(-50%,-50%) scale(1)} 50%{transform:translate(-30%,-60%) scale(1.2)} }
         .scanlines {
             position: absolute; inset: 0;
-            background: repeating-linear-gradient(
-                to bottom,
-                rgba(255,255,255,0.02) 0px,
-                rgba(255,255,255,0.02) 1px,
-                transparent 1px,
-                transparent 3px
-            );
+            background: repeating-linear-gradient(to bottom, rgba(255,255,255,0.02) 0px, rgba(255,255,255,0.02) 1px, transparent 1px, transparent 3px);
             pointer-events: none;
         }
         .scanlines::after {
-            content: ''; position: absolute; left: 0; right: 0; top: 0; height: 110px;
+            content: ''; position: absolute; left: 0; right: 0; top: 0; height: 120px;
             background: linear-gradient(to bottom, transparent, rgba(0,240,255,0.10), transparent);
-            animation: scan 8s linear infinite;
+            animation: scan 7s linear infinite;
         }
-        @keyframes scan { 0%{top:-120px} 100%{top:100%} }
+        @keyframes scan { 0%{top:-130px} 100%{top:100%} }
 
         /* ========== 顶部 HUD ========== */
         .topbar {
             position: sticky; top: 0; z-index: 50;
-            background: linear-gradient(to bottom, rgba(5,6,13,0.85), rgba(5,6,13,0.55));
+            background: linear-gradient(to bottom, rgba(3,4,10,0.92), rgba(3,4,10,0.55));
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 1px solid var(--border);
+            border-bottom: 1px solid var(--line);
         }
         .topbar::after {
             content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px;
             background: var(--grad); opacity: 0.5;
         }
         .topbar-inner {
-            max-width: 1320px; margin: 0 auto; padding: 12px 24px;
-            display: flex; align-items: center; gap: 16px; justify-content: space-between;
+            max-width: 1400px; margin: 0 auto; padding: 10px 24px;
+            display: flex; align-items: center; gap: 18px; justify-content: space-between;
         }
-        .brand { display: flex; align-items: center; gap: 12px; }
+        .brand { display: flex; align-items: center; gap: 14px; }
         .brand-mark {
-            width: 42px; height: 42px; position: relative;
-            display: grid; place-items: center; color: var(--c1);
+            width: 48px; height: 48px; position: relative; flex-shrink: 0;
         }
-        .brand-mark svg { width: 28px; height: 28px; filter: drop-shadow(0 0 6px var(--c1)); }
-        .brand-mark::before {
-            content: ''; position: absolute; inset: 0;
-            background: var(--grad-soft);
-            clip-path: polygon(20% 0, 100% 0, 80% 100%, 0 100%);
-            opacity: 0.6;
+        .brand-mark img {
+            width: 100%; height: 100%; object-fit: cover;
+            filter: drop-shadow(0 0 6px var(--c1)) brightness(1.1) contrast(1.1);
+            animation: emblemPulse 4s ease-in-out infinite;
         }
-        .brand-mark::after {
-            content: ''; position: absolute; inset: 0;
-            border: 1px solid var(--c1);
-            clip-path: polygon(20% 0, 100% 0, 80% 100%, 0 100%);
-            animation: pulseBorder 2.4s ease-in-out infinite;
-        }
-        @keyframes pulseBorder {
-            0%,100%{opacity:0.5;filter:drop-shadow(0 0 4px var(--c1))}
-            50%{opacity:1;filter:drop-shadow(0 0 12px var(--c1))}
+        @keyframes emblemPulse {
+            0%,100% { filter: drop-shadow(0 0 6px var(--c1)) brightness(1.05) contrast(1.1); }
+            50% { filter: drop-shadow(0 0 16px var(--c1)) brightness(1.2) contrast(1.2); }
         }
         .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
         .brand-name {
-            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 17px;
-            letter-spacing: 0.12em; color: var(--text);
+            font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 16px;
+            letter-spacing: 0.16em; color: var(--text);
             text-shadow: 0 0 12px rgba(0,240,255,0.3);
         }
         .brand-sub {
             font-family: 'Share Tech Mono', monospace; font-size: 10px;
-            color: var(--c1); margin-top: 2px; letter-spacing: 0.15em; opacity: 0.85;
+            color: var(--c1); margin-top: 3px; letter-spacing: 0.15em; opacity: 0.85;
         }
         .brand-sub::before { content: '> '; opacity: 0.6; }
         .brand-sub::after { content: '_'; animation: blink 1s steps(1) infinite; opacity: 0.8; }
         @keyframes blink { 50% { opacity: 0; } }
 
-        .top-meta { display: flex; align-items: center; gap: 14px; }
+        .top-meta { display: flex; align-items: center; gap: 18px; }
         .sys-stat {
             display: flex; align-items: center; gap: 6px;
             font-family: 'Share Tech Mono', monospace; font-size: 11px;
             color: var(--text-2); letter-spacing: 0.08em;
         }
-        .sys-stat .pulse-dot {
+        .sys-stat .lbl { color: var(--text-3); }
+        .sys-stat .val { color: var(--c1); font-weight: 600; }
+        .pulse-dot {
             width: 8px; height: 8px; border-radius: 50%; background: var(--success);
             box-shadow: 0 0 8px var(--success);
             animation: pulse 1.6s ease-in-out infinite;
@@ -328,14 +267,11 @@
         @keyframes pulse {
             0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(1.3)}
         }
-        .sys-stat .lbl { color: var(--text-3); }
-        .sys-stat .val { color: var(--c1); font-weight: 600; }
-        @media (max-width: 768px) { .top-meta .sys-stat { display: none; } }
 
         .theme-picker {
             display: flex; align-items: center; gap: 4px; padding: 4px;
-            background: var(--surface);
-            border: 1px solid var(--border);
+            background: var(--panel);
+            border: 1px solid var(--line);
             clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
         }
         .theme-dot {
@@ -353,69 +289,164 @@
         .theme-dot:hover { transform: translateY(-1px); }
         .theme-dot.active { box-shadow: 0 0 0 1px var(--bg), 0 0 0 2px var(--c1), 0 0 8px var(--c1); }
 
-        /* ========== 主区 ========== */
-        .page { position: relative; z-index: 1; max-width: 1320px; margin: 0 auto; padding: 24px; }
-        .hero {
-            margin-bottom: 24px; display: flex; align-items: center; justify-content: space-between;
-            flex-wrap: wrap; gap: 16px;
+        @media (max-width: 880px) { .top-meta { display: none; } }
+
+        /* ========== Tab 导航 ========== */
+        .tab-bar {
+            position: relative; z-index: 1;
+            max-width: 1400px; margin: 18px auto 0; padding: 0 24px;
+            display: flex; gap: 0; flex-wrap: wrap;
         }
-        .hero-text h1 {
+        .tab {
+            position: relative; padding: 10px 18px;
+            background: var(--panel);
+            border: 1px solid var(--line-soft);
+            border-bottom: none;
+            color: var(--text-2);
+            font-family: 'Orbitron', sans-serif; font-size: 12px; font-weight: 700;
+            letter-spacing: 0.14em; text-transform: uppercase;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
+            margin-right: -6px;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .tab .tab-num {
+            font-family: 'Share Tech Mono', monospace; font-size: 10px;
+            color: var(--text-3); font-weight: 600;
+        }
+        .tab .tab-dot {
+            width: 6px; height: 6px; border-radius: 50%;
+            background: var(--text-3);
+        }
+        .tab:hover { color: var(--text); background: var(--panel-2); }
+        .tab.active {
+            color: var(--c1); background: var(--panel-2);
+            border-color: var(--line);
+            text-shadow: 0 0 8px var(--c1);
+            z-index: 2;
+        }
+        .tab.active .tab-num { color: var(--c1); }
+        .tab.active .tab-dot { background: var(--c1); box-shadow: 0 0 8px var(--c1); animation: pulse 1.6s ease-in-out infinite; }
+        .tab.active::after {
+            content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px;
+            background: var(--c1); box-shadow: 0 0 8px var(--c1);
+        }
+
+        /* ========== Hero / Console 面板 ========== */
+        .page { position: relative; z-index: 1; max-width: 1400px; margin: 0 auto; padding: 18px 24px 24px; }
+        .hero {
+            position: relative; padding: 24px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            overflow: hidden;
+            margin-bottom: 18px;
+            display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px;
+            clip-path: polygon(0 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+        }
+        .hero::before {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background:
+                radial-gradient(circle at 20% 30%, rgba(0,240,255,0.08), transparent 40%),
+                radial-gradient(circle at 80% 70%, rgba(255,43,214,0.06), transparent 40%);
+        }
+        .hero::after {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+            background: var(--grad); opacity: 0.6;
+        }
+        .hero h1 {
             font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 32px;
-            letter-spacing: 0.05em; line-height: 1.1;
+            letter-spacing: 0.08em; line-height: 1.05;
             background: var(--grad); -webkit-background-clip: text; background-clip: text;
             -webkit-text-fill-color: transparent;
-            position: relative;
+            position: relative; z-index: 1;
+            text-shadow: 0 0 40px rgba(0,240,255,0.3);
         }
-        .hero-text h1::after {
+        .hero h1::after {
             content: attr(data-text); position: absolute; left: 2px; top: 0;
             background: var(--c2); -webkit-background-clip: text; background-clip: text;
             -webkit-text-fill-color: transparent;
-            mix-blend-mode: screen; opacity: 0.5;
+            mix-blend-mode: screen; opacity: 0.4;
             animation: glitch 6s steps(1) infinite;
         }
         @keyframes glitch {
             0%, 92%, 100% { transform: translate(0,0); opacity: 0; }
             93% { transform: translate(-2px,1px); opacity: 0.7; }
-            95% { transform: translate(2px,-1px); opacity: 0.6; }
+            95% { transform: translate(2px,-1px); opacity: 0.5; }
             97% { transform: translate(-1px,1px); opacity: 0.4; }
         }
-        .hero-text p {
-            color: var(--text-2); font-size: 13px; margin-top: 6px;
-            font-family: 'Share Tech Mono', monospace; letter-spacing: 0.04em;
+        .hero-sub {
+            color: var(--text-2); font-size: 12px; margin-top: 8px;
+            font-family: 'Share Tech Mono', monospace; letter-spacing: 0.05em;
+            position: relative; z-index: 1;
         }
-        .hero-text p::before { content: '// '; color: var(--c1); opacity: 0.7; }
-        .hero-stats { display: flex; gap: 10px; flex-wrap: wrap; }
-        .chip {
-            display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px;
-            background: var(--surface); border: 1px solid var(--border);
-            color: var(--text-2); font-size: 11px; font-family: 'Share Tech Mono', monospace;
-            letter-spacing: 0.08em; clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
-        }
-        .chip svg { width: 14px; height: 14px; color: var(--c1); }
-        .chip .num { color: var(--c1); font-weight: 700; }
+        .hero-sub::before { content: '// '; color: var(--c1); opacity: 0.7; }
 
-        /* ========== 工作台 ========== */
-        .workspace { display: grid; gap: 20px; align-items: start; }
+        .hero-telemetry {
+            position: relative; z-index: 1;
+            display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+            padding: 12px;
+            background: rgba(0,0,0,0.3);
+            border: 1px solid var(--line-soft);
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+        }
+        .tlm-row {
+            display: flex; flex-direction: column; gap: 2px;
+            padding: 6px 8px;
+            background: rgba(0,240,255,0.04);
+            border-left: 2px solid var(--c1);
+        }
+        .tlm-lbl { font-family: 'Share Tech Mono', monospace; font-size: 9px; color: var(--text-3); letter-spacing: 0.1em; text-transform: uppercase; }
+        .tlm-val { font-family: 'JetBrains Mono', monospace; font-size: 13px; color: var(--c1); font-weight: 700; }
+        .tlm-val .u { color: var(--text-2); font-size: 10px; margin-left: 2px; }
+
+        .hero-art {
+            position: relative; z-index: 1;
+            border: 1px solid var(--line-soft);
+            overflow: hidden;
+            clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
+        }
+        .hero-art img { width: 100%; height: 100%; object-fit: cover; opacity: 0.55; filter: hue-rotate(-10deg) contrast(1.2); }
+        .hero-art::before {
+            content: ''; position: absolute; inset: 0; pointer-events: none;
+            background: linear-gradient(135deg, transparent 30%, rgba(3,4,10,0.5) 100%);
+        }
+        .hero-art-label {
+            position: absolute; bottom: 6px; left: 8px; right: 8px;
+            display: flex; justify-content: space-between;
+            font-family: 'Share Tech Mono', monospace; font-size: 9px;
+            color: var(--c1); letter-spacing: 0.1em;
+            text-shadow: 0 0 4px var(--c1);
+        }
+
+        @media (max-width: 880px) {
+            .hero { grid-template-columns: 1fr; }
+            .hero h1 { font-size: 24px; }
+        }
+
+        /* ========== Workspace ========== */
+        .workspace { display: grid; gap: 18px; align-items: start; }
         @media (min-width: 1024px) and (orientation: landscape) {
-            .workspace { grid-template-columns: 360px 1fr; }
-            .col-left { position: sticky; top: 88px; max-height: calc(100vh - 110px); overflow-y: auto; padding-right: 4px; }
+            .workspace { grid-template-columns: 360px 1fr 360px; }
+            .col-left, .col-right { position: sticky; top: 88px; max-height: calc(100vh - 110px); overflow-y: auto; padding-right: 4px; }
         }
         @media (max-width: 1023px), (orientation: portrait) {
             .workspace { grid-template-columns: 1fr; }
         }
 
-        /* ========== 卡片（HUD 框） ========== */
+        /* ========== 卡片 ========== */
         .card {
-            position: relative; background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: 4px; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
+            position: relative; background: var(--panel);
+            border: 1px solid var(--line);
+            backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             box-shadow: var(--shadow-md);
-            margin-bottom: 20px; overflow: hidden;
+            margin-bottom: 18px; overflow: hidden;
+            clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
         }
         .card::before, .card::after,
         .card .corner-tr, .card .corner-bl {
-            content: ''; position: absolute; width: 14px; height: 14px;
-            border: 2px solid var(--c1); pointer-events: none;
+            content: ''; position: absolute; width: 16px; height: 16px;
+            border: 2px solid var(--c1); pointer-events: none; z-index: 2;
         }
         .card::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
         .card::after { top: -1px; right: -1px; border-left: none; border-bottom: none; }
@@ -424,35 +455,35 @@
         .card-head {
             position: relative;
             display: flex; align-items: center; justify-content: space-between; gap: 12px;
-            padding: 14px 18px; border-bottom: 1px solid var(--border-soft);
+            padding: 12px 16px; border-bottom: 1px solid var(--line-soft);
             background: linear-gradient(90deg, rgba(0,240,255,0.05), transparent);
         }
         .card-head::before {
             content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
             background: var(--grad);
         }
-        .card-title { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; font-family: 'Orbitron', sans-serif; letter-spacing: 0.08em; text-transform: uppercase; }
+        .card-title { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 13px; font-family: 'Orbitron', sans-serif; letter-spacing: 0.10em; text-transform: uppercase; }
         .step-num {
-            width: 24px; height: 24px; display: grid; place-items: center;
+            width: 26px; height: 26px; display: grid; place-items: center;
             background: transparent; color: var(--c1); font-family: 'Orbitron', sans-serif;
-            font-size: 11px; font-weight: 700; border: 1px solid var(--c1);
+            font-size: 11px; font-weight: 800; border: 1px solid var(--c1);
             clip-path: polygon(20% 0, 100% 0, 80% 100%, 0 100%);
             box-shadow: inset 0 0 8px rgba(0,240,255,0.2);
         }
         .badge {
             display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px;
-            background: rgba(0,240,255,0.08); border: 1px solid var(--border);
+            background: rgba(0,240,255,0.08); border: 1px solid var(--line);
             color: var(--c1); font-size: 10px; font-weight: 700;
             font-family: 'Share Tech Mono', monospace; letter-spacing: 0.1em;
             clip-path: polygon(6px 0, 100% 0, calc(100% - 6px) 100%, 0 100%);
         }
-        .card-body { padding: 18px; }
+        .card-body { padding: 16px; }
 
-        /* ========== 上传区 ========== */
+        /* ========== 上传 ========== */
         .dropzone {
-            position: relative; padding: 32px 18px; text-align: center; cursor: pointer;
-            background: var(--surface-2);
-            border: 1px dashed var(--border);
+            position: relative; padding: 28px 18px; text-align: center; cursor: pointer;
+            background: var(--panel-2);
+            border: 1px dashed var(--line);
             clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 14px, 100% 100%, 14px 100%, 0 calc(100% - 14px));
             transition: all 0.2s ease;
             overflow: hidden;
@@ -462,13 +493,13 @@
             background: repeating-linear-gradient(45deg, transparent 0 12px, rgba(0,240,255,0.04) 12px 14px);
         }
         .dropzone:hover, .dropzone.dragover {
-            border-color: var(--c1); background: var(--surface-3);
+            border-color: var(--c1); background: var(--panel-3);
             box-shadow: var(--ring);
         }
         .drop-icon {
-            width: 60px; height: 60px; margin: 0 auto 14px;
+            width: 56px; height: 56px; margin: 0 auto 12px;
             display: grid; place-items: center; color: var(--c1);
-            background: rgba(0,240,255,0.06); border: 1px solid var(--border);
+            background: rgba(0,240,255,0.06); border: 1px solid var(--line);
             clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
             transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             position: relative;
@@ -478,16 +509,16 @@
             background: var(--bg); clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
             z-index: 0;
         }
-        .drop-icon svg { width: 28px; height: 28px; position: relative; z-index: 1; filter: drop-shadow(0 0 4px var(--c1)); }
+        .drop-icon svg { width: 26px; height: 26px; position: relative; z-index: 1; filter: drop-shadow(0 0 4px var(--c1)); }
         .dropzone:hover .drop-icon { transform: translateY(-4px) rotate(-5deg); box-shadow: var(--glow-1); }
-        .drop-title { font-family: 'Orbitron', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 6px; text-transform: uppercase; }
-        .drop-hint { font-size: 11px; color: var(--text-3); font-family: 'Share Tech Mono', monospace; letter-spacing: 0.05em; }
-        .dropzone .ripple-host { position: absolute; inset: 0; pointer-events: none; }
+        .drop-title { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.08em; margin-bottom: 6px; text-transform: uppercase; }
+        .drop-hint { font-size: 10px; color: var(--text-3); font-family: 'Share Tech Mono', monospace; letter-spacing: 0.05em; }
+        .ripple-host { position: absolute; inset: 0; pointer-events: none; }
 
-        .img-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 8px; margin-top: 12px; }
+        .img-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; margin-top: 12px; }
         .img-card {
             position: relative; aspect-ratio: 1; overflow: hidden;
-            background: var(--surface-2); border: 1px solid var(--border-soft);
+            background: var(--panel-2); border: 1px solid var(--line-soft);
             cursor: pointer; transition: all 0.2s ease;
             animation: cardPop 0.3s ease backwards;
             clip-path: polygon(0 0, calc(100% - 8px) 0, 100% 8px, 100% 100%, 8px 100%, 0 calc(100% - 8px));
@@ -531,16 +562,16 @@
         .btn-text:hover { background: rgba(0,240,255,0.08); color: var(--c1); }
         .btn-text.danger:hover { background: rgba(255,59,107,0.10); color: var(--danger); }
 
-        /* ========== 功能按钮 ========== */
+        /* ========== 功能网格 ========== */
         .actions-empty { padding: 50px 20px; text-align: center; color: var(--text-3); }
         .actions-empty svg { width: 80px; height: 80px; margin: 0 auto 16px; opacity: 0.5; filter: drop-shadow(0 0 8px var(--c1)); }
-        .actions-empty .t { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; }
+        .actions-empty .t { font-family: 'Orbitron', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.10em; text-transform: uppercase; }
         .actions-empty .d { font-size: 11px; margin-top: 6px; font-family: 'Share Tech Mono', monospace; letter-spacing: 0.05em; }
 
         .actions-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(115px, 1fr)); }
         .action {
             position: relative; padding: 14px 8px; text-align: center; cursor: pointer;
-            background: var(--surface-2); border: 1px solid var(--border-soft);
+            background: var(--panel-2); border: 1px solid var(--line-soft);
             color: var(--text); transition: all 0.2s ease;
             display: flex; flex-direction: column; align-items: center; gap: 8px; overflow: hidden;
             clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
@@ -550,21 +581,20 @@
             background: var(--c1); transition: left 0.4s ease;
         }
         .action .ico {
-            width: 36px; height: 36px; display: grid; place-items: center;
-            color: var(--c1); border: 1px solid var(--border);
+            width: 38px; height: 38px; display: grid; place-items: center;
+            color: var(--c1); border: 1px solid var(--line);
             background: rgba(0,240,255,0.05);
             clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
-            transition: all 0.25s ease;
-            position: relative;
+            transition: all 0.25s ease; position: relative;
         }
         .action .ico svg { width: 18px; height: 18px; position: relative; z-index: 1; }
-        .action .lbl { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+        .action .lbl { font-family: 'Orbitron', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; }
         .action .key-code {
             position: absolute; bottom: 4px; right: 6px; font-family: 'Share Tech Mono', monospace;
             font-size: 8px; color: var(--text-3); opacity: 0.5;
         }
         .action:hover {
-            border-color: var(--c1); background: var(--surface-3);
+            border-color: var(--c1); background: var(--panel-3);
             box-shadow: var(--glow-1); transform: translateY(-2px);
         }
         .action:hover::before { left: 0; }
@@ -578,9 +608,9 @@
         .action.applied .dot { opacity: 1; transform: scale(1); animation: pulse 1.6s ease-in-out infinite; }
 
         /* ========== 结果区 ========== */
-        .result-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+        .result-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
         .result {
-            background: var(--surface-2); border: 1px solid var(--border-soft);
+            background: var(--panel-2); border: 1px solid var(--line-soft);
             overflow: hidden; animation: cardPop 0.3s ease backwards;
             transition: transform 0.2s ease;
             clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 10px 100%, 0 calc(100% - 10px));
@@ -588,7 +618,7 @@
         .result:hover { transform: translateY(-2px); box-shadow: var(--glow-1); border-color: var(--c1); }
         .result img { width: 100%; aspect-ratio: 1; object-fit: cover; background: #000; }
         .result .r-info { padding: 10px 12px; }
-        .result .r-name { font-family: 'Share Tech Mono', monospace; font-size: 11px; font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--c1); }
+        .result .r-name { font-family: 'Share Tech Mono', monospace; font-size: 11px; font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--c1); }
         .result .r-meta { font-size: 10px; color: var(--text-3); margin-top: 3px; display: flex; justify-content: space-between; font-family: 'Share Tech Mono', monospace; letter-spacing: 0.05em; }
         .result .r-dl {
             margin-top: 8px; padding: 6px 10px; background: transparent;
@@ -602,8 +632,8 @@
 
         .actions-row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
         .btn {
-            padding: 10px 18px; font-size: 12px; font-weight: 700;
-            font-family: 'Orbitron', sans-serif; letter-spacing: 0.1em; text-transform: uppercase;
+            padding: 10px 18px; font-size: 11px; font-weight: 700;
+            font-family: 'Orbitron', sans-serif; letter-spacing: 0.12em; text-transform: uppercase;
             transition: all 0.15s ease; position: relative; overflow: hidden;
             display: inline-flex; align-items: center; gap: 6px;
             clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%);
@@ -611,12 +641,12 @@
         .btn svg { width: 14px; height: 14px; }
         .btn-primary { background: var(--c1); color: var(--bg); border: 1px solid var(--c1); }
         .btn-primary:hover { box-shadow: var(--glow-1); transform: translateY(-1px); }
-        .btn-secondary { background: transparent; color: var(--c1); border: 1px solid var(--border); }
+        .btn-secondary { background: transparent; color: var(--c1); border: 1px solid var(--line); }
         .btn-secondary:hover { border-color: var(--c1); background: rgba(0,240,255,0.08); box-shadow: var(--glow-1); }
 
         /* ========== 弹窗 ========== */
         .modal-bg {
-            position: fixed; inset: 0; background: rgba(2, 4, 10, 0.78);
+            position: fixed; inset: 0; background: rgba(2, 4, 10, 0.82);
             backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
             display: grid; place-items: center;
             z-index: 100; opacity: 0; pointer-events: none;
@@ -629,14 +659,14 @@
         .modal-bg.show { opacity: 1; pointer-events: auto; }
         .modal {
             position: relative; background: var(--bg-2);
-            border: 1px solid var(--c1); width: 100%; max-width: 460px;
-            box-shadow: var(--ring), var(--shadow-md);
+            border: 1px solid var(--c1); width: 100%; max-width: 480px;
+            box-shadow: var(--ring), var(--shadow-lg);
             transform: scale(0.95) translateY(8px);
             transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
             max-height: 90vh; overflow: hidden; display: flex; flex-direction: column;
         }
         .modal::before, .modal::after {
-            content: ''; position: absolute; width: 18px; height: 18px;
+            content: ''; position: absolute; width: 20px; height: 20px;
             border: 2px solid var(--c2); pointer-events: none;
         }
         .modal::before { top: -2px; left: -2px; border-right: none; border-bottom: none; }
@@ -644,21 +674,21 @@
         .modal-bg.show .modal { transform: scale(1) translateY(0); }
         .modal-head {
             display: flex; align-items: center; justify-content: space-between;
-            padding: 14px 18px; border-bottom: 1px solid var(--border);
+            padding: 14px 18px; border-bottom: 1px solid var(--line);
             background: linear-gradient(90deg, rgba(255,43,214,0.06), transparent);
         }
         .modal-title {
             display: flex; align-items: center; gap: 10px; font-weight: 700;
-            font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 0.08em; text-transform: uppercase;
+            font-family: 'Orbitron', sans-serif; font-size: 14px; letter-spacing: 0.10em; text-transform: uppercase;
         }
         .modal-title .ico {
-            width: 32px; height: 32px; display: grid; place-items: center;
-            color: var(--c1); background: rgba(0,240,255,0.08); border: 1px solid var(--border);
+            width: 34px; height: 34px; display: grid; place-items: center;
+            color: var(--c1); background: rgba(0,240,255,0.08); border: 1px solid var(--line);
             clip-path: polygon(50% 0, 100% 25%, 100% 75%, 50% 100%, 0 75%, 0 25%);
         }
         .modal-title .ico svg { width: 16px; height: 16px; }
         .modal-close {
-            width: 28px; height: 28px; display: grid; place-items: center;
+            width: 30px; height: 30px; display: grid; place-items: center;
             color: var(--text-2); transition: all 0.15s ease;
             border: 1px solid transparent;
         }
@@ -691,7 +721,7 @@
         }
         .field-input {
             width: 100%; padding: 9px 12px; background: var(--bg);
-            border: 1px solid var(--border); color: var(--text);
+            border: 1px solid var(--line); color: var(--text);
             font-size: 13px; font-family: 'Share Tech Mono', monospace;
             transition: all 0.15s ease;
             clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%);
@@ -700,11 +730,10 @@
             outline: none; border-color: var(--c1); box-shadow: var(--glow-1); background: var(--bg-2);
         }
         .field-input[type="color"] { padding: 3px; height: 36px; cursor: pointer; clip-path: none; }
-
         .range-row { display: flex; align-items: center; gap: 10px; }
         .range-row input[type="range"] {
             flex: 1; -webkit-appearance: none; appearance: none; height: 4px;
-            background: var(--bg); border: 1px solid var(--border); outline: none; padding: 0;
+            background: var(--bg); border: 1px solid var(--line); outline: none; padding: 0;
         }
         .range-row input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none; appearance: none; width: 16px; height: 16px;
@@ -716,11 +745,28 @@
             border: 2px solid var(--bg); cursor: pointer; box-shadow: var(--glow-1);
         }
         .range-val { min-width: 56px; text-align: right; font-size: 12px; font-weight: 700; color: var(--c1); font-family: 'Share Tech Mono', monospace; }
-
-        .modal-foot { padding: 14px 18px; display: flex; gap: 10px; border-top: 1px solid var(--border-soft); }
+        .modal-foot { padding: 14px 18px; display: flex; gap: 10px; border-top: 1px solid var(--line-soft); }
         .modal-foot .btn { flex: 1; justify-content: center; padding: 11px; }
 
-        /* ========== 进度 + Toast ========== */
+        /* ========== 底部控制台状态条 ========== */
+        .console-bar {
+            position: relative; z-index: 1;
+            max-width: 1400px; margin: 12px auto 0; padding: 8px 18px;
+            background: var(--panel);
+            border: 1px solid var(--line);
+            display: flex; align-items: center; gap: 18px; flex-wrap: wrap;
+            font-family: 'Share Tech Mono', monospace; font-size: 11px;
+            color: var(--text-2); letter-spacing: 0.05em;
+            clip-path: polygon(10px 0, calc(100% - 10px) 0, 100% 50%, calc(100% - 10px) 100%, 10px 100%, 0 50%);
+        }
+        .console-bar .cb-item { display: flex; align-items: center; gap: 6px; }
+        .console-bar .cb-item .l { color: var(--text-3); }
+        .console-bar .cb-item .v { color: var(--c1); font-weight: 600; }
+        .console-bar .cb-item .sep { color: var(--line); }
+        .console-bar .cb-spacer { flex: 1; }
+        .console-bar .cb-tip { color: var(--text-3); }
+
+        /* ========== Progress + Toast + Loading ========== */
         .progress { position: fixed; top: 0; left: 0; right: 0; height: 2px; z-index: 200; opacity: 0; transition: opacity 0.2s ease; }
         .progress.show { opacity: 1; }
         .progress-fill { height: 100%; width: 0%; background: var(--grad); box-shadow: var(--glow-1); transition: width 0.3s ease; }
@@ -729,7 +775,7 @@
             position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px);
             background: var(--bg-2); color: var(--text);
             padding: 12px 20px; font-size: 13px; font-weight: 600;
-            border: 1px solid var(--border); box-shadow: var(--shadow-md), var(--glow-1);
+            border: 1px solid var(--line); box-shadow: var(--shadow-md), var(--glow-1);
             z-index: 300; opacity: 0; transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
             display: flex; align-items: center; gap: 8px;
             font-family: 'Share Tech Mono', monospace; letter-spacing: 0.04em;
@@ -742,7 +788,7 @@
         .toast.error::before { content: '✕'; color: var(--danger); font-weight: 700; }
 
         .loading {
-            position: fixed; inset: 0; background: rgba(2, 4, 10, 0.75);
+            position: fixed; inset: 0; background: rgba(2, 4, 10, 0.78);
             backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px);
             display: grid; place-items: center; z-index: 150;
             opacity: 0; pointer-events: none; transition: opacity 0.2s ease;
@@ -763,33 +809,41 @@
         @keyframes spin { to { transform: rotate(360deg); } }
         .loading-txt { font-size: 12px; color: var(--c1); font-family: 'Share Tech Mono', monospace; letter-spacing: 0.1em; text-transform: uppercase; }
 
-        /* ========== 涟漪 ========== */
+        /* ========== Ripple ========== */
         .ripple { position: absolute; border-radius: 50%; pointer-events: none; transform: scale(0); animation: rippleOut 0.55s ease-out forwards; }
         @keyframes rippleOut { to { transform: scale(4); opacity: 0; } }
 
         /* ========== 响应式 ========== */
         @media (max-width: 768px) {
-            .page { padding: 16px; }
-            .topbar-inner { padding: 10px 16px; }
-            .hero { margin-bottom: 16px; }
-            .hero-text h1 { font-size: 22px; }
-            .hero-text p { font-size: 11px; }
+            .page { padding: 14px; }
+            .topbar-inner { padding: 8px 14px; }
+            .tab-bar { padding: 0 14px; margin-top: 12px; }
+            .tab { padding: 8px 12px; font-size: 11px; letter-spacing: 0.10em; margin-right: -4px; }
+            .tab .tab-num { display: none; }
+            .hero { padding: 16px; }
+            .hero h1 { font-size: 22px; }
+            .hero-sub { font-size: 11px; }
             .brand-name { font-size: 14px; }
             .brand-sub { display: none; }
-            .card-head { padding: 12px 14px; }
-            .card-body { padding: 14px; }
+            .brand-mark { width: 40px; height: 40px; }
+            .card-head { padding: 10px 12px; }
+            .card-body { padding: 12px; }
             .actions-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
             .action { padding: 10px 4px; }
-            .action .ico { width: 30px; height: 30px; }
-            .action .lbl { font-size: 9.5px; }
+            .action .ico { width: 32px; height: 32px; }
+            .action .lbl { font-size: 10px; }
             .modal { max-width: 100%; }
             .theme-picker { padding: 3px; }
             .theme-dot { width: 18px; height: 18px; }
+            .console-bar { padding: 6px 12px; gap: 10px; font-size: 10px; }
+            .console-bar .cb-tip { display: none; }
         }
-        @media (max-width: 480px) { .hero-stats { display: none; } }
+        @media (max-width: 480px) {
+            .hero-telemetry { grid-template-columns: 1fr; }
+        }
         @media (orientation: landscape) and (max-height: 600px) {
-            .hero { margin-bottom: 12px; }
-            .hero-text h1 { font-size: 22px; }
+            .hero { padding: 12px; }
+            .hero h1 { font-size: 22px; }
         }
 
         @media (prefers-reduced-motion: reduce) {
@@ -810,59 +864,62 @@
     <header class="topbar">
         <div class="topbar-inner">
             <div class="brand">
-                <div class="brand-mark">
-                    <svg viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <polygon points="16,2 28,9 28,23 16,30 4,23 4,9"/>
-                        <polygon points="16,8 22,12 22,20 16,24 10,20 10,12"/>
-                        <circle cx="16" cy="16" r="2" fill="currentColor"/>
-                    </svg>
-                </div>
+                <div class="brand-mark"><img src="images/emblem.png" alt="NEXUS"></div>
                 <div class="brand-text">
-                    <div class="brand-name">NEXUS FORGE</div>
-                    <div class="brand-sub">IMAGE.PROCESS.SYS</div>
+                    <div class="brand-name">NEXUS // FORGE</div>
+                    <div class="brand-sub">PILOT.CONSOLE.v2.4</div>
                 </div>
             </div>
             <div class="top-meta">
-                <div class="sys-stat">
-                    <span class="pulse-dot"></span>
-                    <span class="lbl">SYS</span>
-                    <span class="val">ONLINE</span>
-                </div>
-                <div class="sys-stat">
-                    <span class="lbl">FPS</span>
-                    <span class="val" id="fpsVal">60</span>
-                </div>
+                <div class="sys-stat"><span class="lbl">UPLINK</span><span class="pulse-dot"></span><span class="val" id="netStat">STABLE</span></div>
+                <div class="sys-stat"><span class="lbl">FPS</span><span class="val" id="fpsVal">60</span></div>
+                <div class="sys-stat"><span class="lbl">CLK</span><span class="val" id="clkVal">--:--:--</span></div>
             </div>
             <div class="theme-picker" id="themePicker" role="radiogroup" aria-label="主题">
-                <button class="theme-dot" data-th="cyberpunk" title="赛博朋克" aria-label="Cyberpunk"></button>
-                <button class="theme-dot" data-th="matrix" title="矩阵" aria-label="Matrix"></button>
-                <button class="theme-dot" data-th="hologram" title="全息" aria-label="Hologram"></button>
-                <button class="theme-dot" data-th="plasma" title="等离子" aria-label="Plasma"></button>
-                <button class="theme-dot" data-th="quantum" title="量子" aria-label="Quantum"></button>
-                <button class="theme-dot" data-th="nebula" title="星云" aria-label="Nebula"></button>
+                <button class="theme-dot" data-th="cyberpunk" title="赛博朋克"></button>
+                <button class="theme-dot" data-th="matrix" title="矩阵"></button>
+                <button class="theme-dot" data-th="hologram" title="全息"></button>
+                <button class="theme-dot" data-th="plasma" title="等离子"></button>
+                <button class="theme-dot" data-th="quantum" title="量子"></button>
+                <button class="theme-dot" data-th="nebula" title="星云"></button>
             </div>
         </div>
     </header>
 
+    <nav class="tab-bar" id="tabBar">
+        <button class="tab active" data-tab="all"><span class="tab-dot"></span><span class="tab-num">00</span>ALL SYS</button>
+        <button class="tab" data-tab="main"><span class="tab-dot"></span><span class="tab-num">01</span>MAIN</button>
+        <button class="tab" data-tab="filter"><span class="tab-dot"></span><span class="tab-num">02</span>FILTER</button>
+        <button class="tab" data-tab="effect"><span class="tab-dot"></span><span class="tab-num">03</span>EFFECT</button>
+        <button class="tab" data-tab="decorate"><span class="tab-dot"></span><span class="tab-num">04</span>DECORATE</button>
+        <button class="tab" data-tab="tools"><span class="tab-dot"></span><span class="tab-num">05</span>TOOLS</button>
+    </nav>
+
     <main class="page">
         <section class="hero">
-            <div class="hero-text">
-                <h1 data-text="NEXUS // IMAGE FORGE">NEXUS // IMAGE FORGE</h1>
-                <p>图片处理引擎 · PNG / JPG / WebP / TIFF / BMP / GIF · 转换、调整、装饰全协议支持</p>
+            <div>
+                <h1 data-text="IMAGE FORGE">IMAGE FORGE</h1>
+                <div class="hero-sub">图片处理引擎 · 19 modules · PNG / JPG / WebP / TIFF / BMP / GIF</div>
+                <div class="hero-telemetry" style="margin-top:14px">
+                    <div class="tlm-row"><span class="tlm-lbl">PILOT</span><span class="tlm-val">NEXUS-7</span></div>
+                    <div class="tlm-row"><span class="tlm-lbl">FRAME</span><span class="tlm-val" id="heroFps">60<span class="u">fps</span></span></div>
+                    <div class="tlm-row"><span class="tlm-lbl">SECTOR</span><span class="tlm-val" id="heroCoord">0x4F·2A</span></div>
+                    <div class="tlm-row"><span class="tlm-lbl">PROTOCOL</span><span class="tlm-val">HTTP/2</span></div>
+                </div>
             </div>
-            <div class="hero-stats">
-                <span class="chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-                    <span class="num">19</span>&nbsp;MODULES
-                </span>
-                <span class="chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
-                    BATCH
-                </span>
-                <span class="chip">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
-                    LOCAL
-                </span>
+            <div>
+                <div class="hero-telemetry" style="height:100%">
+                    <div class="tlm-row"><span class="tlm-lbl">CPU</span><span class="tlm-val" id="tCpu">42<span class="u">%</span></span></div>
+                    <div class="tlm-row"><span class="tlm-lbl">MEM</span><span class="tlm-val" id="tMem">512<span class="u">mb</span></span></div>
+                    <div class="tlm-row"><span class="tlm-lbl">PWR</span><span class="tlm-val">98<span class="u">%</span></span></div>
+                    <div class="tlm-row"><span class="tlm-lbl">TEMP</span><span class="tlm-val" id="tTemp">38<span class="u">°c</span></span></div>
+                    <div class="tlm-row" style="grid-column:1/-1"><span class="tlm-lbl">THROUGHPUT</span><span class="tlm-val" id="tPut">2.4<span class="u">gb/s</span></span></div>
+                    <div class="tlm-row" style="grid-column:1/-1"><span class="tlm-lbl">NEXUS HASH</span><span class="tlm-val" id="tHash" style="font-size:11px">0xA3F2·9E01·CC40</span></div>
+                </div>
+            </div>
+            <div class="hero-art">
+                <img src="images/cockpit-hud.png" alt="Cockpit HUD">
+                <div class="hero-art-label"><span>// COCKPIT.SCAN</span><span>REF.AC-07</span></div>
             </div>
         </section>
 
@@ -872,10 +929,7 @@
                     <span class="corner-tr"></span>
                     <span class="corner-bl"></span>
                     <div class="card-head">
-                        <div class="card-title">
-                            <span class="step-num">01</span>
-                            INPUT.SOURCE
-                        </div>
+                        <div class="card-title"><span class="step-num">01</span>INPUT.SOURCE</div>
                         <span class="badge" id="imgCount" style="display:none">0 IMG</span>
                     </div>
                     <div class="card-body">
@@ -888,8 +942,8 @@
                                     <line x1="12" y1="3" x2="12" y2="15"/>
                                 </svg>
                             </div>
-                            <div class="drop-title">// 拖拽文件至此</div>
-                            <div class="drop-hint">PNG / JPG / WEBP / TIFF / BMP / GIF</div>
+                            <div class="drop-title">// DRAG & DROP</div>
+                            <div class="drop-hint">PNG · JPG · WEBP · TIFF · BMP · GIF</div>
                         </div>
                         <input type="file" id="fileInput" multiple accept="image/*" style="display:none">
                         <div class="img-list" id="imgList"></div>
@@ -908,10 +962,7 @@
                     <span class="corner-tr"></span>
                     <span class="corner-bl"></span>
                     <div class="card-head">
-                        <div class="card-title">
-                            <span class="step-num">02</span>
-                            SELECT.MODULE
-                        </div>
+                        <div class="card-title"><span class="step-num">02</span>SELECT.MODULE</div>
                         <span class="badge" id="actionsHint">STANDBY</span>
                     </div>
                     <div class="card-body">
@@ -923,7 +974,7 @@
                                 <circle cx="60" cy="60" r="6" fill="currentColor"/>
                             </svg>
                             <div class="t">AWAITING INPUT</div>
-                            <div class="d">// upload file to activate modules</div>
+                            <div class="d">// upload to activate modules</div>
                         </div>
                         <div class="actions-grid" id="actionsGrid" style="display:none"></div>
                     </div>
@@ -933,10 +984,7 @@
                     <span class="corner-tr"></span>
                     <span class="corner-bl"></span>
                     <div class="card-head">
-                        <div class="card-title">
-                            <span class="step-num">03</span>
-                            OUTPUT.RESULTS
-                        </div>
+                        <div class="card-title"><span class="step-num">03</span>OUTPUT.RESULTS</div>
                         <span class="badge" id="resultCount">0 IMG</span>
                     </div>
                     <div class="card-body">
@@ -956,6 +1004,20 @@
             </div>
         </div>
     </main>
+
+    <div class="console-bar">
+        <div class="cb-item"><span class="l">SECT</span><span class="v" id="cbSect">04F·2A</span></div>
+        <span class="sep">│</span>
+        <div class="cb-item"><span class="l">ALT</span><span class="v" id="cbAlt">+12,800</span></div>
+        <span class="sep">│</span>
+        <div class="cb-item"><span class="l">VEC</span><span class="v">N·E·UP</span></div>
+        <span class="sep">│</span>
+        <div class="cb-item"><span class="l">MEM</span><span class="v">19/19</span></div>
+        <span class="sep">│</span>
+        <div class="cb-item"><span class="l">NET</span><span class="v">NEXUS-NET</span></div>
+        <span class="cb-spacer"></span>
+        <div class="cb-tip">// DRAG FILES · SELECT MODULE · EXECUTE</div>
+    </div>
 
     <div class="modal-bg" id="modalBg">
         <div class="modal" id="modal">
@@ -1002,7 +1064,7 @@
             if (!canvas) return;
             const ctx = canvas.getContext('2d');
             let stars = [];
-            const STAR_COUNT = 90;
+            const STAR_COUNT = 100;
             function resize() {
                 canvas.width = window.innerWidth;
                 canvas.height = window.innerHeight;
@@ -1011,7 +1073,7 @@
                     stars.push({
                         x: Math.random() * canvas.width,
                         y: Math.random() * canvas.height,
-                        r: Math.random() * 1.2 + 0.2,
+                        r: Math.random() * 1.3 + 0.2,
                         a: Math.random() * 0.7 + 0.1,
                         v: Math.random() * 0.015 + 0.003,
                         p: Math.random() * Math.PI * 2,
@@ -1038,17 +1100,43 @@
             tick();
         })();
 
-        /* ============ FPS 计数器 ============ */
+        /* ============ 实时遥测（假的） ============ */
         (function () {
-            const el = document.getElementById('fpsVal');
-            if (!el) return;
+            const $ = id => document.getElementById(id);
+            const elFps = $('fpsVal'), elClk = $('clkVal'), elHeroFps = $('heroFps');
+            const tCpu = $('tCpu'), tMem = $('tMem'), tTemp = $('tTemp'), tPut = $('tPut'), tHash = $('tHash');
             let last = performance.now(), frames = 0, acc = 0;
             function loop(t) {
                 const dt = t - last; last = t; frames++; acc += dt;
-                if (acc >= 500) { el.textContent = Math.round(1000 / (acc / frames)); acc = 0; frames = 0; }
+                if (acc >= 500) {
+                    const fps = Math.round(1000 / (acc / frames));
+                    if (elFps) elFps.textContent = fps;
+                    if (elHeroFps) elHeroFps.innerHTML = fps + '<span class="u">fps</span>';
+                    acc = 0; frames = 0;
+                }
                 requestAnimationFrame(loop);
             }
             requestAnimationFrame(loop);
+
+            function pad(n) { return n < 10 ? '0' + n : '' + n; }
+            function clock() {
+                const d = new Date();
+                if (elClk) elClk.textContent = pad(d.getHours()) + ':' + pad(d.getMinutes()) + ':' + pad(d.getSeconds());
+                setTimeout(clock, 1000 - d.getMilliseconds());
+            }
+            clock();
+
+            // Simulated telemetry
+            setInterval(() => {
+                if (tCpu) tCpu.innerHTML = (40 + Math.round(Math.random() * 20)) + '<span class="u">%</span>';
+                if (tMem) tMem.innerHTML = (480 + Math.round(Math.random() * 80)) + '<span class="u">mb</span>';
+                if (tTemp) tTemp.innerHTML = (36 + Math.round(Math.random() * 6)) + '<span class="u">°c</span>';
+                if (tPut) tPut.innerHTML = (2.0 + Math.random() * 1.2).toFixed(2) + '<span class="u">gb/s</span>';
+                if (tHash) {
+                    const hex = () => Math.floor(Math.random() * 0xFFFF).toString(16).toUpperCase().padStart(4, '0');
+                    tHash.textContent = '0x' + hex() + '·' + hex() + '·' + hex();
+                }
+            }, 2000);
         })();
 
         /* ============ 图标库 ============ */
@@ -1074,72 +1162,79 @@
             'base64':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>',
         };
 
-        /* ============ 功能定义 ============ */
+        /* ============ 功能定义（含分组） ============ */
         const ACTIONS = [
-            { key: 'convert', label: '格式转换', icon: 'convert', desc: '把图片转换成 PNG / JPG / GIF / BMP / TIFF', fields: [
+            // MAIN (主控)
+            { key: 'convert',   group: 'main',     label: '格式转换', icon: 'convert', desc: '把图片转换成 PNG / JPG / GIF / BMP / TIFF', fields: [
                 { name: 'format', label: '目标格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' },
                 { name: 'quality', label: '质量 (JPEG)', type: 'range', min: 0.3, max: 1, step: 0.05, value: 0.9, show: v => v.toFixed(2) }
             ]},
-            { key: 'resize', label: '调整尺寸', icon: 'resize', desc: '按指定宽高缩放', fields: [
+            { key: 'resize',    group: 'main',     label: '调整尺寸', icon: 'resize', desc: '按指定宽高缩放', fields: [
                 { name: 'width', label: '宽度 (px)', type: 'number', value: 800, min: 1, max: 10000 },
                 { name: 'height', label: '高度 (px)', type: 'number', value: 600, min: 1, max: 10000 },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'scale', label: '按比例缩放', icon: 'scale', desc: '按百分比缩放，保持宽高比', fields: [
+            { key: 'scale',     group: 'main',     label: '按比例缩放', icon: 'scale', desc: '按百分比缩放，保持宽高比', fields: [
                 { name: 'percent', label: '缩放比例', type: 'range', min: 10, max: 200, step: 5, value: 50, show: v => v + '%' },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'rotate', label: '旋转', icon: 'rotate', desc: '按任意角度旋转', fields: [
+            { key: 'rotate',    group: 'main',     label: '旋转', icon: 'rotate', desc: '按任意角度旋转', fields: [
                 { name: 'degrees', label: '旋转角度', type: 'range', min: -180, max: 180, step: 1, value: 90, show: v => v + '°' },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'flip', label: '翻转', icon: 'flip', desc: '水平或垂直翻转', fields: [
+            { key: 'flip',      group: 'main',     label: '翻转', icon: 'flip', desc: '水平或垂直翻转', fields: [
                 { name: 'direction', label: '翻转方向', type: 'select', options: ['horizontal','vertical'], value: 'horizontal' },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'grayscale', label: '黑白', icon: 'grayscale', desc: '变为灰度照片', fields: [
+
+            // FILTER (滤镜)
+            { key: 'grayscale',          group: 'filter', label: '黑白', icon: 'grayscale', desc: '变为灰度照片', fields: [
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'invert', label: '反色', icon: 'invert', desc: '反转为底片效果', fields: [
+            { key: 'invert',             group: 'filter', label: '反色', icon: 'invert', desc: '反转为底片效果', fields: [
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'sepia', label: '复古', icon: 'sepia', desc: '怀旧棕色调', fields: [
+            { key: 'sepia',              group: 'filter', label: '复古', icon: 'sepia', desc: '怀旧棕色调', fields: [
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'brightness-contrast', label: '亮度对比度', icon: 'brightness', desc: '微调亮度和对比度', fields: [
+            { key: 'brightness-contrast',group: 'filter', label: '亮度对比度', icon: 'brightness', desc: '微调亮度和对比度', fields: [
                 { name: 'brightness', label: '亮度', type: 'range', min: -1, max: 1, step: 0.05, value: 0.1, show: v => v.toFixed(2) },
                 { name: 'contrast', label: '对比度', type: 'range', min: -1, max: 1, step: 0.05, value: 0.1, show: v => v.toFixed(2) },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'blur', label: '模糊', icon: 'blur', desc: '高斯模糊', fields: [
+
+            // EFFECT (特效)
+            { key: 'blur',     group: 'effect', label: '模糊', icon: 'blur', desc: '高斯模糊', fields: [
                 { name: 'radius', label: '模糊半径', type: 'range', min: 1, max: 30, step: 1, value: 5, show: v => v + 'px' },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'sharpen', label: '锐化', icon: 'sharpen', desc: '让图片更清晰', fields: [
+            { key: 'sharpen',  group: 'effect', label: '锐化', icon: 'sharpen', desc: '让图片更清晰', fields: [
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'pixelate', label: '像素化', icon: 'pixelate', desc: '马赛克效果', fields: [
+            { key: 'pixelate', group: 'effect', label: '像素化', icon: 'pixelate', desc: '马赛克效果', fields: [
                 { name: 'pixelSize', label: '像素大小', type: 'range', min: 2, max: 40, step: 1, value: 10, show: v => v + 'px' },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'vignette', label: '暗角', icon: 'vignette', desc: '四周变暗', fields: [
+            { key: 'vignette', group: 'effect', label: '暗角', icon: 'vignette', desc: '四周变暗', fields: [
                 { name: 'strength', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.5, show: v => v.toFixed(2) },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'border', label: '加边框', icon: 'border', desc: '给图片加一圈边', fields: [
+
+            // DECORATE (装饰)
+            { key: 'border',          group: 'decorate', label: '加边框', icon: 'border', desc: '给图片加一圈边', fields: [
                 { name: 'width', label: '边框宽度', type: 'range', min: 1, max: 50, step: 1, value: 10, show: v => v + 'px' },
                 { name: 'color', label: '边框颜色', type: 'color', value: '#000000' },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'round-corners', label: '圆角', icon: 'round', desc: '把图片四角变圆', fields: [
+            { key: 'round-corners',   group: 'decorate', label: '圆角', icon: 'round', desc: '把图片四角变圆', fields: [
                 { name: 'radius', label: '圆角半径', type: 'range', min: 1, max: 200, step: 1, value: 30, show: v => v + 'px' },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'thumbnail', label: '缩略图', icon: 'thumbnail', desc: '生成小尺寸缩略图', fields: [
+            { key: 'thumbnail',       group: 'decorate', label: '缩略图', icon: 'thumbnail', desc: '生成小尺寸缩略图', fields: [
                 { name: 'maxSize', label: '最大边长', type: 'range', min: 32, max: 500, step: 8, value: 128, show: v => v + 'px' },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'watermark-text', label: '文字水印', icon: 'watermark', desc: '在图片上加文字', fields: [
+            { key: 'watermark-text',  group: 'decorate', label: '文字水印', icon: 'watermark', desc: '在图片上加文字', fields: [
                 { name: 'text', label: '水印文字', type: 'text', value: '水印', placeholder: '输入文字' },
                 { name: 'position', label: '位置', type: 'select', options: ['center','top-left','top-right','bottom-left','bottom-right'], value: 'center' },
                 { name: 'fontSize', label: '字号', type: 'range', min: 12, max: 120, step: 2, value: 32, show: v => v + 'px' },
@@ -1147,10 +1242,12 @@
                 { name: 'alpha', label: '透明度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.8, show: v => v.toFixed(2) },
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]},
-            { key: 'ascii', label: '字符画', icon: 'ascii', desc: '把图片转成 ASCII 字符画', fields: [
+
+            // TOOLS (工具)
+            { key: 'ascii',   group: 'tools', label: '字符画', icon: 'ascii', desc: '把图片转成 ASCII 字符画', fields: [
                 { name: 'width', label: '宽度 (字符数)', type: 'range', min: 40, max: 200, step: 10, value: 100, show: v => v + ' 字符' }
             ]},
-            { key: 'base64', label: 'Base64', icon: 'base64', desc: '把图片转成 Base64 字符串', fields: [
+            { key: 'base64',  group: 'tools', label: 'Base64', icon: 'base64', desc: '把图片转成 Base64 字符串', fields: [
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
             ]}
         ];
@@ -1160,6 +1257,7 @@
         let results = [];
         let nextId = 1;
         let currentAction = null;
+        let currentTab = 'all';
 
         const $ = id => document.getElementById(id);
         const uploadZone = $('uploadZone');
@@ -1233,14 +1331,25 @@
         });
         initTheme();
 
-        /* ============ 功能按钮渲染 ============ */
+        /* ============ Tab 切换 ============ */
+        $('tabBar').addEventListener('click', e => {
+            const tab = e.target.closest('.tab');
+            if (!tab) return;
+            document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+            currentTab = tab.dataset.tab;
+            renderActions();
+        });
+
+        /* ============ 功能按钮渲染（带 Tab 过滤） ============ */
         function renderActions() {
             actionsGrid.innerHTML = '';
-            ACTIONS.forEach((a, i) => {
+            const list = currentTab === 'all' ? ACTIONS : ACTIONS.filter(a => a.group === currentTab);
+            list.forEach((a, i) => {
                 const btn = document.createElement('button');
                 btn.className = 'action';
                 btn.dataset.key = a.key;
-                btn.innerHTML = `<span class="dot"></span><span class="ico">${ICON[a.icon]||''}</span><span class="lbl">${a.label}</span><span class="key-code">M${String(i+1).padStart(2,'0')}</span>`;
+                const groupLabel = a.group.toUpperCase();
+                btn.innerHTML = `<span class="dot"></span><span class="ico">${ICON[a.icon]||''}</span><span class="lbl">${a.label}</span><span class="key-code">${groupLabel}</span>`;
                 btn.addEventListener('click', e => { makeRipple(e); openModal(a); });
                 actionsGrid.appendChild(btn);
             });
