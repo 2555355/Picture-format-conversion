@@ -1019,7 +1019,7 @@ public class ImageService {
 
     public byte[] neon(byte[] inputBytes, float amount, String format, float quality) throws IOException {
         BufferedImage src = toArgb(readImage(inputBytes));
-        BufferedImage edges = edgeDetect(writeImage(src, "png", 0.9f), 1.2f, "png", 0.9f);
+        BufferedImage edges = toArgb(readImage(edgeDetect(writeImage(src, "png", 0.9f), 1.2f, "png", 0.9f)));
         BufferedImage out = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_ARGB);
         for (int y = 0; y < src.getHeight(); y++) {
             for (int x = 0; x < src.getWidth(); x++) {
@@ -1430,9 +1430,9 @@ public class ImageService {
         for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) {
             int s = src.getRGB(x, y), b = blurred.getRGB(x, y);
             int a = (s >> 24) & 0xFF;
-            int r = clamp255(((s >> 16) & 0xFF) + (int) (((s >> 16) & 0xFF) - ((b >> 16) & 0xFF)) * amount);
-            int g = clamp255(((s >> 8) & 0xFF) + (int) (((s >> 8) & 0xFF) - ((b >> 8) & 0xFF)) * amount);
-            int bb = clamp255((s & 0xFF) + (int) ((s & 0xFF) - (b & 0xFF)) * amount);
+            int r = clamp255((int) (((s >> 16) & 0xFF) + (((s >> 16) & 0xFF) - ((b >> 16) & 0xFF)) * amount));
+            int g = clamp255((int) (((s >> 8) & 0xFF) + (((s >> 8) & 0xFF) - ((b >> 8) & 0xFF)) * amount));
+            int bb = clamp255((int) ((s & 0xFF) + ((s & 0xFF) - (b & 0xFF)) * amount));
             out.setRGB(x, y, (a << 24) | (r << 16) | (g << 8) | bb);
         }
         return writeOut(out, format, quality);
