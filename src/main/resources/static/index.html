@@ -1024,8 +1024,13 @@
                             <button class="tab" data-tab="main">基础</button>
                             <button class="tab" data-tab="filter">滤镜</button>
                             <button class="tab" data-tab="effect">特效</button>
+                            <button class="tab" data-tab="cinematic">电影感</button>
+                            <button class="tab" data-tab="artistic">艺术</button>
+                            <button class="tab" data-tab="distort">扭曲</button>
                             <button class="tab" data-tab="decorate">装饰</button>
+                            <button class="tab" data-tab="overlay">叠加</button>
                             <button class="tab" data-tab="tools">工具</button>
+                            <button class="tab" data-tab="analyze">分析</button>
                         </nav>
                         <div id="actionsEmpty" class="tools-empty">
                             <img src="images/empty-illustration.svg" alt="添加图片">
@@ -1276,7 +1281,391 @@
             ]},
             { key: 'base64',  group: 'tools', label: 'Base64', icon: 'base64', desc: '把图片转成 Base64 字符串', fields: [
                 { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
-            ]}
+            ]},
+            /* ===== 基础扩展 ===== */
+            { key: 'fit', group: 'main', label: '适配缩放', icon: 'resize', desc: '等比缩放到指定框内，留白填充', fields: [
+                { name: 'width', label: '宽度', type: 'number', value: 800, min: 1, max: 10000 },
+                { name: 'height', label: '高度', type: 'number', value: 600, min: 1, max: 10000 },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'cover', group: 'main', label: '覆盖裁剪', icon: 'crop', desc: '等比缩放并裁剪填满指定框', fields: [
+                { name: 'width', label: '宽度', type: 'number', value: 800, min: 1, max: 10000 },
+                { name: 'height', label: '高度', type: 'number', value: 600, min: 1, max: 10000 },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'pad', group: 'main', label: '内边距', icon: 'border', desc: '在四周加内边距', fields: [
+                { name: 'padding', label: '边距', type: 'range', min: 0, max: 200, step: 1, value: 30, show: v => v + 'px' },
+                { name: 'color', label: '填充色', type: 'color', value: '#ffffff' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'trim', group: 'main', label: '智能裁边', icon: 'crop', desc: '去掉边缘相同颜色', fields: [
+                { name: 'tolerance', label: '容差', type: 'range', min: 0, max: 80, step: 1, value: 10, show: v => v },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'transpose', group: 'main', label: '转置', icon: 'rotate', desc: '沿主对角线翻转', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'transverse', group: 'main', label: '反对角转置', icon: 'rotate', desc: '沿反对角线翻转', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'canvas-resize', group: 'main', label: '画布尺寸', icon: 'resize', desc: '改变画布大小并指定背景色', fields: [
+                { name: 'width', label: '宽度', type: 'number', value: 1000, min: 1, max: 10000 },
+                { name: 'height', label: '高度', type: 'number', value: 1000, min: 1, max: 10000 },
+                { name: 'color', label: '背景色', type: 'color', value: '#ffffff' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'split-h', group: 'main', label: '横向分块', icon: 'crop', desc: '把图片横向一分为二，取左(0)/右(1)', fields: [
+                { name: 'index', label: '区块', type: 'select', options: ['0','1'], value: '0' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'split-v', group: 'main', label: '纵向分块', icon: 'crop', desc: '把图片纵向一分为二，取上(0)/下(1)', fields: [
+                { name: 'index', label: '区块', type: 'select', options: ['0','1'], value: '0' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'split-grid', group: 'main', label: '网格分块', icon: 'crop', desc: '按 N×M 网格取指定一格', fields: [
+                { name: 'rows', label: '行数', type: 'range', min: 1, max: 8, step: 1, value: 2, show: v => v },
+                { name: 'cols', label: '列数', type: 'range', min: 1, max: 8, step: 1, value: 2, show: v => v },
+                { name: 'row', label: '行号', type: 'range', min: 0, max: 7, step: 1, value: 0, show: v => v },
+                { name: 'col', label: '列号', type: 'range', min: 0, max: 7, step: 1, value: 0, show: v => v },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'tile', group: 'main', label: '平铺拼接', icon: 'resize', desc: '把图片平铺到指定大画布', fields: [
+                { name: 'width', label: '画布宽度', type: 'number', value: 1200, min: 1, max: 10000 },
+                { name: 'height', label: '画布高度', type: 'number', value: 800, min: 1, max: 10000 },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'strip-alpha', group: 'main', label: '去除透明', icon: 'invert', desc: '去掉 alpha 通道', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'flatten-bg', group: 'main', label: '背景合并', icon: 'invert', desc: '透明背景合并为指定纯色', fields: [
+                { name: 'color', label: '背景色', type: 'color', value: '#ffffff' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            /* ===== 滤镜扩展 ===== */
+            { key: 'equalize', group: 'filter', label: '直方图均衡', icon: 'brightness', desc: '自动均衡直方图', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'auto-contrast', group: 'filter', label: '自动对比度', icon: 'brightness', desc: '拉伸黑白场增强对比度', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'swap-channels', group: 'filter', label: '通道互换', icon: 'channel', desc: '交换 R/G/B 通道顺序', fields: [
+                { name: 'mode', label: '互换模式', type: 'select', options: ['rg','rb','gb'], value: 'rg' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'channel-mix', group: 'filter', label: '通道混合', icon: 'channel', desc: '按比例混合 RGB 通道', fields: [
+                { name: 'rr', label: 'R 比例', type: 'range', min: 0, max: 100, step: 1, value: 60, show: v => v + '%' },
+                { name: 'gg', label: 'G 比例', type: 'range', min: 0, max: 100, step: 1, value: 30, show: v => v + '%' },
+                { name: 'bb', label: 'B 比例', type: 'range', min: 0, max: 100, step: 1, value: 10, show: v => v + '%' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'colorize', group: 'filter', label: '染色', icon: 'colorbalance', desc: '给图片染上指定色调', fields: [
+                { name: 'color', label: '颜色', type: 'color', value: '#ff6b6b' },
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.6, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'tint', group: 'filter', label: '浅染色', icon: 'colorbalance', desc: '轻度色调叠加', fields: [
+                { name: 'color', label: '颜色', type: 'color', value: '#ff6b6b' },
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.4, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'gradient-map', group: 'filter', label: '渐变映射', icon: 'duotone', desc: '按亮度映射到双色渐变', fields: [
+                { name: 'c1', label: '阴影色', type: 'color', value: '#1e3a8a' },
+                { name: 'c2', label: '高光色', type: 'color', value: '#fbbf24' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'dither', group: 'filter', label: '抖动', icon: 'pixelate', desc: 'Floyd-Steinberg 抖动', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'halftone', group: 'filter', label: '半色调', icon: 'pixelate', desc: '网点化印刷效果', fields: [
+                { name: 'dotSize', label: '点尺寸', type: 'range', min: 2, max: 24, step: 1, value: 6, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'solarize', group: 'filter', label: '日晒', icon: 'invert', desc: '高于阈值部分反相', fields: [
+                { name: 'threshold', label: '阈值', type: 'range', min: 0, max: 255, step: 1, value: 128, show: v => v },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            /* ===== 电影感滤镜 ===== */
+            { key: 'cool', group: 'cinematic', label: '冷色调', icon: 'colorbalance', desc: '增强蓝青色', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.5, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'warm', group: 'cinematic', label: '暖色调', icon: 'colorbalance', desc: '增强红黄色', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.5, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'vintage', group: 'cinematic', label: '老照片', icon: 'sepia', desc: '泛黄褪色老照片风', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.8, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'lomo', group: 'cinematic', label: 'Lomo', icon: 'vignette', desc: '高饱和加暗角', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.7, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'cinematic', group: 'cinematic', label: '电影感', icon: 'colorbalance', desc: '电影调色 teal-orange', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.8, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'fade', group: 'cinematic', label: '褪色', icon: 'brightness', desc: '降低对比的雾化感', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.5, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'pastel', group: 'cinematic', label: '马卡龙', icon: 'colorbalance', desc: '柔和粉嫩马卡龙色', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.6, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'neon', group: 'cinematic', label: '霓虹', icon: 'brightness', desc: '霓虹光感色调', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.8, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'heat', group: 'cinematic', label: '热成像', icon: 'colorbalance', desc: '热成像伪彩色', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.8, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'night-vision', group: 'cinematic', label: '夜视', icon: 'brightness', desc: '夜视仪绿色画面', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.8, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'infrared', group: 'cinematic', label: '红外', icon: 'colorbalance', desc: '红外摄影风', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.8, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'polaroid-filter', group: 'cinematic', label: '宝丽来', icon: 'sepia', desc: '宝丽来色彩风', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.7, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'bleach-bypass', group: 'cinematic', label: '漂白旁路', icon: 'brightness', desc: '高对比低饱和电影感', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.7, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'cross-process', group: 'cinematic', label: '交叉冲洗', icon: 'colorbalance', desc: '胶片交叉冲洗色偏', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.7, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'cyanotype', group: 'cinematic', label: '蓝晒', icon: 'colorbalance', desc: '蓝晒工艺青蓝色', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.9, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'silver', group: 'cinematic', label: '银盐', icon: 'grayscale', desc: '银盐胶片质感', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.8, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            /* ===== 特效扩展 ===== */
+            { key: 'motion-blur', group: 'effect', label: '动感模糊', icon: 'blur', desc: '方向性运动模糊', fields: [
+                { name: 'radius', label: '半径', type: 'range', min: 1, max: 40, step: 1, value: 8, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'box-blur', group: 'effect', label: '盒状模糊', icon: 'blur', desc: '快速均值模糊', fields: [
+                { name: 'radius', label: '半径', type: 'range', min: 1, max: 30, step: 1, value: 4, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'radial-blur', group: 'effect', label: '径向模糊', icon: 'blur', desc: '从中心向外辐射模糊', fields: [
+                { name: 'radius', label: '半径', type: 'range', min: 1, max: 30, step: 1, value: 8, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'zoom-blur', group: 'effect', label: '缩放模糊', icon: 'blur', desc: '变焦放射模糊', fields: [
+                { name: 'radius', label: '半径', type: 'range', min: 1, max: 40, step: 1, value: 10, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'unsharp-mask', group: 'effect', label: 'USM 锐化', icon: 'sharpen', desc: '非锐化掩膜锐化', fields: [
+                { name: 'radius', label: '半径', type: 'range', min: 1, max: 20, step: 1, value: 3, show: v => v + 'px' },
+                { name: 'amount', label: '强度', type: 'range', min: 0.1, max: 5, step: 0.1, value: 1.5, show: v => v.toFixed(1) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'soft-glow', group: 'effect', label: '柔光', icon: 'brightness', desc: '柔和发光效果', fields: [
+                { name: 'radius', label: '半径', type: 'range', min: 1, max: 30, step: 1, value: 6, show: v => v + 'px' },
+                { name: 'intensity', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.6, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'bloom', group: 'effect', label: '泛光', icon: 'brightness', desc: '高光溢出泛光', fields: [
+                { name: 'threshold', label: '阈值', type: 'range', min: 100, max: 250, step: 1, value: 180, show: v => v },
+                { name: 'intensity', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.6, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'dreamy', group: 'effect', label: '梦幻', icon: 'blur', desc: '梦幻柔焦光晕', fields: [
+                { name: 'intensity', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.5, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            /* ===== 扭曲特效 ===== */
+            { key: 'fisheye', group: 'distort', label: '鱼眼', icon: 'vignette', desc: '球面鱼眼凸起', fields: [
+                { name: 'strength', label: '强度', type: 'range', min: 0.1, max: 1.5, step: 0.05, value: 0.5, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'pinch', group: 'distort', label: '挤压', icon: 'vignette', desc: '中心挤压变形', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: -1, max: 1, step: 0.05, value: 0.5, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'swirl', group: 'distort', label: '漩涡', icon: 'rotate', desc: '中心螺旋扭曲', fields: [
+                { name: 'degrees', label: '角度', type: 'range', min: 30, max: 360, step: 10, value: 120, show: v => v + '°' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'wave', group: 'distort', label: '波浪', icon: 'rotate', desc: '水波纹扭曲', fields: [
+                { name: 'amplitude', label: '振幅', type: 'range', min: 1, max: 50, step: 1, value: 10, show: v => v + 'px' },
+                { name: 'wavelength', label: '波长', type: 'range', min: 5, max: 100, step: 1, value: 30, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'glass', group: 'distort', label: '玻璃', icon: 'blur', desc: '毛玻璃随机偏移', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 1, max: 30, step: 1, value: 5, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'crystalize', group: 'distort', label: '水晶', icon: 'pixelate', desc: '多边形晶格化', fields: [
+                { name: 'cellSize', label: '格大小', type: 'range', min: 4, max: 60, step: 1, value: 16, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'glitch', group: 'distort', label: '故障', icon: 'pixelate', desc: '像素错位故障艺术', fields: [
+                { name: 'amount', label: '强度', type: 'range', min: 1, max: 80, step: 1, value: 20, show: v => v },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'rgb-split', group: 'distort', label: 'RGB 分离', icon: 'channel', desc: '三通道错位色差', fields: [
+                { name: 'offset', label: '偏移', type: 'range', min: 1, max: 40, step: 1, value: 8, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'scanlines', group: 'distort', label: '扫描线', icon: 'pixelate', desc: 'CRT 显示器扫描线', fields: [
+                { name: 'lineSpacing', label: '线距', type: 'range', min: 1, max: 10, step: 1, value: 3, show: v => v },
+                { name: 'strength', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.4, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'droste', group: 'distort', label: '德罗斯特', icon: 'vignette', desc: '画中画无限递归', fields: [
+                { name: 'count', label: '层数', type: 'range', min: 1, max: 20, step: 1, value: 8, show: v => v },
+                { name: 'scale', label: '缩放', type: 'range', min: 0.3, max: 0.95, step: 0.05, value: 0.7, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'tunnel', group: 'distort', label: '隧道', icon: 'vignette', desc: '同心隧道效果', fields: [
+                { name: 'count', label: '层数', type: 'range', min: 1, max: 30, step: 1, value: 12, show: v => v },
+                { name: 'scale', label: '缩放', type: 'range', min: 0.5, max: 0.95, step: 0.05, value: 0.8, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            /* ===== 艺术风格 ===== */
+            { key: 'painting', group: 'artistic', label: '油画', icon: 'blur', desc: '简化色块油画风', fields: [
+                { name: 'radius', label: '半径', type: 'range', min: 1, max: 20, step: 1, value: 4, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'cartoon', group: 'artistic', label: '卡通', icon: 'edge', desc: '色块+描边卡通画', fields: [
+                { name: 'levels', label: '色阶', type: 'range', min: 2, max: 16, step: 1, value: 6, show: v => v },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'charcoal', group: 'artistic', label: '炭笔', icon: 'sketch', desc: '炭笔素描风', fields: [
+                { name: 'intensity', label: '强度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.8, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'kaleidoscope', group: 'artistic', label: '万花筒', icon: 'rotate', desc: '中心对称万花筒', fields: [
+                { name: 'segments', label: '段数', type: 'range', min: 2, max: 24, step: 1, value: 8, show: v => v },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'mirror-quad', group: 'artistic', label: '四向镜像', icon: 'flip', desc: '四象限镜像拼接', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            /* ===== 叠加装饰 ===== */
+            { key: 'grid-overlay', group: 'overlay', label: '网格线', icon: 'border', desc: '叠加等距网格线', fields: [
+                { name: 'cellSize', label: '格大小', type: 'range', min: 8, max: 200, step: 1, value: 32, show: v => v + 'px' },
+                { name: 'color', label: '颜色', type: 'color', value: '#000000' },
+                { name: 'alpha', label: '透明度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.3, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'watermark-tile', group: 'overlay', label: '平铺水印', icon: 'watermark', desc: '满屏平铺文字水印', fields: [
+                { name: 'text', label: '水印文字', type: 'text', value: 'WATERMARK', placeholder: '输入文字' },
+                { name: 'fontSize', label: '字号', type: 'range', min: 10, max: 80, step: 2, value: 20, show: v => v + 'px' },
+                { name: 'color', label: '颜色', type: 'color', value: '#ffffff' },
+                { name: 'alpha', label: '透明度', type: 'range', min: 0.05, max: 1, step: 0.05, value: 0.2, show: v => v.toFixed(2) },
+                { name: 'spacing', label: '间距', type: 'range', min: 40, max: 400, step: 10, value: 120, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'watermark-diagonal', group: 'overlay', label: '斜向水印', icon: 'watermark', desc: '30°斜向满铺水印', fields: [
+                { name: 'text', label: '水印文字', type: 'text', value: 'CONFIDENTIAL', placeholder: '输入文字' },
+                { name: 'fontSize', label: '字号', type: 'range', min: 12, max: 100, step: 2, value: 28, show: v => v + 'px' },
+                { name: 'color', label: '颜色', type: 'color', value: '#ffffff' },
+                { name: 'alpha', label: '透明度', type: 'range', min: 0.05, max: 1, step: 0.05, value: 0.2, show: v => v.toFixed(2) },
+                { name: 'spacing', label: '间距', type: 'range', min: 40, max: 400, step: 10, value: 150, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'gradient-overlay', group: 'overlay', label: '渐变叠层', icon: 'colorbalance', desc: '叠加双色渐变', fields: [
+                { name: 'c1', label: '起始色', type: 'color', value: '#6366f1' },
+                { name: 'c2', label: '结束色', type: 'color', value: '#ec4899' },
+                { name: 'alpha', label: '透明度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.3, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'bokeh', group: 'overlay', label: '光斑', icon: 'vignette', desc: '随机散景光斑', fields: [
+                { name: 'count', label: '数量', type: 'range', min: 5, max: 200, step: 5, value: 30, show: v => v },
+                { name: 'maxRadius', label: '最大半径', type: 'range', min: 5, max: 120, step: 1, value: 40, show: v => v + 'px' },
+                { name: 'color', label: '颜色', type: 'color', value: '#ffffff' },
+                { name: 'alpha', label: '透明度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.6, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'snow', group: 'overlay', label: '下雪', icon: 'watermark', desc: '叠加雪花效果', fields: [
+                { name: 'count', label: '雪花数', type: 'range', min: 50, max: 2000, step: 50, value: 300, show: v => v },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'rain', group: 'overlay', label: '下雨', icon: 'watermark', desc: '叠加雨丝效果', fields: [
+                { name: 'count', label: '雨丝数', type: 'range', min: 50, max: 2000, step: 50, value: 400, show: v => v },
+                { name: 'length', label: '长度', type: 'range', min: 5, max: 60, step: 1, value: 15, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'sparkles', group: 'overlay', label: '星光', icon: 'watermark', desc: '随机星光闪烁', fields: [
+                { name: 'count', label: '星光数', type: 'range', min: 5, max: 200, step: 5, value: 40, show: v => v },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'gradient-border', group: 'overlay', label: '渐变边框', icon: 'border', desc: '双色渐变描边', fields: [
+                { name: 'width', label: '宽度', type: 'range', min: 1, max: 60, step: 1, value: 12, show: v => v + 'px' },
+                { name: 'c1', label: '色 1', type: 'color', value: '#6366f1' },
+                { name: 'c2', label: '色 2', type: 'color', value: '#ec4899' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'frame-polaroid', group: 'overlay', label: '宝丽来框', icon: 'border', desc: '加宝丽来白边框', fields: [
+                { name: 'border', label: '边框', type: 'range', min: 5, max: 80, step: 1, value: 20, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'frame-film', group: 'overlay', label: '胶片框', icon: 'border', desc: '加胶片打孔边框', fields: [
+                { name: 'holeSize', label: '孔大小', type: 'range', min: 4, max: 40, step: 1, value: 12, show: v => v + 'px' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'caption', group: 'overlay', label: '字幕条', icon: 'watermark', desc: '底部加字幕条', fields: [
+                { name: 'text', label: '文字', type: 'text', value: '字幕内容', placeholder: '输入文字' },
+                { name: 'fontSize', label: '字号', type: 'range', min: 12, max: 80, step: 2, value: 24, show: v => v + 'px' },
+                { name: 'color', label: '文字色', type: 'color', value: '#ffffff' },
+                { name: 'bg', label: '背景色', type: 'color', value: '#000000' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'timestamp', group: 'overlay', label: '时间戳', icon: 'watermark', desc: '底部加当前时间戳', fields: [
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'drop-shadow', group: 'overlay', label: '投影', icon: 'border', desc: '给图片加投影', fields: [
+                { name: 'offset', label: '偏移', type: 'range', min: 0, max: 40, step: 1, value: 6, show: v => v + 'px' },
+                { name: 'blur', label: '模糊', type: 'range', min: 0, max: 40, step: 1, value: 8, show: v => v + 'px' },
+                { name: 'color', label: '颜色', type: 'color', value: '#000000' },
+                { name: 'alpha', label: '透明度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.5, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'outer-glow', group: 'overlay', label: '外发光', icon: 'border', desc: '图片外缘发光', fields: [
+                { name: 'radius', label: '半径', type: 'range', min: 1, max: 60, step: 1, value: 12, show: v => v + 'px' },
+                { name: 'color', label: '颜色', type: 'color', value: '#6366f1' },
+                { name: 'alpha', label: '透明度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.7, show: v => v.toFixed(2) },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            { key: 'stroke', group: 'overlay', label: '描边', icon: 'border', desc: '描出物体轮廓边', fields: [
+                { name: 'width', label: '宽度', type: 'range', min: 1, max: 30, step: 1, value: 4, show: v => v + 'px' },
+                { name: 'color', label: '颜色', type: 'color', value: '#000000' },
+                { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+            ]},
+            /* ===== 工具扩展 ===== */
+            { key: 'ascii-color', group: 'tools', label: '彩色字符画', icon: 'ascii', desc: '彩色 ANSI 字符画', fields: [
+                { name: 'width', label: '宽度 (字符)', type: 'range', min: 40, max: 200, step: 10, value: 100, show: v => v + ' 字符' }
+            ]},
+            { key: 'detect-format', group: 'tools', label: '格式识别', icon: 'info', desc: '识别图片真实格式', fields: [] },
+            { key: 'hex-dump', group: 'tools', label: '十六进制', icon: 'info', desc: '查看前若干字节 16 进制', fields: [
+                { name: 'length', label: '字节数', type: 'range', min: 16, max: 2048, step: 16, value: 256, show: v => v }
+            ]},
+            { key: 'hash-md5', group: 'tools', label: 'MD5 哈希', icon: 'info', desc: '计算文件 MD5', fields: [] },
+            { key: 'hash-sha256', group: 'tools', label: 'SHA256 哈希', icon: 'info', desc: '计算文件 SHA256', fields: [] },
+            /* ===== 图像分析 ===== */
+            { key: 'histogram', group: 'analyze', label: '直方图', icon: 'info', desc: '查看 RGB 直方图数据', fields: [] },
+            { key: 'dominant-color', group: 'analyze', label: '主色调', icon: 'info', desc: '提取主色调', fields: [
+                { name: 'count', label: '颜色数', type: 'range', min: 1, max: 16, step: 1, value: 6, show: v => v }
+            ]},
+            { key: 'palette', group: 'analyze', label: '调色板', icon: 'info', desc: '提取调色板', fields: [
+                { name: 'count', label: '颜色数', type: 'range', min: 1, max: 24, step: 1, value: 8, show: v => v }
+            ]},
+            { key: 'average-color', group: 'analyze', label: '平均色', icon: 'info', desc: '整图平均颜色', fields: [] },
+            { key: 'brightness-meter', group: 'analyze', label: '亮度计', icon: 'info', desc: '整图亮度统计', fields: [] },
+            { key: 'contrast-meter', group: 'analyze', label: '对比度计', icon: 'info', desc: '整图对比度统计', fields: [] }
         ];
 
         let images = [];
