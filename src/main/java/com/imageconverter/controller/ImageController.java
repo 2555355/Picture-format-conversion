@@ -280,28 +280,6 @@ public class ImageController {
 
     // ===== Extended endpoints =====
 
-    @PostMapping("/posterize")
-    public ResponseEntity<byte[]> posterize(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "levels", defaultValue = "4") int levels,
-            @RequestParam(value = "format", defaultValue = "png") String format,
-            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
-        byte[] result = imageService.posterize(file.getBytes(), levels, format, quality);
-        return buildResponse(result, format, file.getOriginalFilename());
-    }
-
-    @PostMapping("/hsb")
-    public ResponseEntity<byte[]> adjustHsb(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "hue", defaultValue = "0") float hue,
-            @RequestParam(value = "saturation", defaultValue = "0") float saturation,
-            @RequestParam(value = "brightness", defaultValue = "0") float brightness,
-            @RequestParam(value = "format", defaultValue = "png") String format,
-            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
-        byte[] result = imageService.adjustHsb(file.getBytes(), hue, saturation, brightness, format, quality);
-        return buildResponse(result, format, file.getOriginalFilename());
-    }
-
     @PostMapping("/threshold")
     public ResponseEntity<byte[]> threshold(
             @RequestParam("file") MultipartFile file,
