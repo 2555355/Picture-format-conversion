@@ -1214,12 +1214,13 @@ public class ImageService {
             if (v < minV) minV = v; if (v > maxV) maxV = v;
         }
         if (maxV <= minV) maxV = minV + 1;
-        double scale = 255.0 / (maxV - minV);
+        final int lo = minV;
+        final double scale = 255.0 / (maxV - minV);
         BufferedImage out = pixelTransform(src, rgb -> {
             int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
-            r = clamp255((int) ((r - minV) * scale));
-            g = clamp255((int) ((g - minV) * scale));
-            b = clamp255((int) ((b - minV) * scale));
+            r = clamp255((int) ((r - lo) * scale));
+            g = clamp255((int) ((g - lo) * scale));
+            b = clamp255((int) ((b - lo) * scale));
             return (r << 16) | (g << 8) | b;
         });
         return writeOut(out, format, quality);
