@@ -447,6 +447,233 @@ public class ImageService {
         return java.util.Base64.getEncoder().encodeToString(out);
     }
 
+    // ===== Extended operations =====
+
+    /** Threshold / binarize: pixels above threshold become white, below become black. */
+    public byte[] threshold(byte[] inputBytes, int threshold, String format, float quality) throws IOException {
+        BufferedImage src = readImage(inputBytes);
+        BufferedImage out = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int y = 0; y < src.getHeight(); y++) {
+            for (int x = 0; x < src.getWidth(); x++) {
+                int rgb = src.getRGB(x, y);
+                int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+                int avg = (r + g + b) / 3;
+                out.setRGB(x, y, avg >= threshold ? 0xFFFFFF : 0x000000);
+            }
+        }
+        return writeImage(out, format, quality);
+    }
+
+    /** Gamma correction. */
+    public byte[] gamma(byte[] inputBytes, double gamma, String format, float quality) throws IOException {
+        BufferedImage src = readImage(inputBytes);
+        BufferedImage out = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+        int[] table = new int[256];
+        for (int i = 0; i < 256; i++) {
+            table[i] = (int) Math.min(255, Math.max(0, Math.pow(i / 255.0, 1.0 / gamma) * 255));
+        }
+        for (int y = 0; y < src.getHeight(); y++) {
+            for (int x = 0; x < src.getWidth(); x++) {
+                int rgb = src.getRGB(x, y);
+                int r = table[(rgb >> 16) & 0xFF];
+                int g = table[(rgb >> 8) & 0xFF];
+                int b = table[rgb & 0xFF];
+                out.setRGB(x, y, (r << 16) | (g << 8) | b);
+            }
+        }
+        return writeImage(out, format, quality);
+    }
+
+    /** Color balance: shift R/G/B channels. */
+    public byte[] colorBalance(byte[] inputBytes, int red, int green, int blue, String format, float quality) throws IOException {
+        BufferedImage src = readImage(inputBytes);
+        BufferedImage out = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int y = 0; y < src.getHeight(); y++) {
+            for (int x = 0; x < src.getWidth(); x++) {
+                int rgb = src.getRGB(x, y);
+                int r = Math.min(255, Math.max(0, ((rgb >> 16) & 0xFF) + red));
+                int g = Math.min(255, Math.max(0, ((rgb >> 8) & 0xFF) + green));
+                int b = Math.min(255, Math.max(0, (rgb & 0xFF) + blue));
+                out.setRGB(x, y, (r << 16) | (g << 8) | b);
+            }
+        }
+        return writeImage(out, format, quality);
+    }
+
+    /** Extract a single R/G/B channel. */
+    public byte[] channelExtract(byte[] inputBytes, String channel, String format, float quality) throws IOException {
+        BufferedImage src = readImage(inputBytes);
+        BufferedImage out = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+        for (int y = 0; y < src.getHeight(); y++) {
+            for (int x = 0; x < src.getWidth(); x++) {
+                int rgb = src.getRGB(x, y);
+                int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+                int v;
+                switch (channel.toLowerCase()) {
+                    case "red": v = r; out.setRGB(x, y, (v << 16)); break;
+                    case "green": v = g; out.setRGB(x, y, (v << 8)); break;
+                    case "blue": v = b; out.setRGB(x, y, v); break;
+                    default: v = (r + g + b) / 3; out.setRGB(x, y, (v << 16) | (v << 8) | v);
+                }
+            }
+        }
+        return writeImage(out, format, quality);
+    }
+
+    /** Duotone: map image to two-color gradient. */
+    public byte[] duotone(byte[] inputBytes, String shadowHex, String highlightHex, String format, float quality) throws IOException {
+        BufferedImage src = readImage(inputBytes);
+        BufferedImage out = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Color shadow = Color.decode("#" + shadowHex);
+        Color highlight = Color.decode("#" + highlightHex);
+        for (int y = 0; y < src.getHeight(); y++) {
+            for (int x = 0; x < src.getWidth(); x++) {
+                int rgb = src.getRGB(x, y);
+                int avg = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF)) / 3;
+                float t = avg / 255f;
+                int r = (int) (shadow.getRed() + (highlight.getRed() - shadow.getRed()) * t);
+                int g = (int) (shadow.getGreen() + (highlight.getGreen() - shadow.getGreen()) * t);
+                int b = (int) (shadow.getBlue() + (highlight.getBlue() - shadow.getBlue()) * t);
+                out.setRGB(x, y, (r << 16) | (g << 8) | b);
+            }
+        }
+        return writeImage(out, format, quality);
+    }
+
+    /** Edge detection using Sobel operator. */
+    public byte[] edgeDetect(byte[] inputBytes, float intensity, String format, float quality) throws IOException {
+        BufferedImage src = readImage(inputBytes);
+        int w = src.getWidth(), h = src.getHeight();
+        int[][] gray = new int[w][h];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int rgb = src.getRGB(x, y);
+                gray[x][y] = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF)) / 3;
+            }
+        }
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        int[][] gx = {{-1,0,1},{-2,0,2},{-1,0,1}};
+        int[][] gy = {{-1,-2,-1},{0,0,0},{1,2,1}};
+        for (int y = 1; y < h - 1; y++) {
+            for (int x = 1; x < w - 1; x++) {
+                int sx = 0, sy = 0;
+                for (int j = -1; j <= 1; j++) {
+                    for (int i = -1; i <= 1; i++) {
+                        sx += gray[x + i][y + j] * gx[i + 1][j + 1];
+                        sy += gray[x + i][y + j] * gy[i + 1][j + 1];
+                    }
+                }
+                int mag = (int) Math.min(255, Math.sqrt(sx * sx + sy * sy) * intensity);
+                out.setRGB(x, y, (mag << 16) | (mag << 8) | mag);
+            }
+        }
+        return writeImage(out, format, quality);
+    }
+
+    /** Emboss effect. */
+    public byte[] emboss(byte[] inputBytes, float amount, String format, float quality) throws IOException {
+        BufferedImage src = readImage(inputBytes);
+        int w = src.getWidth(), h = src.getHeight();
+        int[][] gray = new int[w][h];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int rgb = src.getRGB(x, y);
+                gray[x][y] = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF)) / 3;
+            }
+        }
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        int[][] kernel = {{-2,-1,0},{-1,1,1},{0,1,2}};
+        for (int y = 1; y < h - 1; y++) {
+            for (int x = 1; x < w - 1; x++) {
+                int val = 0;
+                for (int j = -1; j <= 1; j++) {
+                    for (int i = -1; i <= 1; i++) {
+                        val += gray[x + i][y + j] * kernel[i + 1][j + 1];
+                    }
+                }
+                val = (int) (val * amount + 128);
+                val = Math.min(255, Math.max(0, val));
+                out.setRGB(x, y, (val << 16) | (val << 8) | val);
+            }
+        }
+        return writeImage(out, format, quality);
+    }
+
+    /** Sketch effect: grayscale + inverted blur blend. */
+    public byte[] sketch(byte[] inputBytes, float intensity, String format, float quality) throws IOException {
+        BufferedImage src = readImage(inputBytes);
+        int w = src.getWidth(), h = src.getHeight();
+        BufferedImage gray = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int rgb = src.getRGB(x, y);
+                int avg = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF)) / 3;
+                gray.setRGB(x, y, (avg << 16) | (avg << 8) | avg);
+            }
+        }
+        BufferedImage inv = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int rgb = gray.getRGB(x, y);
+                int avg = 255 - (rgb & 0xFF);
+                inv.setRGB(x, y, (avg << 16) | (avg << 8) | avg);
+            }
+        }
+        BufferedImage blurred = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = blurred.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g.drawImage(inv, 0, 0, w / 2, h / 2, null);
+        g.drawImage(inv, 0, 0, w, h, null);
+        g.dispose();
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_RGB);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int base = gray.getRGB(x, y) & 0xFF;
+                int blur = blurred.getRGB(x, y) & 0xFF;
+                int result = blur == 0 ? 255 : Math.min(255, (base * 255) / blur);
+                result = (int) (result * intensity + (255 - result) * (1 - intensity) * 0.3);
+                result = Math.min(255, Math.max(0, result));
+                out.setRGB(x, y, (result << 16) | (result << 8) | result);
+            }
+        }
+        return writeImage(out, format, quality);
+    }
+
+    /** Add random noise. */
+    public byte[] noise(byte[] inputBytes, int amount, String format, float quality) throws IOException {
+        BufferedImage src = readImage(inputBytes);
+        BufferedImage out = new BufferedImage(src.getWidth(), src.getHeight(), BufferedImage.TYPE_INT_RGB);
+        java.util.Random rnd = new java.util.Random();
+        for (int y = 0; y < src.getHeight(); y++) {
+            for (int x = 0; x < src.getWidth(); x++) {
+                int rgb = src.getRGB(x, y);
+                int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+                int n = (int) (rnd.nextGaussian() * amount);
+                r = Math.min(255, Math.max(0, r + n));
+                g = Math.min(255, Math.max(0, g + n));
+                b = Math.min(255, Math.max(0, b + n));
+                out.setRGB(x, y, (r << 16) | (g << 8) | b);
+            }
+        }
+        return writeImage(out, format, quality);
+    }
+
+    /** Crop to circle (with transparent background for PNG). */
+    public byte[] cropCircle(byte[] inputBytes, int padding, String format, float quality) throws IOException {
+        BufferedImage src = readImage(inputBytes);
+        int size = Math.min(src.getWidth(), src.getHeight()) - padding * 2;
+        int sx = (src.getWidth() - size) / 2;
+        int sy = (src.getHeight() - size) / 2;
+        BufferedImage out = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = out.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.setClip(new java.awt.geom.Ellipse2D.Double(0, 0, size, size));
+        g.drawImage(src, 0, 0, size, size, sx, sy, sx + size, sy + size, null);
+        g.dispose();
+        if (!formatSupportsAlpha(format)) out = flatten(out);
+        return writeImage(out, format, quality);
+    }
+
     // ===== Helper methods =====
 
     public BufferedImage readImage(byte[] bytes) throws IOException {

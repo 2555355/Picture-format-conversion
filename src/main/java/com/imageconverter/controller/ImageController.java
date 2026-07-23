@@ -278,6 +278,133 @@ public class ImageController {
         return ResponseEntity.ok(resp);
     }
 
+    // ===== Extended endpoints =====
+
+    @PostMapping("/posterize")
+    public ResponseEntity<byte[]> posterize(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "levels", defaultValue = "4") int levels,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.posterize(file.getBytes(), levels, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/hsb")
+    public ResponseEntity<byte[]> adjustHsb(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "hue", defaultValue = "0") float hue,
+            @RequestParam(value = "saturation", defaultValue = "0") float saturation,
+            @RequestParam(value = "brightness", defaultValue = "0") float brightness,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.adjustHsb(file.getBytes(), hue, saturation, brightness, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/threshold")
+    public ResponseEntity<byte[]> threshold(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "threshold", defaultValue = "128") int threshold,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.threshold(file.getBytes(), threshold, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/gamma")
+    public ResponseEntity<byte[]> gamma(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "gamma", defaultValue = "1.0") double gamma,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.gamma(file.getBytes(), gamma, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/color-balance")
+    public ResponseEntity<byte[]> colorBalance(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "red", defaultValue = "0") int red,
+            @RequestParam(value = "green", defaultValue = "0") int green,
+            @RequestParam(value = "blue", defaultValue = "0") int blue,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.colorBalance(file.getBytes(), red, green, blue, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/channel-extract")
+    public ResponseEntity<byte[]> channelExtract(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "channel", defaultValue = "red") String channel,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.channelExtract(file.getBytes(), channel, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/duotone")
+    public ResponseEntity<byte[]> duotone(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "shadow", defaultValue = "1e3a8a") String shadowHex,
+            @RequestParam(value = "highlight", defaultValue = "fbbf24") String highlightHex,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.duotone(file.getBytes(), shadowHex, highlightHex, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/edge-detect")
+    public ResponseEntity<byte[]> edgeDetect(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "intensity", defaultValue = "1.0") float intensity,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.edgeDetect(file.getBytes(), intensity, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/emboss")
+    public ResponseEntity<byte[]> emboss(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "amount", defaultValue = "1.0") float amount,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.emboss(file.getBytes(), amount, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/sketch")
+    public ResponseEntity<byte[]> sketch(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "intensity", defaultValue = "0.8") float intensity,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.sketch(file.getBytes(), intensity, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/noise")
+    public ResponseEntity<byte[]> noise(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "amount", defaultValue = "25") int amount,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.noise(file.getBytes(), amount, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/crop-circle")
+    public ResponseEntity<byte[]> cropCircle(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "padding", defaultValue = "0") int padding,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.cropCircle(file.getBytes(), padding, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
     private ResponseEntity<byte[]> buildResponse(byte[] data, String format, String originalName) {
         MediaType mediaType = mediaTypeFor(format);
         String safeName = (originalName == null ? "image" : originalName.replaceAll("\\.[^.]+$", ""));
