@@ -13,8 +13,10 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Arrays;
 
 @Service
 public class ImageService {
@@ -2304,5 +2306,381 @@ public class ImageService {
         if (sum == 0) return kernel;
         for (int i = 0; i < kernel.length; i++) kernel[i] /= sum;
         return kernel;
+    }
+
+    // ==================== AI-Like Enhancement Features ====================
+
+    /** 去除背景: 基于四角颜色相似度的 flood-fill 式背景移除 */
+    public byte[] removeBg(byte[] inputBytes, float tolerance, int feather, String format, float quality) throws IOException {
+        BufferedImage src = toArgb(readImage(inputBytes));
+        int w = src.getWidth(), h = src.getHeight();
+        // 采样四角颜色作为背景色
+        int[] corners = {
+            src.getRGB(0, 0), src.getRGB(w - 1, 0),
+            src.getRGB(0, h - 1), src.getRGB(w - 1, h - 1)
+        };
+        int tol = (int) (tolerance * 442); // 0-1 → 0-442 (max RGB distance)
+        boolean[][] bg = new boolean[w][h];
+        java.util.ArrayDeque<int[]> queue = new java.util.ArrayDeque<>();
+        // 从四角开始 BFS
+        for (int[] pt : new int[][]{{0,0},{w-1,0},{0,h-1},{w-1,h-1}}) {
+            if (!bg[pt[0]][pt[1]] && colorMatch(src.getRGB(pt[0], pt[1]), corners, tol)) {
+                bg[pt[0]][pt[1]] = true;
+                queue.add(pt);
+            }
+        }
+        int[][] dirs = {{1,0},{-1,0},{0,1},{0,-1}};
+        while (!queue.isEmpty()) {
+            int[] cur = queue.poll();
+            for (int[] d : dirs) {
+                int nx = cur[0] + d[0], ny = cur[1] + d[1];
+                if (nx >= 0 && nx < w && ny >= 0 && ny < h && !bg[nx][ny]) {
+                    if (colorMatch(src.getRGB(nx, ny), corners, tol)) {
+                        bg[nx][ny] = true;
+                        queue.add(new int[]{nx, ny});
+                    }
+                }
+            }
+        }
+        // 羽化边缘
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int rgb = src.getRGB(x, y);
+                if (!bg[x][y]) {
+                    out.setRGB(x, y, rgb);
+                } else if (feather > 0) {
+                    // 检查是否靠近前景边缘
+                    int minDist = feather + 1;
+                    for (int fy = Math.max(0, y - feather); fy <= Math.min(h-1, y + feather); fy++) {
+                        for (int fx = Math.max(0, x - feather); fx <= Math.min(w-1, x + feather); fx++) {
+                            if (!bg[fx][fy]) {
+                                int d = Math.abs(fx - x) + Math.abs(fy - y);
+                                if (d < minDist) minDist = d;
+                            }
+                        }
+                    }
+                    if (minDist <= feather) {
+                        int a = (int) (255 * (1.0 - (double) minDist / feather));
+                        out.setRGB(x, y, (a << 24) | (rgb & 0x00FFFFFF));
+                    } else {
+                        out.setRGB(x, y, 0);
+                    }
+                } else {
+                    out.setRGB(x, y, 0);
+                }
+            }
+        }
+        if (!formatSupportsAlpha(format)) out = flatten(out);
+        return writeImage(out, format, quality);
+    }
+
+    private boolean colorMatch(int rgb, int[] samples, int tol) {
+        int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+        for (int s : samples) {
+            int sr = (s >> 16) & 0xFF, sg = (s >> 8) & 0xFF, sb = s & 0xFF;
+            int dist = (int) Math.sqrt((r-sr)*(r-sr) + (g-sg)*(g-sg) + (b-sb)*(b-sb));
+            if (dist <= tol) return true;
+        }
+        return false;
+    }
+
+    /** 无损放大: 双三次插值放大 + 自适应锐化 */
+    public byte[] upscaleHq(byte[] inputBytes, int scale, float sharpness, String format, float quality) throws IOException {
+        BufferedImage src = toArgb(readImage(inputBytes));
+        int w = src.getWidth(), h = src.getHeight();
+        int nw = w * scale, nh = h * scale;
+        // 双三次插值放大
+        java.awt.Image scaled = src.getScaledInstance(nw, nh, java.awt.Image.SCALE_AREA_AVERAGING);
+        BufferedImage out = new BufferedImage(nw, nh, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = out.createGraphics();
+        g.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        g.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        g.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g.drawImage(scaled, 0, 0, null);
+        g.dispose();
+        // 自适应锐化 (Unsharp Mask)
+        if (sharpness > 0) {
+            out = unsharpMaskOp(out, sharpness, 1.5f);
+        }
+        return writeOut(out, format, quality);
+    }
+
+    private BufferedImage unsharpMaskOp(BufferedImage src, float amount, float radius) {
+        int w = src.getWidth(), h = src.getHeight();
+        int r = Math.max(1, (int) radius);
+        float[] kernel = createGaussianKernel(r);
+        // 高斯模糊
+        int[] blurred = gaussianBlurHorizontal(src, kernel, r);
+        blurred = gaussianBlurVertical(src, blurred, kernel, r);
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int orig = src.getRGB(x, y);
+                int blur = blurred[y * w + x];
+                int a = (orig >> 24) & 0xFF;
+                int or = (orig >> 16) & 0xFF, og = (orig >> 8) & 0xFF, ob = orig & 0xFF;
+                int br = (blur >> 16) & 0xFF, bg = (blur >> 8) & 0xFF, bb = blur & 0xFF;
+                int nr = clamp255((int) (or + (or - br) * amount));
+                int ng = clamp255((int) (og + (og - bg) * amount));
+                int nb = clamp255((int) (ob + (ob - bb) * amount));
+                out.setRGB(x, y, (a << 24) | (nr << 16) | (ng << 8) | nb);
+            }
+        }
+        return out;
+    }
+
+    private int[] gaussianBlurHorizontal(BufferedImage src, float[] kernel, int r) {
+        int w = src.getWidth(), h = src.getHeight();
+        int[] result = new int[w * h];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                float rr = 0, gg = 0, bb = 0;
+                for (int i = -r; i <= r; i++) {
+                    int sx = clamp(x + i, 0, w - 1);
+                    int rgb = src.getRGB(sx, y);
+                    float k = kernel[i + r];
+                    rr += ((rgb >> 16) & 0xFF) * k;
+                    gg += ((rgb >> 8) & 0xFF) * k;
+                    bb += (rgb & 0xFF) * k;
+                }
+                result[y * w + x] = (clamp255((int) rr) << 16) | (clamp255((int) gg) << 8) | clamp255((int) bb);
+            }
+        }
+        return result;
+    }
+
+    private int[] gaussianBlurVertical(BufferedImage src, int[] horizontal, float[] kernel, int r) {
+        int w = src.getWidth(), h = src.getHeight();
+        int[] result = new int[w * h];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                float rr = 0, gg = 0, bb = 0;
+                for (int j = -r; j <= r; j++) {
+                    int sy = clamp(y + j, 0, h - 1);
+                    int rgb = horizontal[sy * w + x];
+                    float k = kernel[j + r];
+                    rr += ((rgb >> 16) & 0xFF) * k;
+                    gg += ((rgb >> 8) & 0xFF) * k;
+                    bb += (rgb & 0xFF) * k;
+                }
+                result[y * w + x] = (clamp255((int) rr) << 16) | (clamp255((int) gg) << 8) | clamp255((int) bb);
+            }
+        }
+        return result;
+    }
+
+    /** 智能降噪: 中值滤波 */
+    public byte[] denoise(byte[] inputBytes, int radius, float threshold, String format, float quality) throws IOException {
+        BufferedImage src = toArgb(readImage(inputBytes));
+        int w = src.getWidth(), h = src.getHeight();
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        int r = Math.max(1, radius);
+        int thr = (int) (threshold * 100);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int orig = src.getRGB(x, y);
+                int a = (orig >> 24) & 0xFF;
+                int or = (orig >> 16) & 0xFF, og = (orig >> 8) & 0xFF, ob = orig & 0xFF;
+                java.util.List<Integer> rs = new java.util.ArrayList<>();
+                java.util.List<Integer> gs = new java.util.ArrayList<>();
+                java.util.List<Integer> bs = new java.util.ArrayList<>();
+                for (int j = -r; j <= r; j++) {
+                    for (int i = -r; i <= r; i++) {
+                        int sx = clamp(x + i, 0, w - 1);
+                        int sy = clamp(y + j, 0, h - 1);
+                        int rgb = src.getRGB(sx, sy);
+                        rs.add((rgb >> 16) & 0xFF);
+                        gs.add((rgb >> 8) & 0xFF);
+                        bs.add(rgb & 0xFF);
+                    }
+                }
+                Collections.sort(rs);
+                Collections.sort(gs);
+                Collections.sort(bs);
+                int medR = rs.get(rs.size() / 2);
+                int medG = gs.get(gs.size() / 2);
+                int medB = bs.get(bs.size() / 2);
+                // 只在差异超过阈值时替换 (保留细节)
+                if (Math.abs(or - medR) > thr || Math.abs(og - medG) > thr || Math.abs(ob - medB) > thr) {
+                    out.setRGB(x, y, (a << 24) | (medR << 16) | (medG << 8) | medB);
+                } else {
+                    out.setRGB(x, y, orig);
+                }
+            }
+        }
+        return writeOut(out, format, quality);
+    }
+
+    /** 去雾: 暗通道先验 (Dark Channel Prior) */
+    public byte[] dehaze(byte[] inputBytes, float omega, String format, float quality) throws IOException {
+        BufferedImage src = toArgb(readImage(inputBytes));
+        int w = src.getWidth(), h = src.getHeight();
+        int patch = Math.max(3, Math.min(w, h) / 50);
+        if (patch % 2 == 0) patch++;
+        int pr = patch / 2;
+        // Step 1: 计算暗通道
+        int[] darkChannel = new int[w * h];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int minVal = 255;
+                for (int j = -pr; j <= pr; j++) {
+                    for (int i = -pr; i <= pr; i++) {
+                        int sx = clamp(x + i, 0, w - 1);
+                        int sy = clamp(y + j, 0, h - 1);
+                        int rgb = src.getRGB(sx, sy);
+                        int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+                        int minc = Math.min(r, Math.min(g, b));
+                        if (minc < minVal) minVal = minc;
+                    }
+                }
+                darkChannel[y * w + x] = minVal;
+            }
+        }
+        // Step 2: 估计大气光 A (取暗通道最亮的前 0.1% 像素的平均)
+        int[] sorted = darkChannel.clone();
+        Arrays.sort(sorted);
+        int topCount = Math.max(1, (int) (w * h * 0.001));
+        int threshold = sorted[w * h - topCount];
+        long aR = 0, aG = 0, aB = 0, aCount = 0;
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                if (darkChannel[y * w + x] >= threshold) {
+                    int rgb = src.getRGB(x, y);
+                    aR += (rgb >> 16) & 0xFF;
+                    aG += (rgb >> 8) & 0xFF;
+                    aB += rgb & 0xFF;
+                    aCount++;
+                }
+            }
+        }
+        if (aCount == 0) aCount = 1;
+        int AR = clamp255((int) (aR / aCount));
+        int AG = clamp255((int) (aG / aCount));
+        int AB = clamp255((int) (aB / aCount));
+        // Step 3: 估算透射率 t = 1 - omega * min(I/A)
+        float[] t = new float[w * h];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int rgb = src.getRGB(x, y);
+                float r = ((rgb >> 16) & 0xFF) / (float) Math.max(AR, 1);
+                float g = ((rgb >> 8) & 0xFF) / (float) Math.max(AG, 1);
+                float b = (rgb & 0xFF) / (float) Math.max(AB, 1);
+                float minC = Math.min(r, Math.min(g, b));
+                // 暗通道取邻域最小
+                float minDark = 1.0f;
+                for (int j = -pr; j <= pr; j++) {
+                    for (int i = -pr; i <= pr; i++) {
+                        int sx = clamp(x + i, 0, w - 1);
+                        int sy = clamp(y + j, 0, h - 1);
+                        if (darkChannel[sy * w + sx] / 255.0f < minDark) {
+                            minDark = darkChannel[sy * w + sx] / 255.0f;
+                        }
+                    }
+                }
+                t[y * w + x] = Math.max(0.1f, 1.0f - omega * minDark);
+            }
+        }
+        // Step 4: 恢复 J = (I - A) / t + A
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int rgb = src.getRGB(x, y);
+                int a = (rgb >> 24) & 0xFF;
+                float r = (rgb >> 16) & 0xFF;
+                float g = (rgb >> 8) & 0xFF;
+                float b = rgb & 0xFF;
+                float tv = t[y * w + x];
+                int nr = clamp255((int) ((r - AR) / tv + AR));
+                int ng = clamp255((int) ((g - AG) / tv + AG));
+                int nb = clamp255((int) ((b - AB) / tv + AB));
+                out.setRGB(x, y, (a << 24) | (nr << 16) | (ng << 8) | nb);
+            }
+        }
+        return writeOut(out, format, quality);
+    }
+
+    /** 画质增强: 自动对比度 + 轻度锐化 + 饱和度提升 */
+    public byte[] smartEnhance(byte[] inputBytes, float amount, String format, float quality) throws IOException {
+        BufferedImage src = toArgb(readImage(inputBytes));
+        int w = src.getWidth(), h = src.getHeight();
+        // Step 1: 自动对比度
+        int minV = 255, maxV = 0;
+        for (int y = 0; y < h; y++) for (int x = 0; x < w; x++) {
+            int rgb = src.getRGB(x, y);
+            int v = (((rgb >> 16) & 0xFF) + ((rgb >> 8) & 0xFF) + (rgb & 0xFF)) / 3;
+            if (v < minV) minV = v; if (v > maxV) maxV = v;
+        }
+        if (maxV <= minV) maxV = minV + 1;
+        final int lo = minV;
+        final double scale = 255.0 / (maxV - minV);
+        BufferedImage contrasted = pixelTransform(src, rgb -> {
+            int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+            r = clamp255((int) ((r - lo) * scale));
+            g = clamp255((int) ((g - lo) * scale));
+            b = clamp255((int) ((b - lo) * scale));
+            return (r << 16) | (g << 8) | b;
+        });
+        // Step 2: 饱和度提升
+        final float sat = 1.0f + 0.3f * amount;
+        BufferedImage saturated = pixelTransform(contrasted, rgb -> {
+            int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+            float gray = 0.299f * r + 0.587f * g + 0.114f * b;
+            int nr = clamp255((int) (gray + (r - gray) * sat));
+            int ng = clamp255((int) (gray + (g - gray) * sat));
+            int nb = clamp255((int) (gray + (b - gray) * sat));
+            return (nr << 16) | (ng << 8) | nb;
+        });
+        // Step 3: 轻度锐化
+        if (amount > 0) {
+            saturated = unsharpMaskOp(saturated, 0.5f * amount, 1.5f);
+        }
+        return writeOut(saturated, format, quality);
+    }
+
+    /** 美颜磨皮: 双边滤波 (保边平滑) */
+    public byte[] beautify(byte[] inputBytes, int radius, float strength, String format, float quality) throws IOException {
+        BufferedImage src = toArgb(readImage(inputBytes));
+        int w = src.getWidth(), h = src.getHeight();
+        int r = Math.max(1, radius);
+        float sigmaR = 30.0f; // 色彩空间 sigma
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int center = src.getRGB(x, y);
+                int ca = (center >> 24) & 0xFF;
+                int cr = (center >> 16) & 0xFF, cg = (center >> 8) & 0xFF, cb = center & 0xFF;
+                float wSum = 0, rSum = 0, gSum = 0, bSum = 0;
+                for (int j = -r; j <= r; j++) {
+                    for (int i = -r; i <= r; i++) {
+                        int sx = clamp(x + i, 0, w - 1);
+                        int sy = clamp(y + j, 0, h - 1);
+                        int rgb = src.getRGB(sx, sy);
+                        int rr = (rgb >> 16) & 0xFF, gg = (rgb >> 8) & 0xFF, bb = rgb & 0xFF;
+                        // 空间权重 (高斯)
+                        float dist2 = i * i + j * j;
+                        float ws = (float) Math.exp(-dist2 / (2.0f * r * r));
+                        // 色彩权重 (高斯)
+                        int cd = (cr - rr) * (cr - rr) + (cg - gg) * (cg - gg) + (cb - bb) * (cb - bb);
+                        float wc = (float) Math.exp(-cd / (2.0f * sigmaR * sigmaR));
+                        float weight = ws * wc;
+                        wSum += weight;
+                        rSum += rr * weight;
+                        gSum += gg * weight;
+                        bSum += bb * weight;
+                    }
+                }
+                if (wSum == 0) wSum = 1;
+                // 混合原图和滤波结果 (strength 控制磨皮强度)
+                int br = clamp255((int) (rSum / wSum));
+                int bg = clamp255((int) (gSum / wSum));
+                int bb = clamp255((int) (bSum / wSum));
+                int nr = clamp255((int) (cr * (1 - strength) + br * strength));
+                int ng = clamp255((int) (cg * (1 - strength) + bg * strength));
+                int nb = clamp255((int) (cb * (1 - strength) + bb * strength));
+                out.setRGB(x, y, (ca << 24) | (nr << 16) | (ng << 8) | nb);
+            }
+        }
+        return writeOut(out, format, quality);
     }
 }

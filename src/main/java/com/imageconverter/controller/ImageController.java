@@ -1199,6 +1199,72 @@ public class ImageController {
         return ResponseEntity.ok(imageService.asciiColor(file.getBytes(), width));
     }
 
+    // ===== AI-Like Enhancement Features =====
+
+    @PostMapping("/remove-bg")
+    public ResponseEntity<byte[]> removeBg(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "tolerance", defaultValue = "0.3") float tolerance,
+            @RequestParam(value = "feather", defaultValue = "2") int feather,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.removeBg(file.getBytes(), tolerance, feather, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/upscale-hq")
+    public ResponseEntity<byte[]> upscaleHq(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "scale", defaultValue = "2") int scale,
+            @RequestParam(value = "sharpness", defaultValue = "0.5") float sharpness,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.95") float quality) throws IOException {
+        byte[] result = imageService.upscaleHq(file.getBytes(), scale, sharpness, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/denoise")
+    public ResponseEntity<byte[]> denoise(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "radius", defaultValue = "1") int radius,
+            @RequestParam(value = "threshold", defaultValue = "0.3") float threshold,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.denoise(file.getBytes(), radius, threshold, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/dehaze")
+    public ResponseEntity<byte[]> dehaze(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "omega", defaultValue = "0.9") float omega,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.dehaze(file.getBytes(), omega, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/smart-enhance")
+    public ResponseEntity<byte[]> smartEnhance(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "amount", defaultValue = "0.6") float amount,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.smartEnhance(file.getBytes(), amount, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
+    @PostMapping("/beautify")
+    public ResponseEntity<byte[]> beautify(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "radius", defaultValue = "5") int radius,
+            @RequestParam(value = "strength", defaultValue = "0.6") float strength,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
+        byte[] result = imageService.beautify(file.getBytes(), radius, strength, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
     private ResponseEntity<byte[]> buildResponse(byte[] data, String format, String originalName) {
         MediaType mediaType = mediaTypeFor(format);
         String safeName = (originalName == null ? "image" : originalName.replaceAll("\\.[^.]+$", ""));

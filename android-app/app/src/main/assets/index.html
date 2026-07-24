@@ -3920,7 +3920,36 @@ const ACTIONS = [
   ]},
   { key: 'average-color', group: 'analyze', label: '平均色', icon: 'info', desc: '整图平均颜色', fields: [] },
   { key: 'brightness-meter', group: 'analyze', label: '亮度计', icon: 'info', desc: '整图亮度统计', fields: [] },
-  { key: 'contrast-meter', group: 'analyze', label: '对比度计', icon: 'info', desc: '整图对比度统计', fields: [] }
+  { key: 'contrast-meter', group: 'analyze', label: '对比度计', icon: 'info', desc: '整图对比度统计', fields: [] },
+  { key: 'remove-bg', group: 'tools', label: '去除背景', icon: 'crop', desc: '智能识别并移除背景，支持羽化边缘', fields: [
+    { name: 'tolerance', label: '容差', type: 'range', min: 0.05, max: 0.8, step: 0.05, value: 0.3, show: v => v.toFixed(2) },
+    { name: 'feather', label: '羽化半径', type: 'range', min: 0, max: 10, step: 1, value: 2, show: v => v + 'px' },
+    { name: 'format', label: '输出格式', type: 'select', options: ['png'], value: 'png' }
+  ]},
+  { key: 'upscale-hq', group: 'tools', label: '无损放大', icon: 'resize', desc: '高质量双三次插值放大+自适应锐化', fields: [
+    { name: 'scale', label: '放大倍数', type: 'select', options: ['2','3','4'], value: '2' },
+    { name: 'sharpness', label: '锐化强度', type: 'range', min: 0, max: 1.5, step: 0.1, value: 0.5, show: v => v.toFixed(1) },
+    { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','bmp','tiff'], value: 'png' },
+    { name: 'quality', label: '质量 (JPEG)', type: 'range', min: 0.3, max: 1, step: 0.05, value: 0.95, show: v => v.toFixed(2) }
+  ]},
+  { key: 'denoise', group: 'filter', label: '智能降噪', icon: 'blur', desc: '中值滤波降噪，保留边缘细节', fields: [
+    { name: 'radius', label: '滤波半径', type: 'range', min: 1, max: 5, step: 1, value: 1, show: v => v + 'px' },
+    { name: 'threshold', label: '降噪阈值', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.3, show: v => v.toFixed(2) },
+    { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+  ]},
+  { key: 'dehaze', group: 'filter', label: '去雾', icon: 'brightness', desc: '暗通道先验去雾，恢复清晰度', fields: [
+    { name: 'omega', label: '去雾强度', type: 'range', min: 0.3, max: 1, step: 0.05, value: 0.9, show: v => v.toFixed(2) },
+    { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+  ]},
+  { key: 'smart-enhance', group: 'effect', label: '画质增强', icon: 'brightness', desc: '自动对比度+饱和度+锐化一键增强', fields: [
+    { name: 'amount', label: '增强强度', type: 'range', min: 0.2, max: 1.5, step: 0.1, value: 0.6, show: v => v.toFixed(1) },
+    { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+  ]},
+  { key: 'beautify', group: 'effect', label: '美颜磨皮', icon: 'blur', desc: '双边滤波保边平滑，人像磨皮', fields: [
+    { name: 'radius', label: '磨皮半径', type: 'range', min: 2, max: 15, step: 1, value: 5, show: v => v + 'px' },
+    { name: 'strength', label: '磨皮强度', type: 'range', min: 0.2, max: 1, step: 0.05, value: 0.6, show: v => v.toFixed(2) },
+    { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
+  ]}
 ];
 
 let images = [];
