@@ -30,9 +30,22 @@ public class AiSuperResolutionService {
 
     private static final Logger log = LoggerFactory.getLogger(AiSuperResolutionService.class);
 
-    // 模型缓存目录
-    private static final String MODEL_DIR = System.getProperty("user.home") + "/.image-converter-models";
+    // 模型缓存目录 (jar 所在目录/models)
+    private static final String MODEL_DIR = getJarDir() + "/models";
     private static final String MODEL_NAME = "realesr-general-x4v3.onnx";
+
+    /** 获取 jar 所在目录，获取失败则降级到当前工作目录 */
+    private static String getJarDir() {
+        try {
+            String path = AiSuperResolutionService.class
+                .getProtectionDomain().getCodeSource().getLocation().toURI().getPath();
+            java.io.File jarFile = new java.io.File(path);
+            // 如果是 jar 文件，返回其父目录；如果是目录(开发模式)，返回该目录
+            return jarFile.isFile() ? jarFile.getParent() : jarFile.getPath();
+        } catch (Exception e) {
+            return System.getProperty("user.dir");
+        }
+    }
 
     // 模型下载地址 (HuggingFace + GitHub 双备份)
     private static final String[] MODEL_URLS = {
