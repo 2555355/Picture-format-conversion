@@ -3950,8 +3950,9 @@ const ACTIONS = [
     { name: 'strength', label: '磨皮强度', type: 'range', min: 0.2, max: 1, step: 0.05, value: 0.6, show: v => v.toFixed(2) },
     { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
   ]},
-  { key: 'ultra-clear', group: 'effect', label: '超清增强', icon: 'sharpen', desc: 'CLAHE局部对比度+多尺度细节+边缘自适应锐化，让文字物体极致清晰', fields: [
-    { name: 'amount', label: '增强强度', type: 'range', min: 0.3, max: 2, step: 0.1, value: 0.8, show: v => v.toFixed(1) },
+  { key: 'ultra-clear', group: 'effect', label: '超清增强', icon: 'sharpen', desc: 'AI超分辨率(Real-ESRGAN)无损放大4x，让文字物体极致清晰。首次使用自动下载AI模型', fields: [
+    { name: 'scale', label: '放大倍数', type: 'select', options: ['2','4'], value: '4' },
+    { name: 'amount', label: '增强强度(降级)', type: 'range', min: 0.3, max: 2, step: 0.1, value: 0.8, show: v => v.toFixed(1) },
     { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','bmp','tiff'], value: 'png' },
     { name: 'quality', label: '质量 (JPEG)', type: 'range', min: 0.3, max: 1, step: 0.05, value: 0.95, show: v => v.toFixed(2) }
   ]}
