@@ -11,19 +11,15 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 /**
  * AI 超分辨率服务: 基于 ONNX Runtime 的本地 AI 图片增强
- * 自动下载模型 → 分块推理 → 无缝拼接
+ * 手动安装模型 → 分块推理 → 无缝拼接
  */
 @Service
 public class AiSuperResolutionService {
@@ -47,7 +43,7 @@ public class AiSuperResolutionService {
         }
     }
 
-    // 模型下载地址 (HuggingFace + GitHub 双备份)
+    // 模型下载地址 (仅供手动下载参考，不再自动下载)
     private static final String[] MODEL_URLS = {
         "https://huggingface.co/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx",
         "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/real_esrgan_general_x4v3/releases/v0.58.0/real_esrgan_general_x4v3-onnx-float.zip"
@@ -72,9 +68,12 @@ public class AiSuperResolutionService {
     private synchronized void init() {
         if (initialized || initFailed) return;
         try {
-            Path modelPath = ensureModel();
+            Path modelPath = findModel();
             if (modelPath == null) {
-                log.warn("AI 模型下载失败，将使用 Java 算法降级处理");
+                log.warn("未找到 AI 模型文件，将使用 Java 算法降级处理");
+                log.warn("手动安装方法: 下载模型后放到 {} 目录，文件名 {}", MODEL_DIR, MODEL_NAME);
+                log.warn("下载地址1: {}", MODEL_URLS[0]);
+                log.warn("下载地址2 (zip): {}", MODEL_URLS[1]);
                 initFailed = true;
                 return;
             }
@@ -99,76 +98,16 @@ public class AiSuperResolutionService {
     }
 
     /**
-     * 确保模型文件存在，不存在则下载
+     * 查找本地模型文件 (仅手动安装，不自动下载)
      */
-    private Path ensureModel() {
+    private Path findModel() {
         Path modelPath = Paths.get(MODEL_DIR, MODEL_NAME);
         try {
             if (Files.exists(modelPath) && Files.size(modelPath) > 100_000) {
                 return modelPath;
             }
         } catch (IOException ignored) {}
-        // 尝试多个下载源
-        for (String url : MODEL_URLS) {
-            try {
-                log.info("正在下载 AI 模型: {}", url);
-                Files.createDirectories(Paths.get(MODEL_DIR));
-                Path downloaded = downloadModel(url);
-                if (downloaded != null) {
-                    return downloaded;
-                }
-            } catch (Exception e) {
-                log.warn("从 {} 下载失败: {}", url, e.getMessage());
-            }
-        }
         return null;
-    }
-
-    private Path downloadModel(String urlStr) throws IOException {
-        URL url = new URL(urlStr);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setConnectTimeout(30000);
-        conn.setReadTimeout(300000); // 5分钟超时
-        conn.setRequestProperty("User-Agent", "ImageConverter/1.0");
-        conn.setInstanceFollowRedirects(true);
-
-        if (conn.getResponseCode() != 200) {
-            throw new IOException("HTTP " + conn.getResponseCode());
-        }
-
-        String contentType = conn.getContentType();
-        if (contentType == null) contentType = "";
-        Path targetPath = Paths.get(MODEL_DIR, MODEL_NAME);
-
-        if (contentType.contains("zip") || urlStr.endsWith(".zip")) {
-            // 下载 zip 并解压
-            Path zipPath = Paths.get(MODEL_DIR, "model.zip");
-            try (InputStream is = conn.getInputStream()) {
-                Files.copy(is, zipPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            }
-            try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipPath))) {
-                ZipEntry entry;
-                while ((entry = zis.getNextEntry()) != null) {
-                    if (entry.getName().endsWith(".onnx")) {
-                        Files.copy(zis, targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                        zis.closeEntry();
-                        Files.deleteIfExists(zipPath);
-                        log.info("模型解压完成: {} ({} bytes)", targetPath, Files.size(targetPath));
-                        return targetPath;
-                    }
-                    zis.closeEntry();
-                }
-            }
-            Files.deleteIfExists(zipPath);
-            throw new IOException("ZIP 中未找到 .onnx 文件");
-        } else {
-            // 直接下载 .onnx
-            try (InputStream is = conn.getInputStream()) {
-                Files.copy(is, targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-            }
-            log.info("模型下载完成: {} ({} bytes)", targetPath, Files.size(targetPath));
-            return targetPath;
-        }
     }
 
     /**
