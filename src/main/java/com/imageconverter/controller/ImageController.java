@@ -1265,6 +1265,16 @@ public class ImageController {
         return buildResponse(result, format, file.getOriginalFilename());
     }
 
+    @PostMapping("/ultra-clear")
+    public ResponseEntity<byte[]> ultraClear(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam(value = "amount", defaultValue = "0.8") float amount,
+            @RequestParam(value = "format", defaultValue = "png") String format,
+            @RequestParam(value = "quality", defaultValue = "0.95") float quality) throws IOException {
+        byte[] result = imageService.ultraClear(file.getBytes(), amount, format, quality);
+        return buildResponse(result, format, file.getOriginalFilename());
+    }
+
     private ResponseEntity<byte[]> buildResponse(byte[] data, String format, String originalName) {
         MediaType mediaType = mediaTypeFor(format);
         String safeName = (originalName == null ? "image" : originalName.replaceAll("\\.[^.]+$", ""));

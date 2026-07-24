@@ -2683,4 +2683,289 @@ public class ImageService {
         }
         return writeOut(out, format, quality);
     }
+
+    /** 超清增强: CLAHE 局部对比度 + 多尺度细节增强 + 边缘自适应锐化 */
+    public byte[] ultraClear(byte[] inputBytes, float amount, String format, float quality) throws IOException {
+        BufferedImage src = toArgb(readImage(inputBytes));
+        int w = src.getWidth(), h = src.getHeight();
+
+        // Step 1: 轻度双边滤波去噪 (保边)
+        BufferedImage denoised = lightBilateral(src, 2, 0.4f);
+
+        // Step 2: CLAHE 局部自适应对比度增强
+        BufferedImage clahe = applyClahe(denoised, 8, 2.0f + amount * 1.5f);
+
+        // Step 3: 多尺度细节增强 (fine + mid + coarse)
+        BufferedImage detailed = multiScaleDetail(clahe, amount);
+
+        // Step 4: 边缘自适应锐化 (在边缘处加强，平坦处不锐化)
+        BufferedImage out = edgeAdaptiveSharpen(detailed, 0.8f + amount * 0.8f);
+
+        return writeOut(out, format, quality);
+    }
+
+    /** 轻量双边滤波 (半径小，速度快) */
+    private BufferedImage lightBilateral(BufferedImage src, int radius, float strength) {
+        int w = src.getWidth(), h = src.getHeight();
+        int r = Math.max(1, radius);
+        float sigmaR = 40.0f;
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int center = src.getRGB(x, y);
+                int a = (center >> 24) & 0xFF;
+                int cr = (center >> 16) & 0xFF, cg = (center >> 8) & 0xFF, cb = center & 0xFF;
+                float wSum = 0, rSum = 0, gSum = 0, bSum = 0;
+                for (int j = -r; j <= r; j++) {
+                    for (int i = -r; i <= r; i++) {
+                        int sx = clamp(x + i, 0, w - 1), sy = clamp(y + j, 0, h - 1);
+                        int rgb = src.getRGB(sx, sy);
+                        int rr = (rgb >> 16) & 0xFF, gg = (rgb >> 8) & 0xFF, bb = rgb & 0xFF;
+                        float dist2 = i * i + j * j;
+                        float ws = (float) Math.exp(-dist2 / (2.0f * r * r));
+                        int cd = (cr-rr)*(cr-rr) + (cg-gg)*(cg-gg) + (cb-bb)*(cb-bb);
+                        float wc = (float) Math.exp(-cd / (2.0f * sigmaR * sigmaR));
+                        float weight = ws * wc;
+                        wSum += weight; rSum += rr * weight; gSum += gg * weight; bSum += bb * weight;
+                    }
+                }
+                if (wSum == 0) wSum = 1;
+                int br = clamp255((int) (rSum / wSum));
+                int bg = clamp255((int) (gSum / wSum));
+                int bb2 = clamp255((int) (bSum / wSum));
+                int nr = clamp255((int) (cr * (1 - strength) + br * strength));
+                int ng = clamp255((int) (cg * (1 - strength) + bg * strength));
+                int nb = clamp255((int) (cb * (1 - strength) + bb2 * strength));
+                out.setRGB(x, y, (a << 24) | (nr << 16) | (ng << 8) | nb);
+            }
+        }
+        return out;
+    }
+
+    /** CLAHE: 分块自适应直方图均衡化 (带对比度限制) */
+    private BufferedImage applyClahe(BufferedImage src, int tileSize, float clipLimit) {
+        int w = src.getWidth(), h = src.getHeight();
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        int tilesX = Math.max(1, (w + tileSize - 1) / tileSize);
+        int tilesY = Math.max(1, (h + tileSize - 1) / tileSize);
+        // 为每个 tile 计算 LUT (映射表)
+        float[][][] luts = new float[tilesX][tilesY][256];
+        for (int ty = 0; ty < tilesY; ty++) {
+            for (int tx = 0; tx < tilesX; tx++) {
+                int x0 = tx * tileSize, y0 = ty * tileSize;
+                int x1 = Math.min(x0 + tileSize, w), y1 = Math.min(y0 + tileSize, h);
+                // 分通道直方图
+                int[] histR = new int[256], histG = new int[256], histB = new int[256];
+                int count = 0;
+                for (int y = y0; y < y1; y++) {
+                    for (int x = x0; x < x1; x++) {
+                        int rgb = src.getRGB(x, y);
+                        histR[(rgb >> 16) & 0xFF]++;
+                        histG[(rgb >> 8) & 0xFF]++;
+                        histB[rgb & 0xFF]++;
+                        count++;
+                    }
+                }
+                // 对比度限制 (clip)
+                int clip = (int) (count / 256.0 * clipLimit);
+                if (clip < 1) clip = 1;
+                clipHistogram(histR, clip);
+                clipHistogram(histG, clip);
+                clipHistogram(histB, clip);
+                // CDF → LUT
+                float[] lutR = buildLut(histR, count);
+                float[] lutG = buildLut(histG, count);
+                float[] lutB = buildLut(histB, count);
+                luts[tx][ty] = new float[256 * 3];
+                System.arraycopy(lutR, 0, luts[tx][ty], 0, 256);
+                System.arraycopy(lutG, 0, luts[tx][ty], 256, 256);
+                System.arraycopy(lutB, 0, luts[tx][ty], 512, 256);
+            }
+        }
+        // 双线性插值应用 LUT
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int rgb = src.getRGB(x, y);
+                int a = (rgb >> 24) & 0xFF;
+                int r = (rgb >> 16) & 0xFF, g = (rgb >> 8) & 0xFF, b = rgb & 0xFF;
+                // 计算 tile 浮点坐标
+                float fx = (x + 0.5f) / tileSize - 0.5f;
+                float fy = (y + 0.5f) / tileSize - 0.5f;
+                int tx0 = clamp((int) Math.floor(fx), 0, tilesX - 1);
+                int ty0 = clamp((int) Math.floor(fy), 0, tilesY - 1);
+                int tx1 = Math.min(tx0 + 1, tilesX - 1);
+                int ty1 = Math.min(ty0 + 1, tilesY - 1);
+                float ax = fx - (int) Math.floor(fx);
+                float ay = fy - (int) Math.floor(fy);
+                // 四角 tile LUT 双线性插值
+                float[] lt00 = luts[tx0][ty0], lt10 = luts[tx1][ty0];
+                float[] lt01 = luts[tx0][ty1], lt11 = luts[tx1][ty1];
+                int nr = clamp255((int) (bilinearLut(lt00, lt10, lt01, lt11, ax, ay, r, 0)));
+                int ng = clamp255((int) (bilinearLut(lt00, lt10, lt01, lt11, ax, ay, g, 256)));
+                int nb = clamp255((int) (bilinearLut(lt00, lt10, lt01, lt11, ax, ay, b, 512)));
+                out.setRGB(x, y, (a << 24) | (nr << 16) | (ng << 8) | nb);
+            }
+        }
+        return out;
+    }
+
+    private void clipHistogram(int[] hist, int clip) {
+        int excess = 0;
+        for (int i = 0; i < 256; i++) {
+            if (hist[i] > clip) { excess += hist[i] - clip; hist[i] = clip; }
+        }
+        int add = excess / 256;
+        for (int i = 0; i < 256; i++) hist[i] += add;
+    }
+
+    private float[] buildLut(int[] hist, int total) {
+        float[] lut = new float[256];
+        int sum = 0;
+        for (int i = 0; i < 256; i++) {
+            sum += hist[i];
+            lut[i] = (float) sum / total * 255f;
+        }
+        return lut;
+    }
+
+    private float bilinearLut(float[] lt00, float[] lt10, float[] lt01, float[] lt11,
+                              float ax, float ay, int val, int offset) {
+        float v00 = lt00[offset + val], v10 = lt10[offset + val];
+        float v01 = lt01[offset + val], v11 = lt11[offset + val];
+        float v0 = v00 + (v10 - v00) * ax;
+        float v1 = v01 + (v11 - v01) * ax;
+        return v0 + (v1 - v0) * ay;
+    }
+
+    /** 多尺度细节增强: 在多个尺度上提取细节层并放大 */
+    private BufferedImage multiScaleDetail(BufferedImage src, float amount) {
+        int w = src.getWidth(), h = src.getHeight();
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        // 三个尺度的高斯模糊
+        int[] blur1 = gaussianBlurSeparable(src, 1);
+        int[] blur3 = gaussianBlurSeparable(src, 3);
+        int[] blur7 = gaussianBlurSeparable(src, 7);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int idx = y * w + x;
+                int orig = src.getRGB(x, y);
+                int a = (orig >> 24) & 0xFF;
+                int or = (orig >> 16) & 0xFF, og = (orig >> 8) & 0xFF, ob = orig & 0xFF;
+                // 细节层 = 原图 - 模糊
+                int b1 = blur1[idx], b3 = blur3[idx], b7 = blur7[idx];
+                // fine detail (orig - blur1), mid detail (blur1 - blur3), coarse detail (blur3 - blur7)
+                int d1r = or - ((b1 >> 16) & 0xFF), d1g = og - ((b1 >> 8) & 0xFF), d1b = ob - (b1 & 0xFF);
+                int d3r = ((b1 >> 16) & 0xFF) - ((b3 >> 16) & 0xFF);
+                int d3g = ((b1 >> 8) & 0xFF) - ((b3 >> 8) & 0xFF);
+                int d3b = (b1 & 0xFF) - (b3 & 0xFF);
+                int d7r = ((b3 >> 16) & 0xFF) - ((b7 >> 16) & 0xFF);
+                int d7g = ((b3 >> 8) & 0xFF) - ((b7 >> 8) & 0xFF);
+                int d7b = (b3 & 0xFF) - (b7 & 0xFF);
+                // 基础层 = blur7, 细节层放大后叠加
+                float fineGain = 1.5f + amount * 1.5f;   // 文字、细线
+                float midGain = 1.0f + amount * 1.0f;     // 物体轮廓
+                float coarseGain = 0.5f + amount * 0.5f;  // 大尺度结构
+                int nr = clamp255((int) (((b7 >> 16) & 0xFF)
+                    + d7r * coarseGain + d3r * midGain + d1r * fineGain));
+                int ng = clamp255((int) (((b7 >> 8) & 0xFF)
+                    + d7g * coarseGain + d3g * midGain + d1g * fineGain));
+                int nb = clamp255((int) ((b7 & 0xFF)
+                    + d7b * coarseGain + d3b * midGain + d1b * fineGain));
+                out.setRGB(x, y, (a << 24) | (nr << 16) | (ng << 8) | nb);
+            }
+        }
+        return out;
+    }
+
+    private int[] gaussianBlurSeparable(BufferedImage src, int radius) {
+        int w = src.getWidth(), h = src.getHeight();
+        int r = Math.max(1, radius);
+        float[] kernel = createGaussianKernel(r);
+        int[] horizontal = new int[w * h];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                float rr = 0, gg = 0, bb = 0;
+                for (int i = -r; i <= r; i++) {
+                    int sx = clamp(x + i, 0, w - 1);
+                    int rgb = src.getRGB(sx, y);
+                    float k = kernel[i + r];
+                    rr += ((rgb >> 16) & 0xFF) * k;
+                    gg += ((rgb >> 8) & 0xFF) * k;
+                    bb += (rgb & 0xFF) * k;
+                }
+                horizontal[y * w + x] = (clamp255((int) rr) << 16) | (clamp255((int) gg) << 8) | clamp255((int) bb);
+            }
+        }
+        int[] result = new int[w * h];
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                float rr = 0, gg = 0, bb = 0;
+                for (int j = -r; j <= r; j++) {
+                    int sy = clamp(y + j, 0, h - 1);
+                    int rgb = horizontal[sy * w + x];
+                    float k = kernel[j + r];
+                    rr += ((rgb >> 16) & 0xFF) * k;
+                    gg += ((rgb >> 8) & 0xFF) * k;
+                    bb += (rgb & 0xFF) * k;
+                }
+                result[y * w + x] = (clamp255((int) rr) << 16) | (clamp255((int) gg) << 8) | clamp255((int) bb);
+            }
+        }
+        return result;
+    }
+
+    /** 边缘自适应锐化: 检测边缘强度，仅对边缘区域锐化 */
+    private BufferedImage edgeAdaptiveSharpen(BufferedImage src, float amount) {
+        int w = src.getWidth(), h = src.getHeight();
+        BufferedImage out = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < h; y++) {
+            for (int x = 0; x < w; x++) {
+                int orig = src.getRGB(x, y);
+                int a = (orig >> 24) & 0xFF;
+                int or = (orig >> 16) & 0xFF, og = (orig >> 8) & 0xFF, ob = orig & 0xFF;
+                // Sobel 边缘强度
+                int sx1 = clamp(x - 1, 0, w - 1), sx2 = clamp(x + 1, 0, w - 1);
+                int sy1 = clamp(y - 1, 0, h - 1), sy2 = clamp(y + 1, 0, h - 1);
+                int gx = 0, gy = 0;
+                for (int c = 0; c < 3; c++) {
+                    int shift = 16 - c * 8;
+                    int tl = (src.getRGB(sx1, sy1) >> shift) & 0xFF;
+                    int tc = (src.getRGB(x,   sy1) >> shift) & 0xFF;
+                    int tr = (src.getRGB(sx2, sy1) >> shift) & 0xFF;
+                    int ml = (src.getRGB(sx1, y)   >> shift) & 0xFF;
+                    int mr = (src.getRGB(sx2, y)   >> shift) & 0xFF;
+                    int bl = (src.getRGB(sx1, sy2) >> shift) & 0xFF;
+                    int bc = (src.getRGB(x,   sy2) >> shift) & 0xFF;
+                    int br = (src.getRGB(sx2, sy2) >> shift) & 0xFF;
+                    gx += (-tl + tr - 2 * ml + 2 * mr - bl + br) / 3;
+                    gy += (-tl - 2 * tc - tr + bl + 2 * bc + br) / 3;
+                }
+                double edgeMag = Math.sqrt(gx * gx + gy * gy);
+                // 边缘权重: 平滑过渡 (0-100 → 0-1)
+                float edgeWeight = (float) Math.min(1.0, edgeMag / 50.0);
+                // 拉普拉斯锐化核 [0,-1,0;-1,5,-1;0,-1,0]
+                int lap = 5 * or
+                    - ((src.getRGB(x, sy1) >> 16) & 0xFF)
+                    - ((src.getRGB(x, sy2) >> 16) & 0xFF)
+                    - ((src.getRGB(sx1, y) >> 16) & 0xFF)
+                    - ((src.getRGB(sx2, y) >> 16) & 0xFF);
+                int lapG = 5 * og
+                    - ((src.getRGB(x, sy1) >> 8) & 0xFF)
+                    - ((src.getRGB(x, sy2) >> 8) & 0xFF)
+                    - ((src.getRGB(sx1, y) >> 8) & 0xFF)
+                    - ((src.getRGB(sx2, y) >> 8) & 0xFF);
+                int lapB = 5 * ob
+                    - (src.getRGB(x, sy1) & 0xFF)
+                    - (src.getRGB(x, sy2) & 0xFF)
+                    - (src.getRGB(sx1, y) & 0xFF)
+                    - (src.getRGB(sx2, y) & 0xFF);
+                float sharpen = amount * edgeWeight;
+                int nr = clamp255((int) (or + (lap - or) * sharpen));
+                int ng = clamp255((int) (og + (lapG - og) * sharpen));
+                int nb = clamp255((int) (ob + (lapB - ob) * sharpen));
+                out.setRGB(x, y, (a << 24) | (nr << 16) | (ng << 8) | nb);
+            }
+        }
+        return out;
+    }
 }
