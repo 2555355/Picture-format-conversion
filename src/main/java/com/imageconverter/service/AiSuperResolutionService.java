@@ -343,7 +343,7 @@ public class AiSuperResolutionService {
             inputData[pixels.length * 2 + i] = (rgb & 0xFF) / 255.0f;        // B
         }
 
-        try (OnnxTensor inputTensor = OnnxTensor.createTensor(env, inputData, new long[]{1, 3, h, w})) {
+        try (OnnxTensor inputTensor = OnnxTensor.createTensor(env, java.nio.FloatBuffer.wrap(inputData), new long[]{1, 3, h, w})) {
             Map<String, OnnxTensor> inputs = Collections.singletonMap(inputName, inputTensor);
 
             try (OrtSession.Result output = session.run(inputs)) {
