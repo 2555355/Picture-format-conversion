@@ -75,30 +75,23 @@ public class AiSuperResolutionService {
         try {
             // 确保目录存在
             Files.createDirectories(Paths.get(MODEL_DIR));
+
+            // 1. 先检查本地 models 目录
             Path modelPath = findModel();
+
+            // 2. 本地没有，从 jar 内部资源提取
             if (modelPath == null) {
-                // 本地没有有效模型，尝试自动下载
-                log.warn("本地未找到有效模型，尝试自动下载...");
+                modelPath = extractBundledModel();
+            }
+
+            // 3. 仍然没有，尝试在线下载
+            if (modelPath == null) {
+                log.warn("本地未找到模型，尝试在线下载...");
                 modelPath = downloadModel();
             }
+
             if (modelPath == null) {
-                log.warn("模型下载失败，将使用 Java 算法降级处理");
-                log.warn("=== 手动安装 AI 模型步骤 ===");
-                log.warn("1. 用浏览器下载 (国内推荐镜像):");
-                log.warn("   https://hf-mirror.com/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx");
-                log.warn("2. 确认文件大小约 4.6MB (不是 43KB！43KB是LFS指针文件)");
-                log.warn("3. 重命名为: {}", MODEL_NAME);
-                log.warn("4. 放到: {}/{}", MODEL_DIR, MODEL_NAME);
-                log.warn("5. 重启应用");
-                // 列出 models 目录下的实际文件
-                java.io.File dir = new java.io.File(MODEL_DIR);
-                java.io.File[] files = dir.listFiles();
-                if (files != null && files.length > 0) {
-                    log.warn("当前 {} 目录下的文件:", MODEL_DIR);
-                    for (java.io.File f : files) {
-                        log.warn("  {} ({} bytes / {} KB)", f.getName(), f.length(), f.length() / 1024);
-                    }
-                }
+                log.warn("AI 模型不可用，将使用 Java 算法降级处理");
                 initFailed = true;
                 return;
             }
@@ -106,13 +99,10 @@ public class AiSuperResolutionService {
             env = OrtEnvironment.getEnvironment();
             OrtSession.SessionOptions opts = new OrtSession.SessionOptions();
             opts.setOptimizationLevel(OrtSession.SessionOptions.OptLevel.ALL_OPT);
-            // CPU 线程数
             opts.setInterOpNumThreads(1);
             opts.setIntraOpNumThreads(Math.min(4, Runtime.getRuntime().availableProcessors()));
 
             session = env.createSession(modelPath.toString(), opts);
-
-            // 自动获取输入/输出名称
             inputName = session.getInputNames().iterator().next();
             initialized = true;
             log.info("AI 超分辨率模型加载成功: {}", modelPath);
@@ -123,26 +113,50 @@ public class AiSuperResolutionService {
     }
 
     /**
-     * 查找本地模型文件 (仅手动安装，不自动下载)
+     * 从 jar 内部资源提取模型 (CI 构建时打包的)
+     */
+    private Path extractBundledModel() {
+        String resourcePath = "/models/" + MODEL_NAME;
+        try (InputStream is = AiSuperResolutionService.class.getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                log.info("jar 内未打包 AI 模型");
+                return null;
+            }
+            Path targetPath = Paths.get(MODEL_DIR, MODEL_NAME);
+            log.info("从 jar 内提取 AI 模型到: {}", targetPath);
+            Files.copy(is, targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+            long size = Files.size(targetPath);
+            if (size > 1_000_000) {
+                log.info("模型提取成功: {} KB", size / 1024);
+                return targetPath;
+            } else {
+                log.warn("jar 内模型太小 ({} bytes)，可能不完整", size);
+                Files.deleteIfExists(targetPath);
+            }
+        } catch (Exception e) {
+            log.warn("从 jar 提取模型失败: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    /**
+     * 查找本地模型文件
      */
     private Path findModel() {
         Path modelPath = Paths.get(MODEL_DIR, MODEL_NAME);
         try {
             if (Files.exists(modelPath)) {
                 long size = Files.size(modelPath);
-                log.info("找到模型文件: {} ({} bytes / {} KB)", modelPath, size, size / 1024);
                 if (size > 1_000_000) {
-                    // 正常大小 (约 4-5MB)
+                    log.info("找到本地模型: {} ({} KB)", modelPath, size / 1024);
                     return modelPath;
                 } else if (size > 100_000) {
-                    // 可能是量化版 (1.25MB)，也接受
-                    log.warn("模型文件较小 ({} bytes)，可能是量化版本，尝试加载", size);
+                    log.warn("本地模型较小 ({} bytes)，可能是量化版，尝试加载", size);
                     return modelPath;
                 } else {
-                    log.warn("模型文件太小 ({} bytes)，下载不完整，请重新下载", size);
+                    log.warn("本地模型太小 ({} bytes)，删除后重新获取", size);
+                    Files.deleteIfExists(modelPath);
                 }
-            } else {
-                log.warn("模型文件不存在: {}", modelPath);
             }
         } catch (IOException ignored) {}
         return null;

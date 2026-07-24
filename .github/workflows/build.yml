@@ -30,6 +30,40 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
 
+      - name: Download AI model (Real-ESRGAN)
+        run: |
+          mkdir -p src/main/resources/models
+          # 尝试多个源下载模型
+          for URL in \
+            "https://huggingface.co/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx" \
+            "https://hf-mirror.com/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx" \
+            "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/real_esrgan_general_x4v3/releases/v0.58.0/real_esrgan_general_x4v3-onnx-float.zip"; do
+            echo "尝试下载: $URL"
+            if [[ "$URL" == *.zip ]]; then
+              curl -L -o /tmp/model.zip "$URL" && unzip -o /tmp/model.zip -d /tmp/model_extract/ && \
+              find /tmp/model_extract/ -name "*.onnx" -exec cp {} src/main/resources/models/realesr-general-x4v3.onnx \; && \
+              rm -rf /tmp/model.zip /tmp/model_extract/
+            else
+              curl -L -o src/main/resources/models/realesr-general-x4v3.onnx "$URL"
+            fi
+            # 检查文件大小 (>1MB 表示成功)
+            SIZE=$(stat -c%s src/main/resources/models/realesr-general-x4v3.onnx 2>/dev/null || echo 0)
+            echo "文件大小: $SIZE bytes"
+            if [ "$SIZE" -gt 1000000 ]; then
+              echo "模型下载成功!"
+              break
+            fi
+            echo "文件太小，尝试下一个源..."
+            rm -f src/main/resources/models/realesr-general-x4v3.onnx
+          done
+          # 最终验证
+          if [ -f src/main/resources/models/realesr-general-x4v3.onnx ]; then
+            echo "AI模型已打包到 resources/models/"
+            ls -lh src/main/resources/models/
+          else
+            echo "警告: AI模型下载失败，jar将不含模型，运行时降级到Java算法"
+          fi
+
       - name: Build with Maven
         run: mvn -B clean package -DskipTests
 
