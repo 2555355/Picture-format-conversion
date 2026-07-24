@@ -2087,8 +2087,39 @@ img { display: block; max-width: 100%; }
   .setting-label > span:first-child { font-size: 12px; }
   .setting-hint { font-size: 10px; }
   .seg { padding: 6px 12px; font-size: 11px; }
-  .accent-grid { gap: 8px; }
-  .accent-dot { width: 28px; height: 28px; }
+  /* 竖屏：拉长选择工具界面 */
+  .workspace-body { max-height: 420px; }
+  .cat-sidebar { max-height: 420px; }
+  /* 竖屏：主题色板改为列表式 */
+  .accent-grid {
+    display: flex; flex-direction: column; gap: 6px;
+    margin-top: 10px;
+  }
+  .accent-dot {
+    width: 100%; height: 36px; border-radius: 10px;
+    background: var(--bg-soft) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: none !important;
+    display: flex; align-items: center; gap: 10px;
+    padding: 0 12px;
+    position: relative;
+  }
+  .accent-dot::after {
+    content: attr(data-label);
+    font-size: 12px; font-weight: 600; color: var(--text-2);
+    text-align: left; flex: 1;
+  }
+  .accent-dot.active::after { color: var(--text); }
+  .accent-dot::before {
+    content: ''; width: 18px; height: 18px; border-radius: 50%;
+    background: var(--c); flex-shrink: 0;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.08);
+  }
+  .accent-dot:hover { transform: none; background: var(--bg-soft-hi) !important; }
+  .accent-dot.active {
+    background: var(--grad-soft) !important; border-color: var(--accent) !important;
+    transform: none;
+  }
   .about-hero { gap: 10px; padding: 10px 0; }
   .about-logo { width: 40px; height: 40px; }
   .about-name { font-size: 16px; }
@@ -3102,14 +3133,14 @@ img { display: block; max-width: 100%; }
               <span class="setting-hint">与主题色叠加的辅助强调色</span>
             </div>
             <div class="accent-grid" id="accentGrid">
-              <button class="accent-dot" data-accent="violet" style="--c:#a78bfa" title="紫罗兰"></button>
-              <button class="accent-dot" data-accent="pink" style="--c:#f472b6" title="粉红"></button>
-              <button class="accent-dot" data-accent="rose" style="--c:#fb7185" title="玫红"></button>
-              <button class="accent-dot" data-accent="amber" style="--c:#fbbf24" title="琥珀"></button>
-              <button class="accent-dot" data-accent="emerald" style="--c:#34d399" title="翡翠"></button>
-              <button class="accent-dot" data-accent="cyan" style="--c:#22d3ee" title="青蓝"></button>
-              <button class="accent-dot" data-accent="blue" style="--c:#60a5fa" title="天蓝"></button>
-              <button class="accent-dot" data-accent="indigo" style="--c:#818cf8" title="靛蓝"></button>
+              <button class="accent-dot" data-accent="violet" data-label="紫罗兰" style="--c:#a78bfa" title="紫罗兰"></button>
+              <button class="accent-dot" data-accent="pink" data-label="粉红" style="--c:#f472b6" title="粉红"></button>
+              <button class="accent-dot" data-accent="rose" data-label="玫红" style="--c:#fb7185" title="玫红"></button>
+              <button class="accent-dot" data-accent="amber" data-label="琥珀" style="--c:#fbbf24" title="琥珀"></button>
+              <button class="accent-dot" data-accent="emerald" data-label="翡翠" style="--c:#34d399" title="翡翠"></button>
+              <button class="accent-dot" data-accent="cyan" data-label="青蓝" style="--c:#22d3ee" title="青蓝"></button>
+              <button class="accent-dot" data-accent="blue" data-label="天蓝" style="--c:#60a5fa" title="天蓝"></button>
+              <button class="accent-dot" data-accent="indigo" data-label="靛蓝" style="--c:#818cf8" title="靛蓝"></button>
             </div>
           </div>
         </div>
