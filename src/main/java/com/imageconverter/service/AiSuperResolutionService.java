@@ -123,11 +123,19 @@ public class AiSuperResolutionService {
         try {
             if (Files.exists(modelPath)) {
                 long size = Files.size(modelPath);
-                if (size > 100_000) {
+                log.info("找到模型文件: {} ({} bytes / {} KB)", modelPath, size, size / 1024);
+                if (size > 1_000_000) {
+                    // 正常大小 (约 4-5MB)
+                    return modelPath;
+                } else if (size > 100_000) {
+                    // 可能是量化版 (1.25MB)，也接受
+                    log.warn("模型文件较小 ({} bytes)，可能是量化版本，尝试加载", size);
                     return modelPath;
                 } else {
-                    log.warn("模型文件存在但太小 ({} bytes)，可能下载不完整: {}", size, modelPath);
+                    log.warn("模型文件太小 ({} bytes)，下载不完整，请重新下载", size);
                 }
+            } else {
+                log.warn("模型文件不存在: {}", modelPath);
             }
         } catch (IOException ignored) {}
         return null;
