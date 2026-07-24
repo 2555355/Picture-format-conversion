@@ -11,11 +11,15 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 /**
  * AI 超分辨率服务: 基于 ONNX Runtime 的本地 AI 图片增强
@@ -43,8 +47,9 @@ public class AiSuperResolutionService {
         }
     }
 
-    // 模型下载地址 (仅供手动下载参考，不再自动下载)
+    // 模型下载地址 (HuggingFace 镜像 + 原始源，自动尝试)
     private static final String[] MODEL_URLS = {
+        "https://hf-mirror.com/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx",
         "https://huggingface.co/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx",
         "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/real_esrgan_general_x4v3/releases/v0.58.0/real_esrgan_general_x4v3-onnx-float.zip"
     };
@@ -72,25 +77,27 @@ public class AiSuperResolutionService {
             Files.createDirectories(Paths.get(MODEL_DIR));
             Path modelPath = findModel();
             if (modelPath == null) {
-                log.warn("未找到 AI 模型文件，将使用 Java 算法降级处理");
+                // 本地没有有效模型，尝试自动下载
+                log.warn("本地未找到有效模型，尝试自动下载...");
+                modelPath = downloadModel();
+            }
+            if (modelPath == null) {
+                log.warn("模型下载失败，将使用 Java 算法降级处理");
                 log.warn("=== 手动安装 AI 模型步骤 ===");
-                log.warn("1. 下载模型 (浏览器打开以下任一地址):");
-                log.warn("   地址1: {}", MODEL_URLS[0]);
-                log.warn("   地址2 (zip解压后取.onnx): {}", MODEL_URLS[1]);
-                log.warn("2. 将模型文件重命名为: {}", MODEL_NAME);
-                log.warn("3. 放到目录: {}", MODEL_DIR);
-                log.warn("   完整路径: {}/{}", MODEL_DIR, MODEL_NAME);
-                log.warn("4. 重启应用");
-                // 列出 models 目录下的实际文件，帮助排查
+                log.warn("1. 用浏览器下载 (国内推荐镜像):");
+                log.warn("   https://hf-mirror.com/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx");
+                log.warn("2. 确认文件大小约 4.6MB (不是 43KB！43KB是LFS指针文件)");
+                log.warn("3. 重命名为: {}", MODEL_NAME);
+                log.warn("4. 放到: {}/{}", MODEL_DIR, MODEL_NAME);
+                log.warn("5. 重启应用");
+                // 列出 models 目录下的实际文件
                 java.io.File dir = new java.io.File(MODEL_DIR);
                 java.io.File[] files = dir.listFiles();
                 if (files != null && files.length > 0) {
                     log.warn("当前 {} 目录下的文件:", MODEL_DIR);
                     for (java.io.File f : files) {
-                        log.warn("  {} ({} bytes)", f.getName(), f.length());
+                        log.warn("  {} ({} bytes / {} KB)", f.getName(), f.length(), f.length() / 1024);
                     }
-                } else {
-                    log.warn("目录 {} 为空或不存在", MODEL_DIR);
                 }
                 initFailed = true;
                 return;
@@ -138,6 +145,75 @@ public class AiSuperResolutionService {
                 log.warn("模型文件不存在: {}", modelPath);
             }
         } catch (IOException ignored) {}
+        return null;
+    }
+
+    /**
+     * 自动下载模型 (尝试多个源，含国内镜像)
+     */
+    private Path downloadModel() {
+        Path targetPath = Paths.get(MODEL_DIR, MODEL_NAME);
+        for (String urlStr : MODEL_URLS) {
+            try {
+                log.info("正在从 {} 下载 AI 模型...", urlStr);
+                URL url = new URL(urlStr);
+                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+                conn.setConnectTimeout(15000);
+                conn.setReadTimeout(120000);
+                conn.setRequestProperty("User-Agent", "ImageConverter/1.0");
+                conn.setInstanceFollowRedirects(true);
+
+                int code = conn.getResponseCode();
+                if (code != 200) {
+                    log.warn("HTTP {} 从 {}", code, urlStr);
+                    conn.disconnect();
+                    continue;
+                }
+
+                String contentType = conn.getContentType();
+                if (contentType == null) contentType = "";
+
+                if (contentType.contains("zip") || urlStr.endsWith(".zip")) {
+                    // zip: 下载并解压
+                    Path zipPath = Paths.get(MODEL_DIR, "model.zip");
+                    try (InputStream is = conn.getInputStream()) {
+                        Files.copy(is, zipPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    }
+                    conn.disconnect();
+                    try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipPath))) {
+                        ZipEntry entry;
+                        while ((entry = zis.getNextEntry()) != null) {
+                            if (entry.getName().endsWith(".onnx")) {
+                                Files.copy(zis, targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                                zis.closeEntry();
+                                Files.deleteIfExists(zipPath);
+                                break;
+                            }
+                            zis.closeEntry();
+                        }
+                    }
+                    Files.deleteIfExists(zipPath);
+                } else {
+                    // 直接 onnx
+                    try (InputStream is = conn.getInputStream()) {
+                        Files.copy(is, targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                    }
+                    conn.disconnect();
+                }
+
+                // 验证下载文件大小
+                long size = Files.size(targetPath);
+                if (size > 1_000_000) {
+                    log.info("模型下载成功: {} ({} KB)", targetPath, size / 1024);
+                    return targetPath;
+                } else {
+                    log.warn("下载的文件太小 ({} bytes)，可能是LFS指针或错误页面，尝试下一个源", size);
+                    Files.deleteIfExists(targetPath);
+                }
+            } catch (Exception e) {
+                log.warn("从 {} 下载失败: {}", urlStr, e.getMessage());
+            }
+        }
         return null;
     }
 
