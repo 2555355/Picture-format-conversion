@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.nio.file.StandardOpenOption;
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
@@ -242,7 +243,9 @@ public class AiSuperResolutionService {
 
                 HttpResponse<Path> resp = client.send(req,
                     HttpResponse.BodyHandlers.ofFile(tempPath,
-                        StandardCopyOption.REPLACE_EXISTING));
+                        StandardOpenOption.CREATE,
+                        StandardOpenOption.TRUNCATE_EXISTING,
+                        StandardOpenOption.WRITE));
 
                 int code = resp.statusCode();
                 if (code != 200) {
