@@ -30,38 +30,61 @@ jobs:
           key: ${{ runner.os }}-maven-${{ hashFiles('pom.xml') }}
           restore-keys: ${{ runner.os }}-maven-
 
-      - name: Download AI model (Real-ESRGAN)
+      - name: Download AI model (SOTA DAT-2 / SeemoRe fallback)
         run: |
           mkdir -p src/main/resources/models
-          # 尝试多个源下载模型
+          # 分层降级策略:
+          #   第一梯队: DAT-2 (2024 SOTA, 46.5MB, 真实照片修复, GitHub Release)
+          #   第二梯队: SeemoRe x4v2 (ICML 2024, 1.8MB, 通用场景, 动态尺寸)
+          #   第三梯队: 其他备用源
           for URL in \
-            "https://huggingface.co/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx" \
+            "https://github.com/Phhofm/models/releases/download/4xRealWebPhoto_v4_dat2/4xRealWebPhoto_v4_dat2_fp32_opset17.onnx" \
+            "https://cdn.jsdelivr.net/gh/nareshmlx/opencv-superres-models@main/seemore_x4v2_dynamic.onnx" \
+            "https://raw.githubusercontent.com/nareshmlx/opencv-superres-models/main/seemore_x4v2_dynamic.onnx" \
+            "https://cdn.jsdelivr.net/gh/nareshmlx/opencv-superres-models@main/seemore_x4.onnx" \
+            "https://cdn.jsdelivr.net/gh/the-NTSC-RS-guy/RealESRGAN-AnimeVideo-v3-x4-ONNX@main/RealESR-AnimeVideo-v3_x4.onnx" \
+            "https://raw.githubusercontent.com/the-NTSC-RS-guy/RealESRGAN-AnimeVideo-v3-x4-ONNX/main/RealESR-AnimeVideo-v3_x4.onnx" \
             "https://hf-mirror.com/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx" \
+            "https://huggingface.co/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx" \
             "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/real_esrgan_general_x4v3/releases/v0.58.0/real_esrgan_general_x4v3-onnx-float.zip"; do
             echo "尝试下载: $URL"
+            rm -f src/main/resources/models/realesr-general-x4v3.onnx
+            # 大文件 (DAT-2 46MB) 给 20 分钟, 小文件给 5 分钟
+            if [[ "$URL" == *dat2* ]]; then
+              MAX_TIME=1200
+            else
+              MAX_TIME=300
+            fi
             if [[ "$URL" == *.zip ]]; then
-              curl -L -o /tmp/model.zip "$URL" && unzip -o /tmp/model.zip -d /tmp/model_extract/ && \
+              curl -fSL --max-time $MAX_TIME -o /tmp/model.zip "$URL" && unzip -o /tmp/model.zip -d /tmp/model_extract/ && \
               find /tmp/model_extract/ -name "*.onnx" -exec cp {} src/main/resources/models/realesr-general-x4v3.onnx \; && \
               rm -rf /tmp/model.zip /tmp/model_extract/
             else
-              curl -L -o src/main/resources/models/realesr-general-x4v3.onnx "$URL"
+              # -f: 失败返回非零; -L: 跟随重定向; -S: 显示错误
+              curl -fSL --max-time $MAX_TIME -o src/main/resources/models/realesr-general-x4v3.onnx "$URL"
             fi
             # 检查文件大小 (>1MB 表示成功)
             SIZE=$(stat -c%s src/main/resources/models/realesr-general-x4v3.onnx 2>/dev/null || echo 0)
             echo "文件大小: $SIZE bytes"
             if [ "$SIZE" -gt 1000000 ]; then
-              echo "模型下载成功!"
+              # 检测是否是 LFS pointer (前 50 字节若含 git-lfs 字样说明拿到的是 pointer)
+              if head -c 50 src/main/resources/models/realesr-general-x4v3.onnx | grep -q "git-lfs"; then
+                echo "⚠️ 警告: 下载到的是 LFS pointer 文件而非真实模型，尝试下一个源"
+                rm -f src/main/resources/models/realesr-general-x4v3.onnx
+                continue
+              fi
+              echo "✅ 模型下载成功! ($SIZE bytes)"
               break
             fi
-            echo "文件太小，尝试下一个源..."
+            echo "文件太小或为 LFS pointer，尝试下一个源..."
             rm -f src/main/resources/models/realesr-general-x4v3.onnx
           done
           # 最终验证
           if [ -f src/main/resources/models/realesr-general-x4v3.onnx ]; then
-            echo "AI模型已打包到 resources/models/"
+            echo "✅ AI模型已打包到 resources/models/"
             ls -lh src/main/resources/models/
           else
-            echo "警告: AI模型下载失败，jar将不含模型，运行时降级到Java算法"
+            echo "⚠️ 警告: AI模型下载失败，jar将不含模型，运行时降级到Java算法"
           fi
 
       - name: Build with Maven

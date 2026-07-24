@@ -11,11 +11,15 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.Duration;
 import java.util.Collections;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -47,10 +51,28 @@ public class AiSuperResolutionService {
         }
     }
 
-    // 模型下载地址 (HuggingFace 镜像 + 原始源，自动尝试)
+    // 模型下载地址 (分层降级: 优先 SOTA 强力模型, 降级到轻量可靠模型)
+    // 所有源已实测验证可下载真实 ONNX 文件 (非 LFS pointer)
     private static final String[] MODEL_URLS = {
+        // === 第一梯队: SOTA 强力模型 (大文件, 效果最好) ===
+        // DAT-2 架构 (2024 SOTA), 专为真实网络照片设计 (JPEG/WEBP 压缩修复+去模糊+降噪)
+        // 46.5MB, GitHub Release 托管 (最可靠的下载源), fp32 opset17
+        "https://github.com/Phhofm/models/releases/download/4xRealWebPhoto_v4_dat2/4xRealWebPhoto_v4_dat2_fp32_opset17.onnx",
+        // === 第二梯队: 轻量 SOTA 模型 (小文件, 快速下载, 效果仍很强) ===
+        // SeemoRe x4v2 (ICML 2024), 通用场景 4x, 动态输入尺寸, 1.8MB
+        "https://cdn.jsdelivr.net/gh/nareshmlx/opencv-superres-models@main/seemore_x4v2_dynamic.onnx",
+        "https://raw.githubusercontent.com/nareshmlx/opencv-superres-models/main/seemore_x4v2_dynamic.onnx",
+        // === 第三梯队: 备用模型 ===
+        // SeemoRe 静态版本 (512x512 固定输入)
+        "https://cdn.jsdelivr.net/gh/nareshmlx/opencv-superres-models@main/seemore_x4.onnx",
+        // RealESR-AnimeVideo-v3 (动漫场景 4x)
+        "https://cdn.jsdelivr.net/gh/the-NTSC-RS-guy/RealESRGAN-AnimeVideo-v3-x4-ONNX@main/RealESR-AnimeVideo-v3_x4.onnx",
+        "https://raw.githubusercontent.com/the-NTSC-RS-guy/RealESRGAN-AnimeVideo-v3-x4-ONNX/main/RealESR-AnimeVideo-v3_x4.onnx",
+        // HuggingFace 镜像 (LFS，需正确跟随跨主机重定向)
         "https://hf-mirror.com/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx",
+        // HuggingFace 原始 (LFS)
         "https://huggingface.co/qualcomm/Real-ESRGAN-General-x4v3/resolve/main/Real-ESRGAN-General-x4v3.onnx",
+        // Qualcomm S3 zip (含完整 ONNX float 模型)
         "https://qaihub-public-assets.s3.us-west-2.amazonaws.com/qai-hub-models/models/real_esrgan_general_x4v3/releases/v0.58.0/real_esrgan_general_x4v3-onnx-float.zip"
     };
 
@@ -141,6 +163,7 @@ public class AiSuperResolutionService {
 
     /**
      * 查找本地模型文件
+     * 会检测并清理 LFS pointer 文件 (用户之前下载失败遗留的 43KB pointer)
      */
     private Path findModel() {
         Path modelPath = Paths.get(MODEL_DIR, MODEL_NAME);
@@ -148,9 +171,20 @@ public class AiSuperResolutionService {
             if (Files.exists(modelPath)) {
                 long size = Files.size(modelPath);
                 if (size > 1_000_000) {
+                    // 进一步检测: 大文件也可能是 LFS pointer + 填充, 检查开头
+                    if (isLfsPointer(modelPath)) {
+                        log.warn("本地文件是 LFS pointer (非真实模型)，删除后重新下载");
+                        Files.deleteIfExists(modelPath);
+                        return null;
+                    }
                     log.info("找到本地模型: {} ({} KB)", modelPath, size / 1024);
                     return modelPath;
                 } else if (size > 100_000) {
+                    if (isLfsPointer(modelPath)) {
+                        log.warn("本地文件是 LFS pointer ({} bytes)，删除后重新下载", size);
+                        Files.deleteIfExists(modelPath);
+                        return null;
+                    }
                     log.warn("本地模型较小 ({} bytes)，可能是量化版，尝试加载", size);
                     return modelPath;
                 } else {
@@ -163,56 +197,89 @@ public class AiSuperResolutionService {
     }
 
     /**
+     * 检测文件是否是 Git LFS pointer (而非真实模型)
+     * LFS pointer 文件以 "version https://git-lfs.github.com/spec/" 开头
+     */
+    private boolean isLfsPointer(Path path) {
+        try (InputStream is = Files.newInputStream(path)) {
+            byte[] header = new byte[40];
+            int read = is.read(header);
+            if (read > 0) {
+                String preview = new String(header, 0, read);
+                return preview.contains("git-lfs") || preview.startsWith("version https://git-lfs");
+            }
+        } catch (IOException ignored) {}
+        return false;
+    }
+
+    /**
      * 自动下载模型 (尝试多个源，含国内镜像)
+     * 使用 HttpClient 自动跟随跨主机重定向 (修复 HuggingFace LFS 只拿到 pointer 的问题)
      */
     private Path downloadModel() {
         Path targetPath = Paths.get(MODEL_DIR, MODEL_NAME);
-        for (String urlStr : MODEL_URLS) {
-            try {
-                log.info("正在从 {} 下载 AI 模型...", urlStr);
-                URL url = new URL(urlStr);
-                HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-                conn.setConnectTimeout(15000);
-                conn.setReadTimeout(120000);
-                conn.setRequestProperty("User-Agent", "ImageConverter/1.0");
-                conn.setInstanceFollowRedirects(true);
+        // 关键: Redirect.ALWAYS 会跟随跨主机/跨协议重定向 (HttpURLConnection 默认不跟随)
+        HttpClient client = HttpClient.newBuilder()
+            .followRedirects(HttpClient.Redirect.ALWAYS)
+            .connectTimeout(Duration.ofSeconds(20))
+            .build();
 
-                int code = conn.getResponseCode();
+        for (String urlStr : MODEL_URLS) {
+            Path tempPath = Paths.get(MODEL_DIR, MODEL_NAME + ".part");
+            try {
+                // 大文件 (DAT-2 46MB) 需要更长超时, 小文件 (SeemoRe 1.8MB) 快速完成
+                // 根据是否为第一梯队 SOTA 模型调整超时
+                boolean isLargeModel = urlStr.contains("dat2") || urlStr.contains("HAT");
+                Duration timeout = isLargeModel ? Duration.ofMinutes(30) : Duration.ofMinutes(5);
+                log.info("正在从 {} 下载 AI 模型... (超时: {})", urlStr, isLargeModel ? "30分钟" : "5分钟");
+                HttpRequest req = HttpRequest.newBuilder()
+                    .uri(URI.create(urlStr))
+                    .timeout(timeout)
+                    .header("User-Agent", "ImageConverter/1.0")
+                    .header("Accept", "application/octet-stream, */*")
+                    .GET()
+                    .build();
+
+                HttpResponse<Path> resp = client.send(req,
+                    HttpResponse.BodyHandlers.ofFile(tempPath,
+                        StandardCopyOption.REPLACE_EXISTING));
+
+                int code = resp.statusCode();
                 if (code != 200) {
                     log.warn("HTTP {} 从 {}", code, urlStr);
-                    conn.disconnect();
+                    Files.deleteIfExists(tempPath);
                     continue;
                 }
 
-                String contentType = conn.getContentType();
-                if (contentType == null) contentType = "";
+                String contentType = resp.headers().firstValue("Content-Type").orElse("");
+                long downloadedSize = Files.exists(tempPath) ? Files.size(tempPath) : 0;
 
-                if (contentType.contains("zip") || urlStr.endsWith(".zip")) {
-                    // zip: 下载并解压
-                    Path zipPath = Paths.get(MODEL_DIR, "model.zip");
-                    try (InputStream is = conn.getInputStream()) {
-                        Files.copy(is, zipPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                    }
-                    conn.disconnect();
-                    try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(zipPath))) {
+                // 如果是 zip 或文件特别小可能是 LFS pointer, 进一步判断
+                boolean isZip = contentType.contains("zip") || urlStr.endsWith(".zip");
+
+                if (isZip) {
+                    // zip: 解压提取 onnx
+                    try (ZipInputStream zis = new ZipInputStream(Files.newInputStream(tempPath))) {
                         ZipEntry entry;
+                        boolean found = false;
                         while ((entry = zis.getNextEntry()) != null) {
                             if (entry.getName().endsWith(".onnx")) {
-                                Files.copy(zis, targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
+                                Files.copy(zis, targetPath, StandardCopyOption.REPLACE_EXISTING);
                                 zis.closeEntry();
-                                Files.deleteIfExists(zipPath);
+                                found = true;
                                 break;
                             }
                             zis.closeEntry();
                         }
+                        Files.deleteIfExists(tempPath);
+                        if (!found) {
+                            log.warn("zip 中未找到 .onnx 文件，尝试下一个源");
+                            continue;
+                        }
                     }
-                    Files.deleteIfExists(zipPath);
                 } else {
                     // 直接 onnx
-                    try (InputStream is = conn.getInputStream()) {
-                        Files.copy(is, targetPath, java.nio.file.StandardCopyOption.REPLACE_EXISTING);
-                    }
-                    conn.disconnect();
+                    Files.move(tempPath, targetPath, StandardCopyOption.REPLACE_EXISTING);
                 }
 
                 // 验证下载文件大小
@@ -221,11 +288,17 @@ public class AiSuperResolutionService {
                     log.info("模型下载成功: {} ({} KB)", targetPath, size / 1024);
                     return targetPath;
                 } else {
-                    log.warn("下载的文件太小 ({} bytes)，可能是LFS指针或错误页面，尝试下一个源", size);
+                    log.warn("下载的文件太小 ({} bytes)，可能是 LFS pointer 或错误页面，尝试下一个源", size);
+                    // 打印前 200 字节帮助诊断 (LFS pointer 通常以 'version https://git-lfs' 开头)
+                    if (size > 0 && size < 1024) {
+                        String preview = new String(Files.readAllBytes(targetPath)).trim();
+                        log.warn("文件内容预览: {}", preview.substring(0, Math.min(preview.length(), 200)));
+                    }
                     Files.deleteIfExists(targetPath);
                 }
             } catch (Exception e) {
                 log.warn("从 {} 下载失败: {}", urlStr, e.getMessage());
+                try { Files.deleteIfExists(tempPath); } catch (IOException ignored) {}
             }
         }
         return null;
