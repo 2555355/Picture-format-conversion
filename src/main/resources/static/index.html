@@ -1950,6 +1950,10 @@ img { display: block; max-width: 100%; }
   opacity: 0;
   transition: opacity 0.3s var(--ease-out);
 }
+/* 横屏：设置面板拉长 */
+@media (min-aspect-ratio: 1/1) {
+  .settings-panel { max-height: 96vh; }
+}
 .settings-bg.show .settings-panel { opacity: 1; }
 
 .settings-panel::before {
@@ -2090,28 +2094,28 @@ img { display: block; max-width: 100%; }
   /* 竖屏：拉长选择工具界面 */
   .workspace-body { max-height: 420px; }
   .cat-sidebar { max-height: 420px; }
-  /* 竖屏：主题色板改为列表式 */
+  /* 竖屏：强调色改为横置（2列） */
   .accent-grid {
-    display: flex; flex-direction: column; gap: 6px;
+    display: flex; flex-wrap: wrap; gap: 8px;
     margin-top: 10px;
   }
   .accent-dot {
-    width: 100%; height: 36px; border-radius: 10px;
+    width: calc(50% - 4px); height: 36px; border-radius: 10px;
     background: var(--bg-soft) !important;
     border: 1px solid var(--border) !important;
     box-shadow: none !important;
-    display: flex; align-items: center; gap: 10px;
-    padding: 0 12px;
+    display: flex; align-items: center; gap: 8px;
+    padding: 0 10px;
     position: relative;
   }
   .accent-dot::after {
     content: attr(data-label);
-    font-size: 12px; font-weight: 600; color: var(--text-2);
+    font-size: 11px; font-weight: 600; color: var(--text-2);
     text-align: left; flex: 1;
   }
   .accent-dot.active::after { color: var(--text); }
   .accent-dot::before {
-    content: ''; width: 18px; height: 18px; border-radius: 50%;
+    content: ''; width: 16px; height: 16px; border-radius: 50%;
     background: var(--c); flex-shrink: 0;
     box-shadow: 0 0 0 2px rgba(255,255,255,0.08);
   }
@@ -2206,18 +2210,16 @@ img { display: block; max-width: 100%; }
   gap: 12px; margin-top: 10px;
 }
 @media (max-aspect-ratio: 1/1) {
+  /* 竖屏：主题色板改为表格式（2列） */
   .theme-gallery {
-    display: flex; flex-wrap: nowrap;
-    grid-template-columns: none;
-    overflow-x: auto; overflow-y: hidden;
-    gap: 10px; margin: 10px -16px 0;
-    padding: 4px 16px 12px;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px; margin: 10px 0 0;
+    padding: 0;
+    overflow: visible;
   }
-  .theme-gallery::-webkit-scrollbar { height: 6px; }
-  .theme-gallery::-webkit-scrollbar-thumb { background: var(--border-hi); border-radius: 3px; }
-  .theme-card { flex: 0 0 140px; width: 140px; height: 110px; aspect-ratio: auto; scroll-snap-align: start; }
+  .theme-gallery::-webkit-scrollbar { display: none; }
+  .theme-card { width: 100%; height: 90px; aspect-ratio: 16/9; }
 }
 .theme-card {
   position: relative; overflow: hidden;
