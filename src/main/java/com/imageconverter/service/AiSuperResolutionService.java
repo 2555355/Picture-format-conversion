@@ -68,12 +68,30 @@ public class AiSuperResolutionService {
     private synchronized void init() {
         if (initialized || initFailed) return;
         try {
+            // 确保目录存在
+            Files.createDirectories(Paths.get(MODEL_DIR));
             Path modelPath = findModel();
             if (modelPath == null) {
                 log.warn("未找到 AI 模型文件，将使用 Java 算法降级处理");
-                log.warn("手动安装方法: 下载模型后放到 {} 目录，文件名 {}", MODEL_DIR, MODEL_NAME);
-                log.warn("下载地址1: {}", MODEL_URLS[0]);
-                log.warn("下载地址2 (zip): {}", MODEL_URLS[1]);
+                log.warn("=== 手动安装 AI 模型步骤 ===");
+                log.warn("1. 下载模型 (浏览器打开以下任一地址):");
+                log.warn("   地址1: {}", MODEL_URLS[0]);
+                log.warn("   地址2 (zip解压后取.onnx): {}", MODEL_URLS[1]);
+                log.warn("2. 将模型文件重命名为: {}", MODEL_NAME);
+                log.warn("3. 放到目录: {}", MODEL_DIR);
+                log.warn("   完整路径: {}/{}", MODEL_DIR, MODEL_NAME);
+                log.warn("4. 重启应用");
+                // 列出 models 目录下的实际文件，帮助排查
+                java.io.File dir = new java.io.File(MODEL_DIR);
+                java.io.File[] files = dir.listFiles();
+                if (files != null && files.length > 0) {
+                    log.warn("当前 {} 目录下的文件:", MODEL_DIR);
+                    for (java.io.File f : files) {
+                        log.warn("  {} ({} bytes)", f.getName(), f.length());
+                    }
+                } else {
+                    log.warn("目录 {} 为空或不存在", MODEL_DIR);
+                }
                 initFailed = true;
                 return;
             }
@@ -103,8 +121,13 @@ public class AiSuperResolutionService {
     private Path findModel() {
         Path modelPath = Paths.get(MODEL_DIR, MODEL_NAME);
         try {
-            if (Files.exists(modelPath) && Files.size(modelPath) > 100_000) {
-                return modelPath;
+            if (Files.exists(modelPath)) {
+                long size = Files.size(modelPath);
+                if (size > 100_000) {
+                    return modelPath;
+                } else {
+                    log.warn("模型文件存在但太小 ({} bytes)，可能下载不完整: {}", size, modelPath);
+                }
             }
         } catch (IOException ignored) {}
         return null;
