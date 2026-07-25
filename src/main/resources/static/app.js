@@ -322,25 +322,24 @@ document.documentElement.setAttribute('data-theme', appSettings.dark ? 'dark' : 
 const $ = id => document.getElementById(id);
 
 // Landscape
-const lCats = $('lCats');
+const lNav = $('lNav');
 const lTools = $('lTools');
-const lImgs = $('lImgs');
-const lImgsEmpty = $('lImgsEmpty');
-const lImgsStrip = $('lImgsStrip');
+const lCanvas = $('lCanvas');
+const lCanvasEmpty = $('lCanvasEmpty');
+const lCanvasStrip = $('lCanvasStrip');
+const lStatTools = $('lStatTools');
 const lInfoName = $('lInfoName');
 const lInfoType = $('lInfoType');
 const lInfoSize = $('lInfoSize');
 const lInfoDim = $('lInfoDim');
-const lInfoMode = $('lInfoMode');
+const lInfoMod = $('lInfoMod');
+const lInfoThumb = $('lInfoThumb');
 const lInfoEmpty = $('lInfoEmpty');
 const lInfoContent = $('lInfoContent');
 const lOutEmpty = $('lOutEmpty');
 const lOutContent = $('lOutContent');
 const lResList = $('lResList');
 const lLog = $('lLog');
-const lFootStatus = $('lFootStatus');
-const lFootSel = $('lFootSel');
-const lFootCount = $('lFootCount');
 const lSwatches = $('lSwatches');
 const lDarkMode = $('lDarkMode');
 const lSetFmt = $('lSetFmt');
@@ -348,20 +347,24 @@ const lSetQuality = $('lSetQuality');
 const lSetQualityVal = $('lSetQualityVal');
 const lAiPath = $('lAiPath');
 const lAiStatus = $('lAiStatus');
-const toolSearchL = $('toolSearchL');
+const searchL = $('searchL');
 const btnThemeL = $('btnThemeL');
 const btnSettingsL = $('btnSettingsL');
 const btnUploadL = $('btnUploadL');
-const btnCmdL = $('btnCmdL');
 const lBtnClear = $('lBtnClear');
+const lBtnHelp = $('lBtnHelp');
+const lBtnClearR = $('lBtnClearR');
 const lBtnDlAll = $('lBtnDlAll');
+const helpBg = $('helpBg');
 
 // Portrait
 const pCats = $('pCats');
 const pToolList = $('pToolList');
-const pFeaturedList = $('pFeaturedList');
+const pFeatured = $('pFeatured');
 const pImgGrid = $('pImgGrid');
 const pFileCount = $('pFileCount');
+const pFilesEmpty = $('pFilesEmpty');
+const pResCount = $('pResCount');
 const pResList = $('pResList');
 const pOutEmpty = $('pOutEmpty');
 const pBtnDlAll = $('pBtnDlAll');
@@ -377,13 +380,15 @@ const btnThemeP = $('btnThemeP');
 const btnSettingsP = $('btnSettingsP');
 const pFab = $('pFab');
 const pDrop = $('pDrop');
-const pBtnUpload = $('pBtnUpload');
-const pFilesEmpty = $('pFilesEmpty');
+const pClearBtn = $('pClearBtn');
+const pMoreBtn = $('pMoreBtn');
+const pToolsH = $('pToolsH');
 
 // Shared
 const modalBg = $('modalBg');
 const modalIco = $('modalIco');
-const modalTitleText = $('modalTitleText');
+const modalTitle = $('modalTitle');
+const modalEyebrow = $('modalEyebrow');
 const modalDesc = $('modalDesc');
 const modalScope = $('modalScope');
 const modalFields = $('modalFields');
@@ -409,12 +414,22 @@ function humanSize(b) {
   if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
   return (b / 1024 / 1024).toFixed(2) + ' MB';
 }
-function saveSettings() { try { localStorage.setItem('pixel-settings', JSON.stringify(appSettings)); } catch(e) {} }
+function saveSettings() { try { localStorage.setItem('nimbus-settings', JSON.stringify(appSettings)); } catch(e) {} }
 function applyAccent() {
   const a = ACCENTS.find(x => x.id === appSettings.accent) || ACCENTS[0];
   document.documentElement.style.setProperty('--accent', a.color);
   document.documentElement.style.setProperty('--accent-2', a.color);
-  document.documentElement.style.setProperty('--accent-gradient', `linear-gradient(135deg, ${a.color} 0%, #8b5cf6 50%, #ec4899 100%)`);
+  document.documentElement.style.setProperty('--accent-glow', hexToRgba(a.color, 0.30));
+  document.documentElement.style.setProperty('--accent-soft', hexToRgba(a.color, 0.10));
+  document.documentElement.style.setProperty('--gradient-1', `linear-gradient(135deg, ${a.color} 0%, #7c3aed 100%)`);
+  document.documentElement.style.setProperty('--gradient-aurora', `linear-gradient(135deg, #ff7a59 0%, #ec4899 25%, #7c3aed 50%, ${a.color} 100%)`);
+}
+function hexToRgba(hex, alpha) {
+  const h = hex.replace('#', '');
+  const r = parseInt(h.substring(0, 2), 16);
+  const g = parseInt(h.substring(2, 4), 16);
+  const b = parseInt(h.substring(4, 6), 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
 }
 function logMsg(msg, type) {
   const line = document.createElement('div');
@@ -440,24 +455,24 @@ function getSelected() { return images.filter(i => i.selected); }
 
 /* ========== Categories (横屏侧边栏) ========== */
 function buildLCats() {
-  if (!lCats) return;
+  if (!lNav) return;
   const groups = ['all', ...Array.from(new Set(ACTIONS.map(a => a.group)))];
-  lCats.innerHTML = '';
+  lNav.innerHTML = '';
   groups.forEach(g => {
     const count = g === 'all' ? ACTIONS.length : ACTIONS.filter(a => a.group === g).length;
     const btn = document.createElement('button');
-    btn.className = 'l-cat' + (g === currentTab ? ' active' : '');
+    btn.className = 'l-nav-item' + (g === currentTab ? ' active' : '');
     btn.dataset.group = g;
     btn.innerHTML =
-      '<span class="l-cat-ico">' + (CATEGORY_ICON[g] || '·') + '</span>' +
-      '<span class="l-cat-name">' + (CATEGORY_LABELS[g] || g) + '</span>' +
-      '<span class="l-cat-count">' + count + '</span>';
+      '<span class="l-nav-ico">' + (CATEGORY_ICON[g] || '·') + '</span>' +
+      '<span class="l-nav-name">' + (CATEGORY_LABELS[g] || g) + '</span>' +
+      '<span class="l-nav-count">' + count + '</span>';
     btn.addEventListener('click', () => {
       currentTab = g;
       buildLCats();
       renderTools();
     });
-    lCats.appendChild(btn);
+    lNav.appendChild(btn);
   });
 }
 
@@ -482,15 +497,15 @@ function buildPCats() {
 }
 
 /* ========== Search (横屏) ========== */
-if (toolSearchL) {
-  toolSearchL.addEventListener('input', renderTools);
+if (searchL) {
+  searchL.addEventListener('input', renderTools);
 }
 
 /* ========== Tools (横屏) ========== */
 function renderTools() {
   if (!lTools) return;
   lTools.innerHTML = '';
-  const q = (toolSearchL && toolSearchL.value ? toolSearchL.value : '').trim().toLowerCase();
+  const q = (searchL && searchL.value ? searchL.value : '').trim().toLowerCase();
   let list = currentTab === 'all' ? ACTIONS : ACTIONS.filter(a => a.group === currentTab);
   if (q) {
     list = ACTIONS.filter(a =>
@@ -506,9 +521,12 @@ function renderTools() {
       const sec = document.createElement('div');
       sec.className = 'l-tools-section';
       sec.innerHTML =
-        '<div class="l-tools-section-head">' +
-          '<span class="l-tools-section-title">' + (CATEGORY_ICON[g] || '·') + '  ' + (CATEGORY_LABELS[g] || g) + '</span>' +
-          '<span class="l-tools-section-count">' + items.length + ' 项</span>' +
+        '<div class="l-section-head">' +
+          '<div>' +
+            '<div class="l-section-eyebrow">' + (CATEGORY_LABELS[g] || g) + '</div>' +
+            '<h2 class="l-section-title">' + (CATEGORY_ICON[g] || '·') + ' ' + (CATEGORY_LABELS[g] || g) + '</h2>' +
+            '<div class="l-section-sub">' + items.length + ' 款工具</div>' +
+          '</div>' +
         '</div>' +
         '<div class="l-tool-grid"></div>';
       const grid = sec.querySelector('.l-tool-grid');
@@ -519,9 +537,12 @@ function renderTools() {
     const sec = document.createElement('div');
     sec.className = 'l-tools-section';
     sec.innerHTML =
-      '<div class="l-tools-section-head">' +
-        '<span class="l-tools-section-title">' + (CATEGORY_ICON[currentTab] || '·') + '  ' + (CATEGORY_LABELS[currentTab] || currentTab) + '</span>' +
-        '<span class="l-tools-section-count">' + list.length + ' 项</span>' +
+      '<div class="l-section-head">' +
+        '<div>' +
+          '<div class="l-section-eyebrow">' + (CATEGORY_LABELS[currentTab] || currentTab) + '</div>' +
+          '<h2 class="l-section-title">' + (CATEGORY_ICON[currentTab] || '·') + ' ' + (CATEGORY_LABELS[currentTab] || currentTab) + '</h2>' +
+          '<div class="l-section-sub">' + list.length + ' 款工具</div>' +
+        '</div>' +
       '</div>' +
       '<div class="l-tool-grid"></div>';
     const grid = sec.querySelector('.l-tool-grid');
@@ -563,12 +584,12 @@ function makePTool(a) {
   return row;
 }
 function renderPFeatured() {
-  if (!pFeaturedList) return;
-  pFeaturedList.innerHTML = '';
+  if (!pFeatured) return;
+  pFeatured.innerHTML = '';
   const featured = ['convert', 'resize', 'scale', 'rotate', 'grayscale', 'blur', 'sharpen', 'watermark', 'round-corners', 'remove-bg'];
   featured.forEach(k => {
     const a = ACTIONS.find(x => x.key === k);
-    if (a) pFeaturedList.appendChild(makePTool(a));
+    if (a) pFeatured.appendChild(makePTool(a));
   });
 }
 
@@ -578,7 +599,8 @@ function openModal(action) {
   if (selected.length === 0) { showToast('请先选择图片', 'error'); return; }
   currentAction = action;
   modalIco.innerHTML = ICON[action.icon] || '';
-  modalTitleText.textContent = action.label;
+  modalTitle.textContent = action.label;
+  if (modalEyebrow) modalEyebrow.textContent = CATEGORY_LABELS[action.group] || '工具';
   modalDesc.textContent = action.desc || '';
   modalScope.textContent = selected.length + ' 张图片 · 批量=' + (selected.length > 1 ? '是' : '否');
   modalFields.innerHTML = '';
@@ -713,12 +735,14 @@ function renderResults() {
     if (lOutEmpty) lOutEmpty.style.display = '';
     if (pBtnDlAll) pBtnDlAll.style.display = 'none';
     if (pOutEmpty) pOutEmpty.style.display = '';
+    if (pResCount) pResCount.textContent = '0';
     return;
   }
   if (lOutContent) lOutContent.style.display = '';
   if (lOutEmpty) lOutEmpty.style.display = 'none';
   if (pBtnDlAll) pBtnDlAll.style.display = '';
   if (pOutEmpty) pOutEmpty.style.display = 'none';
+  if (pResCount) pResCount.textContent = results.length;
   if (lResList) lResList.innerHTML = '';
   if (pResList) pResList.innerHTML = '';
   results.forEach((r, idx) => {
@@ -814,8 +838,31 @@ document.body.addEventListener('drop', e => {
 
 // Top buttons
 if (btnUploadL) btnUploadL.addEventListener('click', () => fileInput && fileInput.click());
-if (pBtnUpload) pBtnUpload.addEventListener('click', () => fileInput && fileInput.click());
 if (pFab) pFab.addEventListener('click', () => fileInput && fileInput.click());
+if (lCanvasEmpty) lCanvasEmpty.addEventListener('click', () => fileInput && fileInput.click());
+if (pDrop) pDrop.addEventListener('click', () => fileInput && fileInput.click());
+if (lBtnHelp) lBtnHelp.addEventListener('click', () => helpBg && helpBg.classList.add('show'));
+if (pClearBtn) pClearBtn.addEventListener('click', () => {
+  if (images.length === 0) return;
+  images.forEach(i => URL.revokeObjectURL(i.url));
+  images = [];
+  renderImageLists();
+  showToast('已清空', 'success');
+});
+if (pMoreBtn) pMoreBtn.addEventListener('click', () => switchPPane('tools'));
+if (lBtnClearR) lBtnClearR.addEventListener('click', () => {
+  results = [];
+  renderResults();
+  showToast('已清空结果', 'success');
+});
+// Help modal close
+document.querySelectorAll('[data-close]').forEach(b => {
+  b.addEventListener('click', () => {
+    const id = b.dataset.close;
+    const el = document.getElementById(id);
+    if (el) el.classList.remove('show');
+  });
+});
 
 function addImage(file) {
   if (!file.type.startsWith('image/')) { showToast('不支持: ' + file.name, 'error'); return; }
@@ -834,34 +881,33 @@ function addImage(file) {
 function renderImageLists() {
   renderLImgs();
   renderPImgs();
-  updateFooter();
   // Switch to files pane when first image added (portrait)
   if (images.length === 1) switchPPane('files');
 }
 function renderLImgs() {
-  if (!lImgsStrip) return;
+  if (!lCanvasStrip) return;
   if (images.length === 0) {
-    lImgsEmpty.style.display = '';
-    lImgsStrip.style.display = 'none';
-    lImgsStrip.innerHTML = '';
+    lCanvasEmpty.style.display = '';
+    lCanvasStrip.style.display = 'none';
+    lCanvasStrip.innerHTML = '';
     return;
   }
-  lImgsEmpty.style.display = 'none';
-  lImgsStrip.style.display = '';
-  lImgsStrip.innerHTML = '';
+  lCanvasEmpty.style.display = 'none';
+  lCanvasStrip.style.display = '';
+  lCanvasStrip.innerHTML = '';
   images.forEach(img => {
     const div = document.createElement('div');
-    div.className = 'l-img' + (img.selected ? ' sel' : '');
-    div.innerHTML = '<img src="' + img.url + '"><button class="l-img-del" data-id="' + img.id + '">×</button>';
+    div.className = 'l-canvas-tile' + (img.selected ? ' sel' : '');
+    div.innerHTML = '<img src="' + img.url + '"><div class="l-canvas-tile-info">' + (img.dims ? img.dims.w + '×' + img.dims.h : '…') + '</div><button class="l-canvas-tile-del" data-id="' + img.id + '">×</button>';
     div.addEventListener('click', e => {
-      if (e.target.classList.contains('l-img-del')) return;
+      if (e.target.classList.contains('l-canvas-tile-del')) return;
       img.selected = !img.selected;
       renderImageLists();
     });
     div.addEventListener('dblclick', () => setCurrentImage(img.id));
-    lImgsStrip.appendChild(div);
+    lCanvasStrip.appendChild(div);
   });
-  lImgsStrip.querySelectorAll('.l-img-del').forEach(btn => {
+  lCanvasStrip.querySelectorAll('.l-canvas-tile-del').forEach(btn => {
     btn.addEventListener('click', e => {
       e.stopPropagation();
       const id = parseInt(btn.dataset.id);
@@ -910,12 +956,7 @@ function renderPImgs() {
   });
 }
 
-/* ========== Footer (横屏) ========== */
-function updateFooter() {
-  if (lFootSel) lFootSel.textContent = getSelected().length;
-  if (lFootCount) lFootCount.textContent = images.length;
-  if (lFootStatus) lFootStatus.textContent = images.length === 0 ? '就绪' : (getSelected().length === 0 ? '未选' : '已就绪');
-}
+/* ========== Sidebar Clear (横屏) ========== */
 if (lBtnClear) lBtnClear.addEventListener('click', () => {
   if (images.length === 0) return;
   images.forEach(i => URL.revokeObjectURL(i.url));
@@ -940,7 +981,8 @@ function setCurrentImage(id) {
   if (lInfoType) lInfoType.textContent = img.file.type || 'image';
   if (lInfoSize) lInfoSize.textContent = humanSize(img.file.size);
   if (lInfoDim) lInfoDim.textContent = img.dims ? (img.dims.w + ' × ' + img.dims.h) : '—';
-  if (lInfoMode) lInfoMode.textContent = 'RGB';
+  if (lInfoMod) lInfoMod.textContent = new Date(img.file.lastModified || Date.now()).toLocaleDateString();
+  if (lInfoThumb) lInfoThumb.src = img.url;
   // Switch to info tab
   switchITab('info');
 }
@@ -1002,14 +1044,14 @@ function buildSwatchGrid(host) {
   host.innerHTML = '';
   ACCENTS.forEach(a => {
     const d = document.createElement('button');
-    d.className = 'p-swatch' + (a.id === appSettings.accent ? ' on' : '');
+    d.className = 'set-swatch' + (a.id === appSettings.accent ? ' on' : '');
     d.dataset.accent = a.id;
     d.style.background = a.color;
     d.title = a.id;
     d.addEventListener('click', () => {
       appSettings.accent = a.id;
       applyAccent();
-      document.querySelectorAll('.p-swatch').forEach(x => x.classList.toggle('on', x === d));
+      document.querySelectorAll('.set-swatch').forEach(x => x.classList.toggle('on', x === d));
       saveSettings();
       showToast('已切换强调色', 'success');
     });
@@ -1062,7 +1104,6 @@ function openCmd() {
   renderCmdList('');
 }
 function closeCmd() { if (cmdBg) cmdBg.classList.remove('show'); }
-if (btnCmdL) btnCmdL.addEventListener('click', openCmd);
 if (btnSearchP) btnSearchP.addEventListener('click', openCmd);
 if (cmdBg) cmdBg.addEventListener('click', e => { if (e.target === cmdBg) closeCmd(); });
 if (cmdInput) cmdInput.addEventListener('input', e => renderCmdList(e.target.value));
@@ -1152,8 +1193,10 @@ function init() {
   renderPFeatured();
   applyAccent();
   checkAiStatus();
-  logMsg('PIXEL 已就绪', 'success');
+  if (lStatTools) lStatTools.textContent = ACTIONS.length;
+  logMsg('NIMBUS 已就绪', 'success');
   logMsg('工具数量: ' + ACTIONS.length);
+  logMsg('识别方向: ' + (window.matchMedia('(orientation: landscape)').matches ? '横屏' : '竖屏'));
 }
 
 init();
