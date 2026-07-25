@@ -1,6 +1,5 @@
 /* =========================================================
-   PIX_FORGE · Image Workstation - Application Logic
-   Brutalist × Cyberpunk Edition
+   PIXEL · 优雅现代风 - 双方向应用逻辑 (横屏 + 竖屏)
    ========================================================= */
 const ICON = {
   'convert':    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>',
@@ -27,10 +26,11 @@ const ICON = {
   'hsb':        '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="13.5" cy="6.5" r=".5" fill="currentColor"/><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10c.926 0 1.648-.746 1.648-1.688 0-.437-.18-.835-.437-1.125-.29-.289-.438-.652-.438-1.125a1.64 1.64 0 0 1 1.668-1.668h1.996c3.051 0 5.555-2.503 5.555-5.554C21.965 6.012 17.461 2 12 2z"/></svg>',
   'threshold':  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 3a9 9 0 0 0 0 18" fill="currentColor"/></svg>',
   'colorbalance':'<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2v20M2 12h20"/></svg>',
-  'channel':    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="18"/></svg>'
+  'channel':    '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="18"/><rect x="14" y="3" width="7" height="18"/></svg>',
+  'circle':     '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg>'
 };
 
-/* ===== ACTIONS (full list of 126+ tools) ===== */
+/* ===== ACTIONS ===== */
 const ACTIONS = [
   { key: 'convert',   group: 'main',     label: '格式转换', icon: 'convert', desc: '把图片转换成 PNG / JPG / GIF / BMP / TIFF', fields: [
     { name: 'format', label: '目标格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' },
@@ -219,7 +219,7 @@ const ACTIONS = [
     { name: 'format', label: '输出格式', type: 'select', options: ['png','jpeg','gif','bmp','tiff'], value: 'png' }
   ]},
   { key: 'watermark', group: 'overlay', label: '水印', icon: 'watermark', desc: '添加文字水印', fields: [
-    { name: 'text', label: '水印文字', type: 'text', value: 'PIX_FORGE', placeholder: '输入水印文字' },
+    { name: 'text', label: '水印文字', type: 'text', value: 'PIXEL', placeholder: '输入水印文字' },
     { name: 'size', label: '字号', type: 'range', min: 12, max: 96, step: 2, value: 32, show: v => v + 'px' },
     { name: 'color', label: '颜色', type: 'color', value: '#ffffff' },
     { name: 'opacity', label: '透明度', type: 'range', min: 0.1, max: 1, step: 0.05, value: 0.5, show: v => v.toFixed(2) },
@@ -283,42 +283,28 @@ const ACTIONS = [
 ];
 
 const CATEGORY_LABELS = {
-  all: '全部',
-  main: '基础',
-  filter: '滤镜',
-  cinematic: '电影',
-  effect: '特效',
-  distort: '变形',
-  overlay: '叠加',
-  tools: '工具',
-  analyze: '分析'
+  all: '全部', main: '基础', filter: '滤镜', cinematic: '电影', effect: '特效',
+  distort: '变形', overlay: '叠加', tools: '工具', analyze: '分析'
 };
 
 const CATEGORY_ICON = {
-  all:       '▦',
-  main:      '✚',
-  filter:    '◉',
-  cinematic: '▶',
-  effect:    '⚡',
-  distort:   '◐',
-  overlay:   '◧',
-  tools:     '⚙',
-  analyze:   '◎'
+  all:       '◉', main: '✚', filter: '◐', cinematic: '▶', effect: '⚡',
+  distort:   '◎', overlay: '◧', tools: '⚙', analyze: '◌'
 };
 
 const ACCENTS = [
-  { id: 'magenta', color: '#ff00aa' },
-  { id: 'cyan',    color: '#00f0ff' },
-  { id: 'lime',    color: '#b6ff00' },
-  { id: 'yellow',  color: '#ffea00' },
-  { id: 'red',     color: '#ff003c' },
-  { id: 'orange',  color: '#ff6b00' },
-  { id: 'pink',    color: '#ff5cc8' },
-  { id: 'blue',    color: '#3b82f6' },
-  { id: 'purple',  color: '#a855f7' },
-  { id: 'green',   color: '#00ff88' },
+  { id: 'indigo',  color: '#6366f1' },
+  { id: 'violet',  color: '#8b5cf6' },
+  { id: 'pink',    color: '#ec4899' },
+  { id: 'rose',    color: '#f43f5e' },
+  { id: 'orange',  color: '#f97316' },
+  { id: 'amber',   color: '#f59e0b' },
+  { id: 'emerald', color: '#10b981' },
   { id: 'teal',    color: '#14b8a6' },
-  { id: 'white',   color: '#ededed' }
+  { id: 'sky',     color: '#0ea5e9' },
+  { id: 'blue',    color: '#3b82f6' },
+  { id: 'slate',   color: '#64748b' },
+  { id: 'mono',    color: '#0f172a' }
 ];
 
 /* ========== State ========== */
@@ -328,65 +314,115 @@ let nextId = 1;
 let currentAction = null;
 let currentTab = 'all';
 let currentImage = null;
-let appSettings = { accent: 'magenta', fmt: 'png', quality: 90, names: true, zip: true, sfx: false, kbd: true };
-try { Object.assign(appSettings, JSON.parse(localStorage.getItem('pixforge-settings') || '{}')); } catch(e) {}
+let appSettings = { accent: 'indigo', fmt: 'png', quality: 90, dark: false, recent: [] };
+try { Object.assign(appSettings, JSON.parse(localStorage.getItem('pixel-settings') || '{}')); } catch(e) {}
+document.documentElement.setAttribute('data-theme', appSettings.dark ? 'dark' : 'light');
 
 /* ========== DOM Refs ========== */
 const $ = id => document.getElementById(id);
-const uploadZone = $('uploadZone');
-const fileInput = $('fileInput');
-const imgList = $('imgList');
-const workspace = $('workspace');
-const welcomePane = $('welcomePane');
-const resultList = $('resultList');
-const outputEmpty = $('outputEmpty');
-const outputContent = $('outputContent');
+
+// Landscape
+const lCats = $('lCats');
+const lTools = $('lTools');
+const lImgs = $('lImgs');
+const lImgsEmpty = $('lImgsEmpty');
+const lImgsStrip = $('lImgsStrip');
+const lInfoName = $('lInfoName');
+const lInfoType = $('lInfoType');
+const lInfoSize = $('lInfoSize');
+const lInfoDim = $('lInfoDim');
+const lInfoMode = $('lInfoMode');
+const lInfoEmpty = $('lInfoEmpty');
+const lInfoContent = $('lInfoContent');
+const lOutEmpty = $('lOutEmpty');
+const lOutContent = $('lOutContent');
+const lResList = $('lResList');
+const lLog = $('lLog');
+const lFootStatus = $('lFootStatus');
+const lFootSel = $('lFootSel');
+const lFootCount = $('lFootCount');
+const lSwatches = $('lSwatches');
+const lDarkMode = $('lDarkMode');
+const lSetFmt = $('lSetFmt');
+const lSetQuality = $('lSetQuality');
+const lSetQualityVal = $('lSetQualityVal');
+const lAiPath = $('lAiPath');
+const lAiStatus = $('lAiStatus');
+const toolSearchL = $('toolSearchL');
+const btnThemeL = $('btnThemeL');
+const btnSettingsL = $('btnSettingsL');
+const btnUploadL = $('btnUploadL');
+const btnCmdL = $('btnCmdL');
+const lBtnClear = $('lBtnClear');
+const lBtnDlAll = $('lBtnDlAll');
+
+// Portrait
+const pCats = $('pCats');
+const pToolList = $('pToolList');
+const pFeaturedList = $('pFeaturedList');
+const pImgGrid = $('pImgGrid');
+const pFileCount = $('pFileCount');
+const pResList = $('pResList');
+const pOutEmpty = $('pOutEmpty');
+const pBtnDlAll = $('pBtnDlAll');
+const pSwatches = $('pSwatches');
+const pDarkMode = $('pDarkMode');
+const pSetFmt = $('pSetFmt');
+const pSetQuality = $('pSetQuality');
+const pSetQualityVal = $('pSetQualityVal');
+const pAiPath = $('pAiPath');
+const pAiStatus = $('pAiStatus');
+const btnSearchP = $('btnSearchP');
+const btnThemeP = $('btnThemeP');
+const btnSettingsP = $('btnSettingsP');
+const pFab = $('pFab');
+const pDrop = $('pDrop');
+const pBtnUpload = $('pBtnUpload');
+const pFilesEmpty = $('pFilesEmpty');
+
+// Shared
 const modalBg = $('modalBg');
 const modalIco = $('modalIco');
 const modalTitleText = $('modalTitleText');
 const modalDesc = $('modalDesc');
-const modalScopeText = $('modalScopeText');
+const modalScope = $('modalScope');
 const modalFields = $('modalFields');
+const modalClose = $('modalClose');
+const modalCancel = $('modalCancel');
+const modalSubmit = $('modalSubmit');
 const loading = $('loading');
 const loadingText = $('loadingText');
 const loadingBar = $('loadingBar');
-const nav = $('nav');
-const toolsWrap = $('toolsWrap');
-const toolSearch = $('toolSearch');
-const workInfo = $('workInfo');
 const cmdBg = $('cmdBg');
 const cmdInput = $('cmdInput');
 const cmdList = $('cmdList');
 const drawer = $('drawer');
 const drawerBg = $('drawerBg');
+const drawerClose = $('drawerClose');
 const toastHost = $('toastHost');
-const swatchAccent = $('swatchAccent');
-const setFmt = $('setFmt');
-const setQuality = $('setQuality');
-const setQualityVal = $('setQualityVal');
-const footStatus = $('footStatus');
-const footCount = $('footCount');
-const footSel = $('footSel');
-const logList = $('logList');
+const fileInput = $('fileInput');
 
 /* ========== Helpers ========== */
 function humanSize(b) {
+  if (!b && b !== 0) return '—';
   if (b < 1024) return b + ' B';
   if (b < 1024 * 1024) return (b / 1024).toFixed(1) + ' KB';
   return (b / 1024 / 1024).toFixed(2) + ' MB';
 }
-function saveSettings() { try { localStorage.setItem('pixforge-settings', JSON.stringify(appSettings)); } catch(e) {} }
+function saveSettings() { try { localStorage.setItem('pixel-settings', JSON.stringify(appSettings)); } catch(e) {} }
 function applyAccent() {
   const a = ACCENTS.find(x => x.id === appSettings.accent) || ACCENTS[0];
-  document.documentElement.style.setProperty('--magenta', a.color);
   document.documentElement.style.setProperty('--accent', a.color);
+  document.documentElement.style.setProperty('--accent-2', a.color);
+  document.documentElement.style.setProperty('--accent-gradient', `linear-gradient(135deg, ${a.color} 0%, #8b5cf6 50%, #ec4899 100%)`);
 }
 function logMsg(msg, type) {
   const line = document.createElement('div');
-  line.style.color = type === 'error' ? 'var(--blood)' : (type === 'success' ? 'var(--lime)' : 'var(--bone-dim)');
   line.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
-  logList.appendChild(line);
-  logList.scrollTop = logList.scrollHeight;
+  if (type === 'error') line.style.color = 'var(--error)';
+  else if (type === 'success') line.style.color = 'var(--success)';
+  lLog.appendChild(line);
+  lLog.scrollTop = lLog.scrollHeight;
 }
 function showToast(msg, type) {
   const t = document.createElement('div');
@@ -400,39 +436,61 @@ function showLoading(text) { loadingText.textContent = text || '处理中...'; l
 function hideLoading() { loading.classList.remove('show'); }
 function setProgress(p) { loadingBar.style.width = (p * 100) + '%'; }
 
-/* ========== Sidebar NAV ========== */
-function buildNav() {
+function getSelected() { return images.filter(i => i.selected); }
+
+/* ========== Categories (横屏侧边栏) ========== */
+function buildLCats() {
+  if (!lCats) return;
   const groups = ['all', ...Array.from(new Set(ACTIONS.map(a => a.group)))];
-  nav.innerHTML = '';
-  groups.forEach((g, i) => {
+  lCats.innerHTML = '';
+  groups.forEach(g => {
     const count = g === 'all' ? ACTIONS.length : ACTIONS.filter(a => a.group === g).length;
-    const sec = document.createElement('div');
-    sec.className = 'nav-section' + (g === currentTab ? ' active' : '');
-    sec.dataset.idx = i;
-    sec.innerHTML = '<div class="nav-head"><span>' + (CATEGORY_ICON[g] || '▸') + ' ' + (CATEGORY_LABELS[g] || g) + '</span><span class="num">' + count + '</span></div>';
-    nav.appendChild(sec);
+    const btn = document.createElement('button');
+    btn.className = 'l-cat' + (g === currentTab ? ' active' : '');
+    btn.dataset.group = g;
+    btn.innerHTML =
+      '<span class="l-cat-ico">' + (CATEGORY_ICON[g] || '·') + '</span>' +
+      '<span class="l-cat-name">' + (CATEGORY_LABELS[g] || g) + '</span>' +
+      '<span class="l-cat-count">' + count + '</span>';
+    btn.addEventListener('click', () => {
+      currentTab = g;
+      buildLCats();
+      renderTools();
+    });
+    lCats.appendChild(btn);
   });
 }
-nav.addEventListener('click', e => {
-  const sec = e.target.closest('.nav-section');
-  if (!sec) return;
-  const sections = nav.querySelectorAll('.nav-section');
-  const idx = parseInt(sec.dataset.idx);
+
+/* ========== Categories (竖屏 chip 行) ========== */
+function buildPCats() {
+  if (!pCats) return;
   const groups = ['all', ...Array.from(new Set(ACTIONS.map(a => a.group)))];
-  const g = groups[idx];
-  if (!g) return;
-  currentTab = g;
-  sections.forEach(s => s.classList.toggle('active', s === sec));
-  renderTools();
-});
+  pCats.innerHTML = '';
+  groups.forEach(g => {
+    const count = g === 'all' ? ACTIONS.length : ACTIONS.filter(a => a.group === g).length;
+    const btn = document.createElement('button');
+    btn.className = 'p-chip' + (g === currentTab ? ' on' : '');
+    btn.dataset.group = g;
+    btn.innerHTML = (CATEGORY_LABELS[g] || g) + ' <span class="num">' + count + '</span>';
+    btn.addEventListener('click', () => {
+      currentTab = g;
+      buildPCats();
+      renderPToolList();
+    });
+    pCats.appendChild(btn);
+  });
+}
 
-/* ========== Search ========== */
-toolSearch.addEventListener('input', renderTools);
+/* ========== Search (横屏) ========== */
+if (toolSearchL) {
+  toolSearchL.addEventListener('input', renderTools);
+}
 
-/* ========== Tools Grid ========== */
+/* ========== Tools (横屏) ========== */
 function renderTools() {
-  toolsWrap.innerHTML = '';
-  const q = (toolSearch.value || '').trim().toLowerCase();
+  if (!lTools) return;
+  lTools.innerHTML = '';
+  const q = (toolSearchL && toolSearchL.value ? toolSearchL.value : '').trim().toLowerCase();
   let list = currentTab === 'all' ? ACTIONS : ACTIONS.filter(a => a.group === currentTab);
   if (q) {
     list = ACTIONS.filter(a =>
@@ -445,59 +503,94 @@ function renderTools() {
     const groups = {};
     list.forEach(a => { (groups[a.group] = groups[a.group] || []).push(a); });
     Object.entries(groups).forEach(([g, items]) => {
-      const head = document.createElement('div');
-      head.className = 'section-head';
-      head.innerHTML = '<span class="section-head-text">' + (CATEGORY_ICON[g] || '■') + ' ' + (CATEGORY_LABELS[g] || g) + ' · ' + items.length + '</span><span class="section-head-line"></span>';
-      toolsWrap.appendChild(head);
-      const row = document.createElement('div');
-      row.className = 'tool-row';
-      items.forEach(a => row.appendChild(makeToolCard(a)));
-      toolsWrap.appendChild(row);
+      const sec = document.createElement('div');
+      sec.className = 'l-tools-section';
+      sec.innerHTML =
+        '<div class="l-tools-section-head">' +
+          '<span class="l-tools-section-title">' + (CATEGORY_ICON[g] || '·') + '  ' + (CATEGORY_LABELS[g] || g) + '</span>' +
+          '<span class="l-tools-section-count">' + items.length + ' 项</span>' +
+        '</div>' +
+        '<div class="l-tool-grid"></div>';
+      const grid = sec.querySelector('.l-tool-grid');
+      items.forEach(a => grid.appendChild(makeLTool(a)));
+      lTools.appendChild(sec);
     });
   } else {
-    const head = document.createElement('div');
-    head.className = 'section-head';
-    head.innerHTML = '<span class="section-head-text">' + (CATEGORY_ICON[currentTab] || '■') + ' ' + (CATEGORY_LABELS[currentTab] || currentTab) + ' · ' + list.length + '</span><span class="section-head-line"></span>';
-    toolsWrap.appendChild(head);
-    const row = document.createElement('div');
-    row.className = 'tool-row';
-    list.forEach(a => row.appendChild(makeToolCard(a)));
-    toolsWrap.appendChild(row);
+    const sec = document.createElement('div');
+    sec.className = 'l-tools-section';
+    sec.innerHTML =
+      '<div class="l-tools-section-head">' +
+        '<span class="l-tools-section-title">' + (CATEGORY_ICON[currentTab] || '·') + '  ' + (CATEGORY_LABELS[currentTab] || currentTab) + '</span>' +
+        '<span class="l-tools-section-count">' + list.length + ' 项</span>' +
+      '</div>' +
+      '<div class="l-tool-grid"></div>';
+    const grid = sec.querySelector('.l-tool-grid');
+    list.forEach(a => grid.appendChild(makeLTool(a)));
+    lTools.appendChild(sec);
   }
-  workInfo.textContent = list.length + ' / ' + ACTIONS.length;
 }
-function makeToolCard(a) {
+function makeLTool(a) {
   const card = document.createElement('button');
-  card.className = 'tool-card';
+  card.className = 'l-tool';
   card.dataset.key = a.key;
   card.innerHTML =
-    '<div class="tool-ico">' + (ICON[a.icon] || '') + '</div>' +
-    '<div class="tool-lbl">' + a.label + '</div>' +
-    '<div class="tool-meta">' + (CATEGORY_LABELS[a.group] || a.group) + '</div>';
+    '<div class="l-tool-ico">' + (ICON[a.icon] || '') + '</div>' +
+    '<div class="l-tool-name">' + a.label + '</div>' +
+    '<div class="l-tool-desc">' + (a.desc || '') + '</div>';
   card.addEventListener('click', () => openModal(a));
   return card;
 }
 
+/* ========== Tools (竖屏) ========== */
+function renderPToolList() {
+  if (!pToolList) return;
+  pToolList.innerHTML = '';
+  const list = currentTab === 'all' ? ACTIONS : ACTIONS.filter(a => a.group === currentTab);
+  list.forEach(a => pToolList.appendChild(makePTool(a)));
+}
+function makePTool(a) {
+  const row = document.createElement('button');
+  row.className = 'p-tool';
+  row.dataset.key = a.key;
+  row.innerHTML =
+    '<div class="p-tool-ico">' + (ICON[a.icon] || '') + '</div>' +
+    '<div class="p-tool-info">' +
+      '<div class="p-tool-name">' + a.label + '</div>' +
+      '<div class="p-tool-desc">' + (CATEGORY_LABELS[a.group] || a.group) + ' · ' + (a.desc || '') + '</div>' +
+    '</div>' +
+    '<div class="p-tool-go"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></div>';
+  row.addEventListener('click', () => openModal(a));
+  return row;
+}
+function renderPFeatured() {
+  if (!pFeaturedList) return;
+  pFeaturedList.innerHTML = '';
+  const featured = ['convert', 'resize', 'scale', 'rotate', 'grayscale', 'blur', 'sharpen', 'watermark', 'round-corners', 'remove-bg'];
+  featured.forEach(k => {
+    const a = ACTIONS.find(x => x.key === k);
+    if (a) pFeaturedList.appendChild(makePTool(a));
+  });
+}
+
 /* ========== Modal ========== */
 function openModal(action) {
-  const selected = images.filter(i => i.selected);
+  const selected = getSelected();
   if (selected.length === 0) { showToast('请先选择图片', 'error'); return; }
   currentAction = action;
   modalIco.innerHTML = ICON[action.icon] || '';
   modalTitleText.textContent = action.label;
   modalDesc.textContent = action.desc || '';
-  modalScopeText.textContent = '▸ ' + selected.length + ' IMAGE(S) · BATCH=' + (selected.length > 1 ? 'YES' : 'NO');
+  modalScope.textContent = selected.length + ' 张图片 · 批量=' + (selected.length > 1 ? '是' : '否');
   modalFields.innerHTML = '';
   action.fields.forEach((field) => {
     const wrap = document.createElement('div');
-    wrap.className = 'field';
     const label = document.createElement('label');
     label.className = 'field-label';
-    label.innerHTML = '<span>' + field.label + '</span><span class="val" data-val></span>';
+    label.innerHTML = '<span>' + field.label + '</span><span class="v" data-val></span>';
     wrap.appendChild(label);
     if (field.type === 'select') {
       const sel = document.createElement('select');
-      sel.className = 'field-input';
+      sel.className = 'select';
       sel.dataset.field = field.name;
       field.options.forEach(o => {
         const opt = document.createElement('option');
@@ -520,13 +613,15 @@ function openModal(action) {
       wrap.appendChild(inp);
     } else if (field.type === 'color') {
       const inp = document.createElement('input');
-      inp.type = 'color'; inp.className = 'field-input'; inp.value = field.value; inp.dataset.field = field.name;
+      inp.type = 'color';
+      inp.style.cssText = 'width:48px;height:32px;border:1px solid var(--border);border-radius:8px;cursor:pointer;background:transparent;padding:2px';
+      inp.value = field.value; inp.dataset.field = field.name;
       wrap.appendChild(inp);
       label.querySelector('[data-val]').textContent = field.value;
       inp.addEventListener('input', () => label.querySelector('[data-val]').textContent = inp.value);
     } else {
       const inp = document.createElement('input');
-      inp.type = field.type; inp.className = 'field-input'; inp.value = field.value; inp.dataset.field = field.name;
+      inp.type = field.type; inp.className = 'input'; inp.value = field.value; inp.dataset.field = field.name;
       if (field.placeholder) inp.placeholder = field.placeholder;
       wrap.appendChild(inp);
       label.querySelector('[data-val]').textContent = field.value;
@@ -536,14 +631,13 @@ function openModal(action) {
   });
   modalBg.classList.add('show');
 }
-function closeModal() { modalBg.classList.remove('show'); }
-$('modalClose').addEventListener('click', closeModal);
-$('modalCancel').addEventListener('click', closeModal);
+function closeModal() { modalBg.classList.remove('show'); currentAction = null; }
+if (modalClose) modalClose.addEventListener('click', closeModal);
+if (modalCancel) modalCancel.addEventListener('click', closeModal);
 modalBg.addEventListener('click', e => { if (e.target === modalBg) closeModal(); });
-document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeDrawer(); closeCmd(); } });
 
-$('modalSubmit').addEventListener('click', async () => {
-  const selected = images.filter(i => i.selected);
+if (modalSubmit) modalSubmit.addEventListener('click', async () => {
+  const selected = getSelected();
   if (selected.length === 0 || !currentAction) return;
   const params = {};
   modalFields.querySelectorAll('input, select').forEach(inp => {
@@ -554,28 +648,35 @@ $('modalSubmit').addEventListener('click', async () => {
     params[n] = v;
   });
   closeModal();
-  results = []; resultList.innerHTML = ''; outputContent.style.display = 'none'; outputEmpty.style.display = '';
+  results = [];
+  if (lResList) lResList.innerHTML = '';
+  if (pResList) pResList.innerHTML = '';
+  if (lOutContent) lOutContent.style.display = 'none';
+  if (lOutEmpty) lOutEmpty.style.display = '';
+  if (pBtnDlAll) pBtnDlAll.style.display = 'none';
+  if (pOutEmpty) pOutEmpty.style.display = '';
   const multi = selected.length > 1;
-  if (multi) { setProgress(0); showLoading('PROCESSING 0/' + selected.length); }
-  else { showLoading('PROCESSING...'); }
+  if (multi) { setProgress(0); showLoading('处理中 0/' + selected.length); }
+  else { showLoading('处理中...'); }
   try {
     for (let i = 0; i < selected.length; i++) {
       const img = selected[i];
-      loadingText.textContent = 'PROCESSING ' + (i + 1) + '/' + selected.length + ' · ' + img.file.name;
+      loadingText.textContent = '处理 ' + (i + 1) + '/' + selected.length + ' · ' + img.file.name;
       const r = await callApi(currentAction.key, params, img.file);
       results.push(r);
       if (multi) setProgress((i + 1) / selected.length);
     }
     hideLoading(); setProgress(0);
     renderResults();
-    showToast('DONE · ' + results.length + ' FILE(S)', 'success');
-    document.querySelectorAll('.tool-card').forEach(b => b.classList.toggle('applied', b.dataset.key === currentAction.key));
-    // Switch to output tab
-    document.querySelectorAll('.out-tab').forEach(t => t.classList.toggle('on', t.dataset.itab === 'output'));
-    document.querySelectorAll('.out-pane').forEach(p => p.style.display = p.dataset.ipane === 'output' ? '' : 'none');
+    showToast('完成 · ' + results.length + ' 个文件', 'success');
+    // Switch to output pane (portrait)
+    switchPPane('output');
+    // Update landscape applied state
+    document.querySelectorAll('.l-tool, .p-tool').forEach(b => b.classList.toggle('applied', b.dataset.key === currentAction.key));
+    addRecent(currentAction.key);
   } catch (err) {
     hideLoading(); setProgress(0);
-    showToast('FAIL: ' + (err.message || err), 'error');
+    showToast('失败: ' + (err.message || err), 'error');
     console.error(err);
   }
 });
@@ -607,40 +708,69 @@ async function callApi(key, params, file) {
 
 /* ========== Results ========== */
 function renderResults() {
-  if (results.length === 0) { outputContent.style.display = 'none'; outputEmpty.style.display = ''; return; }
-  outputContent.style.display = ''; outputEmpty.style.display = 'none';
-  resultList.innerHTML = '';
+  if (results.length === 0) {
+    if (lOutContent) lOutContent.style.display = 'none';
+    if (lOutEmpty) lOutEmpty.style.display = '';
+    if (pBtnDlAll) pBtnDlAll.style.display = 'none';
+    if (pOutEmpty) pOutEmpty.style.display = '';
+    return;
+  }
+  if (lOutContent) lOutContent.style.display = '';
+  if (lOutEmpty) lOutEmpty.style.display = 'none';
+  if (pBtnDlAll) pBtnDlAll.style.display = '';
+  if (pOutEmpty) pOutEmpty.style.display = 'none';
+  if (lResList) lResList.innerHTML = '';
+  if (pResList) pResList.innerHTML = '';
   results.forEach((r, idx) => {
-    const item = document.createElement('div');
-    item.className = 'res-item';
     let preview = '';
     if (r.dataUri) {
-      preview = '<img class="res-thumb" src="' + r.dataUri + '">';
+      preview = '<img class="l-res-thumb" src="' + r.dataUri + '">';
     } else if (!r.isText) {
       const url = URL.createObjectURL(r.blob); r.url = url;
-      preview = '<img class="res-thumb" src="' + url + '">';
+      preview = '<img class="l-res-thumb" src="' + url + '">';
     } else {
-      preview = '<div class="res-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--ink);color:var(--bone-dim);font-size:10px;font-weight:800">TXT</div>';
+      preview = '<div class="l-res-thumb" style="display:flex;align-items:center;justify-content:center;background:var(--surface-3);color:var(--text-2);font-size:9px;font-weight:800">TXT</div>';
     }
-    item.innerHTML =
-      preview +
-      '<div class="res-info"><div class="res-name">' + r.name + '</div><div class="res-meta">' + (r.blob ? humanSize(r.blob.size) : '—') + '</div></div>' +
-      '<button class="res-dl" data-idx="' + idx + '">▼</button>';
-    resultList.appendChild(item);
+    // Landscape item
+    if (lResList) {
+      const item = document.createElement('div');
+      item.className = 'l-res-item';
+      item.innerHTML =
+        preview +
+        '<div class="l-res-info"><div class="l-res-name">' + r.name + '</div><div class="l-res-meta">' + (r.blob ? humanSize(r.blob.size) : '—') + '</div></div>' +
+        '<button class="l-res-dl" data-idx="' + idx + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>';
+      lResList.appendChild(item);
+    }
+    // Portrait item
+    if (pResList) {
+      const item = document.createElement('div');
+      item.className = 'l-res-item';
+      item.style.marginBottom = '8px';
+      item.innerHTML =
+        preview +
+        '<div class="l-res-info"><div class="l-res-name">' + r.name + '</div><div class="l-res-meta">' + (r.blob ? humanSize(r.blob.size) : '—') + '</div></div>' +
+        '<button class="l-res-dl" data-idx="' + idx + '"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>';
+      pResList.appendChild(item);
+    }
   });
 }
-resultList.addEventListener('click', e => {
-  const dl = e.target.closest('.res-dl');
-  if (dl) {
-    const r = results[parseInt(dl.dataset.idx)];
-    if (!r) return;
-    const a = document.createElement('a');
-    if (r.url) a.href = r.url; else a.href = r.dataUri || '#';
-    a.download = r.name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
-    showToast('SAVED: ' + r.name, 'success');
-  }
-});
-$('btnDownloadAll').addEventListener('click', async () => {
+function downloadResult(idx) {
+  const r = results[idx]; if (!r) return;
+  const a = document.createElement('a');
+  if (r.url) a.href = r.url; else a.href = r.dataUri || '#';
+  a.download = r.name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  showToast('已下载: ' + r.name, 'success');
+}
+function bindResDl(host) {
+  if (!host) return;
+  host.addEventListener('click', e => {
+    const dl = e.target.closest('.l-res-dl');
+    if (dl) downloadResult(parseInt(dl.dataset.idx));
+  });
+}
+bindResDl(lResList);
+bindResDl(pResList);
+async function downloadAll() {
   if (results.length === 0) return;
   for (const r of results) {
     const a = document.createElement('a');
@@ -648,170 +778,309 @@ $('btnDownloadAll').addEventListener('click', async () => {
     a.download = r.name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
     await new Promise(res => setTimeout(res, 200));
   }
-  showToast('BATCH DOWNLOAD ' + results.length + ' FILES', 'success');
-});
-$('btnDlAll').addEventListener('click', () => $('btnDownloadAll').click());
-$('btnAgain').addEventListener('click', () => {
-  results = []; resultList.innerHTML = ''; outputContent.style.display = 'none'; outputEmpty.style.display = '';
-  showToast('RESULTS CLEARED', 'success');
-});
+  showToast('批量下载 ' + results.length + ' 个文件', 'success');
+}
+if (lBtnDlAll) lBtnDlAll.addEventListener('click', downloadAll);
+if (pBtnDlAll) pBtnDlAll.addEventListener('click', downloadAll);
 
 /* ========== File Upload ========== */
-uploadZone.addEventListener('click', () => fileInput.click());
-$('btnUpload').addEventListener('click', () => fileInput.click());
-fileInput.addEventListener('change', e => {
-  Array.from(e.target.files).forEach(f => addImage(f));
-  fileInput.value = '';
+if (fileInput) {
+  fileInput.addEventListener('change', e => {
+    Array.from(e.target.files).forEach(f => addImage(f));
+    fileInput.value = '';
+  });
+}
+function bindDropZone(zone) {
+  if (!zone) return;
+  zone.addEventListener('click', () => fileInput && fileInput.click());
+  ['dragover','dragenter'].forEach(ev => zone.addEventListener(ev, e => {
+    e.preventDefault(); zone.style.borderColor = 'var(--accent)';
+  }));
+  zone.addEventListener('dragleave', () => zone.style.borderColor = '');
+  zone.addEventListener('drop', e => {
+    e.preventDefault(); zone.style.borderColor = '';
+    Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).forEach(f => addImage(f));
+  });
+}
+bindDropZone(pDrop);
+// Make the whole landscape and portrait containers accept drops
+['dragover','dragenter'].forEach(ev => document.body.addEventListener(ev, e => e.preventDefault()));
+document.body.addEventListener('drop', e => {
+  e.preventDefault();
+  if (e.dataTransfer && e.dataTransfer.files) {
+    Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).forEach(f => addImage(f));
+  }
 });
-['dragover','dragenter'].forEach(ev => uploadZone.addEventListener(ev, e => {
-  e.preventDefault(); uploadZone.classList.add('dragover');
-}));
-uploadZone.addEventListener('dragleave', () => uploadZone.classList.remove('dragover'));
-uploadZone.addEventListener('drop', e => {
-  e.preventDefault(); uploadZone.classList.remove('dragover');
-  Array.from(e.dataTransfer.files).filter(f => f.type.startsWith('image/')).forEach(f => addImage(f));
-});
+
+// Top buttons
+if (btnUploadL) btnUploadL.addEventListener('click', () => fileInput && fileInput.click());
+if (pBtnUpload) pBtnUpload.addEventListener('click', () => fileInput && fileInput.click());
+if (pFab) pFab.addEventListener('click', () => fileInput && fileInput.click());
 
 function addImage(file) {
-  if (!file.type.startsWith('image/')) { showToast('UNSUPPORTED: ' + file.name, 'error'); return; }
+  if (!file.type.startsWith('image/')) { showToast('不支持: ' + file.name, 'error'); return; }
   const id = nextId++;
   const url = URL.createObjectURL(file);
-  // Read dims
-  const tmp = new Image();
-  tmp.onload = () => { img.dims = { w: tmp.width, h: tmp.height }; renderImageList(); };
   const img = { id, file, url, selected: true, dims: null };
   images.push(img);
+  const tmp = new Image();
+  tmp.onload = () => { img.dims = { w: tmp.width, h: tmp.height }; renderImageLists(); };
   tmp.src = url;
-  renderImageList();
-  showWorkspace();
-  showToast('ADDED: ' + file.name, 'success');
+  renderImageLists();
+  showToast('已添加: ' + file.name, 'success');
 }
-function showWorkspace() {
-  welcomePane.style.display = 'none';
-  workspace.style.display = 'flex';
-  updateStatus();
+
+/* ========== Image Lists (横屏 + 竖屏) ========== */
+function renderImageLists() {
+  renderLImgs();
+  renderPImgs();
+  updateFooter();
+  // Switch to files pane when first image added (portrait)
+  if (images.length === 1) switchPPane('files');
 }
-function renderImageList() {
-  imgList.innerHTML = '';
-  images.forEach((img, i) => {
-    const div = document.createElement('div');
-    div.className = 'thumb' + (img.selected ? ' sel' : '');
-    div.innerHTML = '<img src="' + img.url + '"><button class="thumb-del" data-id="' + img.id + '">×</button>';
-    div.addEventListener('click', e => {
-      if (e.target.classList.contains('thumb-del')) return;
-      img.selected = !img.selected;
-      renderImageList();
-      updateStatus();
-    });
-    imgList.appendChild(div);
-  });
+function renderLImgs() {
+  if (!lImgsStrip) return;
   if (images.length === 0) {
-    welcomePane.style.display = '';
-    workspace.style.display = 'none';
+    lImgsEmpty.style.display = '';
+    lImgsStrip.style.display = 'none';
+    lImgsStrip.innerHTML = '';
+    return;
   }
-  updateStatus();
-}
-function updateStatus() {
-  const sel = images.filter(i => i.selected).length;
-  const total = images.length;
-  $('statusInfo').textContent = total + ' IMG · ' + sel + ' SEL';
-  footCount.textContent = total;
-  footSel.textContent = sel;
-  footStatus.textContent = total === 0 ? 'READY' : (sel === 0 ? 'NO SEL' : 'ARMED');
-}
-
-imgList.addEventListener('click', e => {
-  if (e.target.classList.contains('thumb-del')) {
-    e.stopPropagation();
-    const id = parseInt(e.target.dataset.id);
-    const idx = images.findIndex(i => i.id === id);
-    if (idx >= 0) {
-      URL.revokeObjectURL(images[idx].url);
-      images.splice(idx, 1);
-      renderImageList();
-    }
-  }
-});
-
-/* ========== Inspector Tabs ========== */
-document.querySelectorAll('.out-tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.out-tab').forEach(x => x.classList.toggle('on', x === t));
-    document.querySelectorAll('.out-pane').forEach(p => p.style.display = p.dataset.ipane === t.dataset.itab ? '' : 'none');
+  lImgsEmpty.style.display = 'none';
+  lImgsStrip.style.display = '';
+  lImgsStrip.innerHTML = '';
+  images.forEach(img => {
+    const div = document.createElement('div');
+    div.className = 'l-img' + (img.selected ? ' sel' : '');
+    div.innerHTML = '<img src="' + img.url + '"><button class="l-img-del" data-id="' + img.id + '">×</button>';
+    div.addEventListener('click', e => {
+      if (e.target.classList.contains('l-img-del')) return;
+      img.selected = !img.selected;
+      renderImageLists();
+    });
+    div.addEventListener('dblclick', () => setCurrentImage(img.id));
+    lImgsStrip.appendChild(div);
   });
+  lImgsStrip.querySelectorAll('.l-img-del').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const idx = images.findIndex(i => i.id === id);
+      if (idx >= 0) {
+        URL.revokeObjectURL(images[idx].url);
+        images.splice(idx, 1);
+        renderImageLists();
+      }
+    });
+  });
+}
+function renderPImgs() {
+  if (!pImgGrid) return;
+  pImgGrid.innerHTML = '';
+  if (pFileCount) pFileCount.textContent = images.length;
+  if (images.length === 0) {
+    if (pFilesEmpty) pFilesEmpty.style.display = '';
+    pImgGrid.style.display = 'none';
+    return;
+  }
+  if (pFilesEmpty) pFilesEmpty.style.display = 'none';
+  pImgGrid.style.display = '';
+  images.forEach(img => {
+    const div = document.createElement('div');
+    div.className = 'p-img-card' + (img.selected ? ' sel' : '');
+    div.innerHTML = '<img src="' + img.url + '"><div class="p-img-card-tag">' + (img.dims ? img.dims.w + '×' + img.dims.h : '…') + '</div><button class="p-img-card-del" data-id="' + img.id + '">×</button>';
+    div.addEventListener('click', e => {
+      if (e.target.classList.contains('p-img-card-del')) return;
+      img.selected = !img.selected;
+      renderImageLists();
+    });
+    pImgGrid.appendChild(div);
+  });
+  pImgGrid.querySelectorAll('.p-img-card-del').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const id = parseInt(btn.dataset.id);
+      const idx = images.findIndex(i => i.id === id);
+      if (idx >= 0) {
+        URL.revokeObjectURL(images[idx].url);
+        images.splice(idx, 1);
+        renderImageLists();
+      }
+    });
+  });
+}
+
+/* ========== Footer (横屏) ========== */
+function updateFooter() {
+  if (lFootSel) lFootSel.textContent = getSelected().length;
+  if (lFootCount) lFootCount.textContent = images.length;
+  if (lFootStatus) lFootStatus.textContent = images.length === 0 ? '就绪' : (getSelected().length === 0 ? '未选' : '已就绪');
+}
+if (lBtnClear) lBtnClear.addEventListener('click', () => {
+  if (images.length === 0) return;
+  images.forEach(i => URL.revokeObjectURL(i.url));
+  images = [];
+  renderImageLists();
+  showToast('已清空', 'success');
 });
 
-/* ========== Top Bar Buttons ========== */
-$('btnCmd').addEventListener('click', openCmd);
-$('btnSettings').addEventListener('click', openDrawer);
+/* ========== Inspector (横屏) - 点击缩略图显示信息 ========== */
+let currentImageId = null;
+function setCurrentImage(id) {
+  currentImageId = id;
+  const img = images.find(i => i.id === id);
+  if (!img) {
+    if (lInfoEmpty) lInfoEmpty.style.display = '';
+    if (lInfoContent) lInfoContent.style.display = 'none';
+    return;
+  }
+  if (lInfoEmpty) lInfoEmpty.style.display = 'none';
+  if (lInfoContent) lInfoContent.style.display = '';
+  if (lInfoName) lInfoName.textContent = img.file.name;
+  if (lInfoType) lInfoType.textContent = img.file.type || 'image';
+  if (lInfoSize) lInfoSize.textContent = humanSize(img.file.size);
+  if (lInfoDim) lInfoDim.textContent = img.dims ? (img.dims.w + ' × ' + img.dims.h) : '—';
+  if (lInfoMode) lInfoMode.textContent = 'RGB';
+  // Switch to info tab
+  switchITab('info');
+}
+// Patch renderLImgs already includes dblclick for inspector
+// Patch renderPImgs to add dblclick for inspector (optional)
+// (Note: portrait has no inspector panel; dblclick is harmless.)
+const _origRenderPImgs = renderPImgs;
+renderPImgs = function() {
+  _origRenderPImgs();
+  if (!pImgGrid) return;
+  pImgGrid.querySelectorAll('.p-img-card').forEach(div => {
+    const id = parseInt(div.querySelector('.p-img-card-del').dataset.id);
+    div.addEventListener('dblclick', () => setCurrentImage(id));
+  });
+};
 
-/* ========== Drawer (Settings) ========== */
-function openDrawer() { drawer.classList.add('show'); drawerBg.classList.add('show'); }
-function closeDrawer() { drawer.classList.remove('show'); drawerBg.classList.remove('show'); }
-$('drawerClose').addEventListener('click', closeDrawer);
-drawerBg.addEventListener('click', closeDrawer);
+/* ========== Inspector Tabs (横屏) ========== */
+function switchITab(name) {
+  document.querySelectorAll('.l-right-tab').forEach(t => t.classList.toggle('on', t.dataset.itab === name));
+  document.querySelectorAll('.l-pane').forEach(p => p.classList.toggle('on', p.dataset.ipane === name));
+}
+document.querySelectorAll('.l-right-tab').forEach(t => {
+  t.addEventListener('click', () => switchITab(t.dataset.itab));
+});
 
-function buildAccentGrid() {
-  swatchAccent.innerHTML = '';
+/* ========== Portrait Pane Switch ========== */
+function switchPPane(name) {
+  document.querySelectorAll('.p-nav-item').forEach(t => t.classList.toggle('on', t.dataset.pnav === name));
+  document.querySelectorAll('.p-pane').forEach(p => p.classList.toggle('on', p.dataset.ppane === name));
+}
+document.querySelectorAll('.p-nav-item').forEach(t => {
+  t.addEventListener('click', () => switchPPane(t.dataset.pnav));
+});
+
+/* ========== Theme Toggle ========== */
+function toggleTheme() {
+  appSettings.dark = !appSettings.dark;
+  document.documentElement.setAttribute('data-theme', appSettings.dark ? 'dark' : 'light');
+  if (pDarkMode) pDarkMode.classList.toggle('on', appSettings.dark);
+  if (lDarkMode) lDarkMode.classList.toggle('on', appSettings.dark);
+  saveSettings();
+  showToast(appSettings.dark ? '已切换深色模式' : '已切换浅色模式', 'success');
+}
+if (btnThemeL) btnThemeL.addEventListener('click', toggleTheme);
+if (btnThemeP) btnThemeP.addEventListener('click', toggleTheme);
+if (pDarkMode) pDarkMode.addEventListener('click', toggleTheme);
+if (lDarkMode) lDarkMode.addEventListener('click', toggleTheme);
+
+/* ========== Settings (Drawer / Settings tab) ========== */
+function openDrawer() { if (drawer) drawer.classList.add('show'); if (drawerBg) drawerBg.classList.add('show'); }
+function closeDrawer() { if (drawer) drawer.classList.remove('show'); if (drawerBg) drawerBg.classList.remove('show'); }
+if (btnSettingsL) btnSettingsL.addEventListener('click', openDrawer);
+if (btnSettingsP) btnSettingsP.addEventListener('click', () => switchPPane('settings'));
+if (drawerClose) drawerClose.addEventListener('click', closeDrawer);
+if (drawerBg) drawerBg.addEventListener('click', closeDrawer);
+
+function buildSwatchGrid(host) {
+  if (!host) return;
+  host.innerHTML = '';
   ACCENTS.forEach(a => {
     const d = document.createElement('button');
-    d.className = 'swatch' + (a.id === appSettings.accent ? ' on' : '');
+    d.className = 'p-swatch' + (a.id === appSettings.accent ? ' on' : '');
     d.dataset.accent = a.id;
     d.style.background = a.color;
     d.title = a.id;
     d.addEventListener('click', () => {
       appSettings.accent = a.id;
       applyAccent();
-      document.querySelectorAll('.swatch').forEach(x => x.classList.toggle('on', x === d));
+      document.querySelectorAll('.p-swatch').forEach(x => x.classList.toggle('on', x === d));
       saveSettings();
+      showToast('已切换强调色', 'success');
     });
-    swatchAccent.appendChild(d);
+    host.appendChild(d);
   });
 }
+buildSwatchGrid(pSwatches);
+buildSwatchGrid(lSwatches);
 
-setFmt.value = appSettings.fmt;
-setFmt.addEventListener('change', () => { appSettings.fmt = setFmt.value; saveSettings(); });
-setQuality.value = appSettings.quality;
-setQualityVal.textContent = appSettings.quality;
-setQuality.addEventListener('input', () => {
-  appSettings.quality = parseInt(setQuality.value);
-  setQualityVal.textContent = appSettings.quality;
-  saveSettings();
-});
-
-document.querySelectorAll('.tog').forEach(t => {
-  const k = t.dataset.tog;
-  if (appSettings[k]) t.classList.add('on');
-  t.addEventListener('click', () => {
-    t.classList.toggle('on');
-    appSettings[k] = t.classList.contains('on');
+function bindSetFmt(el) {
+  if (!el) return;
+  el.value = appSettings.fmt;
+  el.addEventListener('change', () => {
+    appSettings.fmt = el.value;
+    if (pSetFmt) pSetFmt.value = el.value;
+    if (lSetFmt) lSetFmt.value = el.value;
     saveSettings();
   });
-});
+}
+bindSetFmt(pSetFmt);
+bindSetFmt(lSetFmt);
 
-/* ========== Command Palette ========== */
+function bindSetQuality(el, valEl) {
+  if (!el || !valEl) return;
+  el.value = appSettings.quality;
+  valEl.textContent = appSettings.quality;
+  el.addEventListener('input', () => {
+    appSettings.quality = parseInt(el.value);
+    valEl.textContent = appSettings.quality;
+    if (pSetQuality) pSetQuality.value = el.value;
+    if (lSetQuality) lSetQuality.value = el.value;
+    if (pSetQualityVal) pSetQualityVal.textContent = el.value;
+    if (lSetQualityVal) lSetQualityVal.textContent = el.value;
+    saveSettings();
+  });
+}
+bindSetQuality(pSetQuality, pSetQualityVal);
+bindSetQuality(lSetQuality, lSetQualityVal);
+
+// Init dark toggle states
+if (pDarkMode) pDarkMode.classList.toggle('on', appSettings.dark);
+if (lDarkMode) lDarkMode.classList.toggle('on', appSettings.dark);
+
+/* ========== Command Palette (横屏) ========== */
 function openCmd() {
+  if (!cmdBg) return;
   cmdBg.classList.add('show');
   cmdInput.value = '';
   cmdInput.focus();
   renderCmdList('');
 }
-function closeCmd() { cmdBg.classList.remove('show'); }
-cmdBg.addEventListener('click', e => { if (e.target === cmdBg) closeCmd(); });
-cmdInput.addEventListener('input', e => renderCmdList(e.target.value));
+function closeCmd() { if (cmdBg) cmdBg.classList.remove('show'); }
+if (btnCmdL) btnCmdL.addEventListener('click', openCmd);
+if (btnSearchP) btnSearchP.addEventListener('click', openCmd);
+if (cmdBg) cmdBg.addEventListener('click', e => { if (e.target === cmdBg) closeCmd(); });
+if (cmdInput) cmdInput.addEventListener('input', e => renderCmdList(e.target.value));
 function renderCmdList(q) {
+  if (!cmdList) return;
   cmdList.innerHTML = '';
   q = (q || '').toLowerCase().trim();
   if (!q) {
     const common = [
-      { key: 'upload', label: '上传图片', icon: '▲', run: () => fileInput.click() },
-      { key: 'settings', label: '打开设置', icon: '⚙', run: () => { closeCmd(); openDrawer(); } }
+      { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>', label: '上传图片', run: () => fileInput && fileInput.click() },
+      { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>', label: '打开设置', run: () => { closeCmd(); openDrawer(); } },
+      { icon: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>', label: appSettings.dark ? '切换浅色' : '切换深色', run: () => { closeCmd(); toggleTheme(); } }
     ];
-    common.forEach(c => cmdList.appendChild(makeCmdItem(c.icon, c.label, 'CTRL', c.run)));
+    common.forEach(c => cmdList.appendChild(makeCmdItem(c.icon, c.label, '', c.run)));
     ACTIONS.slice(0, 12).forEach(a => {
-      cmdList.appendChild(makeCmdItem(CATEGORY_ICON[a.group] || '■', a.label, CATEGORY_LABELS[a.group] || '', () => {
+      cmdList.appendChild(makeCmdItem(ICON[a.icon] || '', a.label, CATEGORY_LABELS[a.group] || '', () => {
         closeCmd();
-        if (images.filter(i => i.selected).length > 0) openModal(a);
+        if (getSelected().length > 0) openModal(a);
         else showToast('请先选择图片', 'error');
       }));
     });
@@ -822,12 +1091,12 @@ function renderCmdList(q) {
       a.key.toLowerCase().includes(q)
     );
     if (matched.length === 0) {
-      cmdList.innerHTML = '<div style="padding:20px;text-align:center;color:var(--bone-dim);font-size:12px">// NO MATCH</div>';
+      cmdList.innerHTML = '<div style="padding:24px;text-align:center;color:var(--text-3);font-size:13px">无匹配</div>';
     } else {
-      matched.slice(0, 20).forEach(a => {
-        cmdList.appendChild(makeCmdItem(CATEGORY_ICON[a.group] || '■', a.label, CATEGORY_LABELS[a.group] || '', () => {
+      matched.slice(0, 24).forEach(a => {
+        cmdList.appendChild(makeCmdItem(ICON[a.icon] || '', a.label, CATEGORY_LABELS[a.group] || '', () => {
           closeCmd();
-          if (images.filter(i => i.selected).length > 0) openModal(a);
+          if (getSelected().length > 0) openModal(a);
           else showToast('请先选择图片', 'error');
         }));
       });
@@ -844,10 +1113,18 @@ function makeCmdItem(ico, name, key, run) {
 
 /* ========== Keyboard Shortcuts ========== */
 document.addEventListener('keydown', e => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); openCmd(); }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') { e.preventDefault(); openCmd(); }
   if ((e.ctrlKey || e.metaKey) && e.key === ',') { e.preventDefault(); openDrawer(); }
-  if (e.key === 'Escape' && cmdBg.classList.contains('show')) closeCmd();
+  if (e.key === 'Escape') { closeModal(); closeDrawer(); closeCmd(); }
 });
+
+/* ========== Recent (竖屏首页) ========== */
+function addRecent(key) {
+  appSettings.recent = (appSettings.recent || []).filter(k => k !== key);
+  appSettings.recent.unshift(key);
+  if (appSettings.recent.length > 8) appSettings.recent = appSettings.recent.slice(0, 8);
+  saveSettings();
+}
 
 /* ========== AI Model Status ========== */
 async function checkAiStatus() {
@@ -855,22 +1132,28 @@ async function checkAiStatus() {
     const r = await fetch('/api/ai-status');
     if (r.ok) {
       const j = await r.json();
-      $('aiStatus').textContent = j.loaded ? '✓ LOADED' : '✗ NOT LOADED';
-      $('aiStatus').style.color = j.loaded ? 'var(--lime)' : 'var(--blood)';
-      $('aiPath').textContent = j.path || '—';
+      const txt = j.loaded ? '✓ 已加载' : '✗ 未加载';
+      const cls = j.loaded ? 'badge success' : 'badge';
+      const path = j.path || '—';
+      if (lAiStatus) { lAiStatus.textContent = txt; lAiStatus.className = cls; }
+      if (lAiPath) lAiPath.textContent = path;
+      if (pAiStatus) { pAiStatus.textContent = txt; pAiStatus.className = cls; }
+      if (pAiPath) pAiPath.textContent = path;
     }
   } catch(e) {}
 }
 
 /* ========== Init ========== */
 function init() {
-  buildNav();
+  buildLCats();
+  buildPCats();
   renderTools();
-  buildAccentGrid();
+  renderPToolList();
+  renderPFeatured();
   applyAccent();
   checkAiStatus();
-  logMsg('PIX_FORGE INITIALIZED', 'success');
-  logMsg('TOOLS LOADED: ' + ACTIONS.length);
+  logMsg('PIXEL 已就绪', 'success');
+  logMsg('工具数量: ' + ACTIONS.length);
 }
 
 init();
