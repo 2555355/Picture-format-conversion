@@ -1,8 +1,8 @@
 # 图片工坊
 
-一个功能丰富的在线图片处理 Web 应用，基于 Spring Boot 构建，提供 **120+ 种** 图片处理能力。
+一个功能丰富的在线图片处理 Web 应用，基于 Spring Boot 构建，提供 **132+ 种** 图片处理能力。
 
-## 功能特性（120+）
+## 功能特性（132+）
 
 ### 基础操作（19）
 - 格式转换（PNG/JPG/GIF/BMP/TIFF）
@@ -63,6 +63,7 @@
 
 - Spring Boot 3.3.5 (Java 17)
 - TwelveMonkeys ImageIO（WEBP/TIFF/PSD/PCX/TGA/PNM 等扩展格式支持）
+- ONNX Runtime（本地 AI 超分辨率推理）
 - Java AWT / BufferedImage / Graphics2D
 - 现代简约 UI 设计（多 Tab 分类）
 
@@ -112,3 +113,33 @@ curl -F "file=@input.png" http://localhost:8080/api/histogram
 ## GitHub Actions
 
 每次推送到 `main` 分支会自动构建 JAR，构件保留 30 天可下载。
+
+## AI 声明
+
+本项目仅在 **超清增强（AI 超分）** 功能中使用人工智能模型，其他 130+ 项功能均为传统图像处理算法（Java AWT / BufferedImage / 自实现算法），不涉及 AI 推理。
+
+### AI 模型
+
+| 项目 | 内容 |
+| --- | --- |
+| 模型 | Real-ESRGAN General x4 v3 |
+| 格式 | ONNX |
+| 用途 | 图像超分辨率（2x/3x/4x 上采样） |
+| 推理框架 | ONNX Runtime（本地 CPU 推理） |
+| 模型来源 | https://github.com/xinntao/Real-ESRGAN （Apache-2.0 / MIT） |
+| 模型大小 | 约 4.65 MB |
+| 存放位置 | `{jar 同级目录}/models/realesr-general-x4v3.onnx` |
+
+### 数据隐私
+
+- **完全本地推理**：所有 AI 推理在用户机器上完成，**图片数据不会上传到任何远程服务器**
+- **无网络依赖**：模型下载完成后即可离线使用
+- **无数据收集**：不收集任何用户数据、图像内容或使用统计
+- **开源透明**：所有算法（除模型权重外）均开源可审计
+
+### 局限与免责
+
+- AI 推理仅作为辅助工具，结果仅供参考
+- 处理时间取决于图片大小与硬件性能（CPU 推理约 1–10 秒/张）
+- 4x 超分对极小图（< 64px）可能产生伪影
+- 模型遵循上游许可协议，使用本项目即代表您同意 Real-ESRGAN 的相关条款
