@@ -2684,24 +2684,6 @@ public class ImageService {
         return writeOut(out, format, quality);
     }
 
-    /** 超清增强 (Java 降级版): 温和的保边去噪 + USM 锐化 + 轻度对比度提升
-     *  不如 AI 版强大，但不会损坏图片 */
-    public byte[] ultraClear(byte[] inputBytes, float amount, String format, float quality) throws IOException {
-        BufferedImage src = toArgb(readImage(inputBytes));
-        int w = src.getWidth(), h = src.getHeight();
-
-        // Step 1: 温和保边去噪 (3x3 中值滤波，仅对低频区域生效)
-        BufferedImage denoised = gentleDenoise(src);
-
-        // Step 2: 轻度对比度提升 (线性拉伸，安全可控)
-        BufferedImage contrast = linearContrast(denoised, 0.1f * amount);
-
-        // Step 3: USM 锐化 (Unsharp Mask，经典安全锐化)
-        BufferedImage out = unsharpMask(contrast, 0.5f + amount * 0.5f, 1);
-
-        return writeOut(out, format, quality);
-    }
-
     /** 温和去噪: 3x3 中值滤波，只处理与邻居差异小的像素 (保边) */
     private BufferedImage gentleDenoise(BufferedImage src) {
         int w = src.getWidth(), h = src.getHeight();

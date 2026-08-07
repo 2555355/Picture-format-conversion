@@ -1,6 +1,5 @@
 package com.imageconverter.controller;
 
-import com.imageconverter.service.AiSuperResolutionService;
 import com.imageconverter.service.ImageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -20,9 +19,6 @@ public class ImageController {
 
     @Autowired
     private ImageService imageService;
-
-    @Autowired
-    private AiSuperResolutionService aiService;
 
     @GetMapping("/formats")
     public ResponseEntity<Map<String, Object>> supportedFormats() {
@@ -1266,33 +1262,6 @@ public class ImageController {
             @RequestParam(value = "format", defaultValue = "png") String format,
             @RequestParam(value = "quality", defaultValue = "0.9") float quality) throws IOException {
         byte[] result = imageService.beautify(file.getBytes(), radius, strength, format, quality);
-        return buildResponse(result, format, file.getOriginalFilename());
-    }
-
-    @PostMapping("/ultra-clear")
-    public ResponseEntity<byte[]> ultraClear(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "amount", defaultValue = "0.8") float amount,
-            @RequestParam(value = "scale", defaultValue = "4") int scale,
-            @RequestParam(value = "format", defaultValue = "png") String format,
-            @RequestParam(value = "quality", defaultValue = "0.95") float quality) throws IOException {
-        byte[] inputBytes = file.getBytes();
-        byte[] result;
-
-        // 优先使用 AI 超分辨率 (Real-ESRGAN ONNX)，降级使用 Java 算法
-        if (aiService.isAvailable()) {
-            try {
-                java.awt.image.BufferedImage aiResult = aiService.enhance(inputBytes, scale);
-                result = imageService.writeOut(aiResult, format, quality);
-            } catch (Exception e) {
-                // AI 处理失败，降级到 Java 算法
-                result = imageService.ultraClear(inputBytes, amount, format, quality);
-            }
-        } else {
-            // AI 模型不可用，使用 Java 算法
-            result = imageService.ultraClear(inputBytes, amount, format, quality);
-        }
-
         return buildResponse(result, format, file.getOriginalFilename());
     }
 
