@@ -1,9 +1,0 @@
-# Build artifacts
-build/
-.gradle/
-local.properties
-.idea/
-*.iml
-.DS_Store
-captures/
-.cxx/

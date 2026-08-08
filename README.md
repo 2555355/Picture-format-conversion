@@ -127,7 +127,7 @@ curl -F "file=@input.png" http://localhost:8080/api/histogram
 
 > ⚠️ **本项目代码由 AI 辅助生成**
 >
-> 本项目的源代码（包括后端 Java 服务、前端 UI、构建脚本、Android 应用等）主要由 AI 编程助手（TRAE / Claude）生成并迭代。
+> 本项目的源代码（包括后端 Java 服务、前端 UI、构建脚本等）主要由 AI 编程助手（TRAE / Claude）生成并迭代。
 >
 > - **代码生成**：功能实现、算法实现、UI 设计均由 AI 生成
 > - **人工参与**：需求定义、功能验收、问题反馈由人工完成
